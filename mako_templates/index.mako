@@ -80,7 +80,7 @@ body{
 /* Bottom row */
 .bottom-row{
   display:grid;
-  grid-template-columns:1.35fr .75fr;
+  grid-template-columns:1fr 1fr;
   gap:14px;
   align-items:start;
 }
@@ -120,6 +120,7 @@ body{
   border-radius:24px;
   border:1px solid var(--line);
   background:linear-gradient(180deg,rgba(11,19,35,.96),rgba(8,14,24,.98));
+  width:100%;
 }
 .num{
   display:flex;
@@ -132,7 +133,12 @@ body{
   font-size:2.2rem;
   font-weight:900;
 }
-.pmid{display:grid;grid-template-rows:auto auto auto;gap:10px}
+.pmid{
+  display:grid;
+  grid-template-rows:auto auto auto;
+  gap:10px;
+  min-width:0;
+}
 .ptitle{
   min-height:50px;
   padding:12px 16px;
