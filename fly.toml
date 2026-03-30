@@ -1,0 +1,50 @@
+# fly.toml app configuration file generated for bbcguild-raffle on 2025-07-19T13:59:36-04:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'bbcguilds'
+primary_region = 'iad'
+
+[build]
+  dockerfile = 'Dockerfile.production'
+
+[deploy]
+  strategy = 'immediate'
+
+[env]
+  DATABASE_PATH = '/data/raffle.db'
+  IMPORT_PATH = '/data/import'
+  LOG_LEVEL = 'INFO'
+  PYRAMID_DEBUG = '0'
+  PYTHONPATH = '/app'
+
+[processes]
+  app = '/app/startup.sh'
+
+[[mounts]]
+  source = 'raffle_data'
+  destination = '/data'
+  initial_size = '2gb'
+
+[http_service]
+  internal_port = 80
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ['app']
+
+  [[http_service.checks]]
+    interval = '30s'
+    timeout = '5s'
+    grace_period = '10s'
+    method = 'GET'
+    path = '/health'
+
+[[restart]]
+  policy = 'on-failure'
+
+[[vm]]
+  memory = '1gb'
+  cpus = 1

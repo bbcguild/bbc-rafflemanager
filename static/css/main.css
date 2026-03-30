@@ -1,0 +1,199 @@
+html {
+    height: 100%;
+}
+
+body {
+    position: absolute;
+    top: 0; bottom: 0; left: 0; right: 0;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+table, tr, th, td {
+    vertical-align: top;
+}
+
+.column {
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 5px;
+}
+
+#main {
+    width: 100%;
+    height: 99%;
+    min-height: 99%;
+}
+
+#main_table {
+    width: 100%;
+    height: 100%;
+    vertical-align: top;
+}
+
+#left {
+    padding-left: 10px;
+    display: block;
+    height: 100%;
+}
+
+#right {
+    display: block;
+    height: 95%;
+}
+
+#guild_header {
+    font-size: 1.6em;
+    font-weight: bold;
+}
+
+#raffle_subheader {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.prize_number {
+    font-weight: bold;
+    font-size: 3em;
+    padding: .5em;
+}
+
+#prize_template {
+    display: none;
+}
+
+.prize {
+    width: 26em;
+    table-layout: fixed;
+    border: 1px solid #000000;
+    padding: .3em;
+    margin-left: .3em;
+}
+
+#center {
+    height: 100%;
+/*    overflow-y: scroll;*/
+}
+
+#ticket_info {
+    margin-top: .7em;
+    margin-right: 1em;
+    height: 100%;
+/*    overflow-x: hidden;*/
+}
+
+.winner, .winning_number, .winning_prize {
+    font-weight: bold;
+    width: 40%;
+}
+
+#prize_info {
+}
+
+.number_column, .winner_column, .prize_column {
+    width: 50%;
+}
+
+.prize_winner, .prize_winner_name, .prize_item {
+    display: block;
+    text-align: center;
+    width: 100%;
+}
+
+.prize_number_column {
+    width: 20%;
+}
+
+.prize {
+    margin-top: .7em;
+    margin-right: 1em;
+}
+
+.handsontable th {
+    background-color: #ffffff;
+    font-color: #000000;
+    font-weight: bold;
+}
+
+.handsontable th, .handsontable td {
+    border-right: 1px solid #000;
+    border-bottom: 1px solid #000;
+}
+
+.handsontable th:last-child {
+  /*Foundation framework fix*/
+  border-right: 1px solid #000;
+  border-bottom: 1px solid #000;
+}
+
+.handsontable tr:first-child th.htNoFrame,
+.handsontable th:first-child.htNoFrame,
+.handsontable th.htNoFrame {
+  border-left-width: 0;
+  background-color: white;
+  border-color: #000;
+}
+
+.handsontable th:first-child,
+.handsontable td:first-of-type,
+.handsontable .htNoFrame + th,
+.handsontable .htNoFrame + td {
+  border-left: 1px solid #000;
+}
+
+.handsontable.htRowHeaders thead tr th:nth-child(2) {
+  border-left: 1px solid #000;
+}
+
+.handsontable tr:first-child th,
+.handsontable tr:first-child td {
+  border-top: 1px solid #000;
+}
+
+.handsontable .htDimmed {
+    color: #000;
+}
+
+.handsontable .colHeader {
+    color: #000;
+}
+
+#column_prizeinfo {
+    width: 30%;
+    height: 100%;
+}
+
+#column_ticketinfo {
+    width: 30%;
+    height: 100%;
+}
+
+#column_guildinfo {
+    width: 25%;
+    height: 100%;
+}
+
+#column_ticketlist {
+    width: 15%;
+    height: 100%;
+}
+
+#ticket_list {
+/*    overflow-x: hidden;*/
+    height: 100%;
+    width: 20em;
+    margin-top: .7em;
+    margin-left: 1em;
+}
+
+@-moz-document url-prefix() {
+    #ticket_list {
+/*        overflow-y: scroll;*/
+    }
+}
+
+.wtHolder {
+    height: 100%;
+    width: 100%;
+}

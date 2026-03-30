@@ -1,0 +1,21 @@
+# Git attributes for consistent behavior across platforms
+* text=auto eol=lf
+
+# Preserve line endings for shell scripts
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Preserve line endings for Python files
+*.py text eol=lf
+
+# Binary files
+*.db binary
+*.sqlite binary
+*.ico binary
+*.gif binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+
+# Don't track file mode changes (permissions)
+# This helps prevent spurious diffs in containers

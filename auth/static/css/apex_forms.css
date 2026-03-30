@@ -1,0 +1,9 @@
+.field_error {
+	color: #f00;
+}
+.help_text {
+	font-size: 10pt;
+}
+#field_error_back {
+	background: #fcc;
+}

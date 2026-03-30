@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<head>   
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.js"></script>
+<title>Raffles!</title>
+</head>
+<body>
+<!-- The main button bar -->
+<div id="main">
+    <p>Pick your poison!</p>
+    <p><ul>
+        <li><a href="union/">Akaviri Union</a></li>
+        <li><a href="exchange/">Akaviri Exchange</a></li>
+        <li><a href="imports/">Akaviri Imports</a></li>
+    </ul></p>
+</div>
+</body>
+</html>

@@ -1,0 +1,31 @@
+# Production Dockerfile for Fly.io deployment
+# Uses rafflebase image which contains Python environment and dependencies
+FROM technitaur/rafflebase:latest
+
+# Copy application code
+COPY . .
+
+# Copy template database if no raffle.db exists (git-ignored file)
+# This ensures we have a fallback for new deployments
+RUN if [ ! -f raffle.db ] && [ -f raffle_template.db ]; then \
+        cp raffle_template.db raffle.db; \
+        echo "Using template database for initial setup"; \
+    fi
+
+# Copy database initialization script and startup script with proper ownership
+COPY --chown=app:app init_db.py /app/
+COPY --chown=app:app startup.sh /app/
+RUN chmod +x /app/startup.sh
+
+# Set proper ownership after copying everything
+RUN chown -R app:app /app
+
+# Expose port
+EXPOSE 80
+
+# Health check endpoint
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
+    CMD curl -f http://localhost:80/health || exit 1
+
+# Production command - run startup script as root for permissions, then switch to app user
+CMD ["/app/startup.sh"]

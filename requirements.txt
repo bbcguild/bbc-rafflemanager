@@ -1,0 +1,30 @@
+# Core web framework dependencies
+pyramid>=2.0
+pyramid-mako>=1.1.0
+pyramid-mailer>=0.15.1
+waitress>=2.0.0
+requests>=2.25.0
+
+# Database dependencies
+SQLAlchemy>=1.4.0
+psycopg2-binary>=2.8.0
+
+# Authentication and security
+cryptacular>=1.5.0
+wtforms>=3.0.0
+zope.interface>=5.0.0
+
+# File processing
+Mako>=1.1.0
+MarkupSafe>=2.0.0
+
+# Development dependencies
+gunicorn>=20.0.0
+redis>=4.0.0
+
+# Additional utilities
+python-dateutil>=2.8.0
+pytz>=2021.1
+
+# Pin setuptools to avoid pkg_resources deprecation warnings
+setuptools>=75.0.0,<81.0.0

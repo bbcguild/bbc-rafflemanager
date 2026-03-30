@@ -1,0 +1,145 @@
+#raffle_notes {
+    width: 28em;
+    height: 10em;
+}
+
+#raffle_subheader {
+    width: 5em;
+}
+
+#raffle_time {
+    width: 20em;
+}
+
+#raffle_cost {
+    width: 4em;
+}
+
+#output_data {
+    width: 60em;
+    padding: 0;
+}
+
+.prize_number {
+    width: 1.5em;
+    font-size: 1em;
+    padding-right: 1em;
+}
+
+.htNumeric.htDimmed {
+    background-color: #fff0f5;
+}
+
+.prize_delete, .prize_finalise, .prize_roll {
+    width: 100%;
+}
+
+.delete_button, .finalise_button, .roll_button {
+    width: 10%;
+    text-align: center;
+    vertical-align: top;
+}
+
+#add_prize_block {
+    margin-top: 2em;
+}
+
+.finalised {
+    background-color: lightgreen;
+}
+
+#dropzone {
+    width: 4em;
+    height: 3em;
+}
+
+#import_data {
+/*    overflow-y: scroll;
+    overflow-x: hide;*/
+    height: 90%;
+}
+
+#import_template {
+    display: none;
+}
+
+#import_data_here {
+    width: 100%;
+}
+
+.import, .confirm, .barter, .paid {
+    background-color: #f8f8f8;
+    border: 1px solid #000000;
+    padding: 2px;
+}
+
+#confirm_data {
+/*    overflow-y: scroll;
+    overflow-x: hide;*/
+    height: 90%;
+}
+
+div#paid_data {
+    height: 90%;
+    background-color: #f8f8f8 !important;
+    padding: 5px !important;
+}
+
+div#paid_buttons {
+    background-color: #f8f8f8 !important;
+    padding: 5px !important;
+    border-bottom: 1px solid #ccc !important;
+}
+
+#confirm_template {
+    display: none;
+}
+
+#barter_template {
+    display: none;
+}
+
+div#paid_template {
+    display: none;
+    background-color: #f8f8f8 !important;
+    border: 1px solid #000000 !important;
+    padding: 2px !important;
+    position: absolute !important;
+    z-index: 100 !important;
+}
+
+div#paid_template.paid {
+    background-color: #f8f8f8 !important;
+    border: 1px solid #000000 !important;
+}
+
+#confirm_string, #confirm_names, #barter_import_string, #barter_confirm_string, #paid_import_string, #paid_confirm_string {
+    width: 95%;
+    height: 10em;
+}
+
+/* Force paid template styling - must override any other rules */
+#paid_template,
+#paid_template.paid,
+div#paid_template,
+div#paid_template.paid {
+    background-color: #f8f8f8 !important;
+    border: 1px solid #000000 !important;
+    padding: 2px !important;
+    opacity: 1 !important;
+}
+
+#paid_data,
+div#paid_data {
+    background-color: #f8f8f8 !important;
+    padding: 5px !important;
+    opacity: 1 !important;
+}
+
+#paid_buttons,
+div#paid_buttons {
+    background-color: #f8f8f8 !important;
+    padding: 5px !important;
+    border-bottom: 1px solid #ccc !important;
+    opacity: 1 !important;
+}

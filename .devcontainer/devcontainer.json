@@ -1,0 +1,67 @@
+{
+    "name": "BBC Guild Raffle Development",
+    "dockerFile": "Dockerfile",
+    "context": "..",
+    
+    // Use host networking for external DNS access
+    "runArgs": ["-p", "80:80"],
+    
+    // Configure tool-specific properties
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "charliermarsh.ruff",
+                "ms-python.black-formatter",
+                "vscode.json-language-features",
+                "ms-vscode.makefile-tools"
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "/usr/local/bin/python",
+                "python.linting.enabled": false,
+                "python.analysis.typeCheckingMode": "basic",
+                "[python]": {
+                    "editor.defaultFormatter": "ms-python.black-formatter",
+                    "editor.codeActionsOnSave": {
+                        "source.organizeImports": "explicit"
+                    }
+                },
+                "ruff.enable": true,
+                "ruff.organizeImports": true,
+                "terminal.integrated.defaultProfile.linux": "bash"
+            }
+        }
+    },
+
+    // Use 'postCreateCommand' to run commands after the container is created
+    "postCreateCommand": "pip install -r requirements.txt && git config --global --add safe.directory /workspaces/bbc-rafflemanager && echo 'Development environment ready! Run: python wsgi.py' && echo 'App will be accessible at: http://technitaur.com'",
+
+    // Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root
+    "remoteUser": "vscode",
+    
+    // Mount the source code as a volume for better performance
+    "mounts": [
+        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+    ],
+
+    // Ensure proper file permissions and ownership
+    "updateRemoteUserUID": true,
+    "overrideCommand": false,
+    
+    // Keep container running
+    "shutdownAction": "none",
+
+    // Environment variables
+    "containerEnv": {
+        "PYTHONPATH": "/workspaces/bbc-rafflemanager",
+        "PYRAMID_DEBUG": "1",
+        "LOG_LEVEL": "DEBUG",
+        "DATABASE_PATH": "/workspaces/bbc-rafflemanager/raffle.db"
+    },
+
+    // Features to add to the dev container
+    "features": {
+        "ghcr.io/devcontainers/features/git:1": {},
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+    }
+}

@@ -1,0 +1,43 @@
+[MASTER]
+# Add the project root to Python path
+init-hook='import sys; sys.path.append(".")'
+
+# Files or directories to be skipped
+ignore=CVS,.git,__pycache__,.pytest_cache
+
+# Use multiple processes to speed up Pylint
+jobs=1
+
+[MESSAGES CONTROL]
+# Disable specific warnings that are common in web frameworks
+disable=
+    missing-module-docstring,
+    missing-class-docstring,
+    missing-function-docstring,
+    too-few-public-methods,
+    too-many-arguments,
+    too-many-locals,
+    too-many-branches,
+    too-many-statements,
+    broad-except,
+    import-error,
+    no-member,
+    unused-argument,
+    invalid-name,
+    line-too-long,
+    redefined-outer-name
+
+[FORMAT]
+# Maximum number of characters on a single line
+max-line-length=120
+
+[DESIGN]
+# Maximum number of arguments for function / method
+max-args=10
+
+# Maximum number of locals for function / method body
+max-locals=20
+
+[TYPECHECK]
+# List of module names for which member attributes should not be checked
+ignored-modules=pyramid,pyramid.config,pyramid.view,waitress,sqlite3

@@ -1,0 +1,62 @@
+Trading Guild since 2015 |H1:guild:266193|hBlackbriar Barter Co|h has openings for active traders.  NO FEES/MINS, excellent CRAGLORN location.  Epic Guild house with all the things!  Click the link for details / to apply, or PST.
+
+Hello!
+
+Congrats, You've won 100,000G PLUS a 100,000G Shopping Spree in the Bleakrock store!
+
+Your first 100,000G is attached.  Spend it in the store *this week* and let me know when you are done.  Then we'll send you another 100,000g!
+
+Hey I just wanted to take a moment to thank you for all of your work on Master Merchant.  We wouldn't be a trading guild without it and you've only made an awesome tool even better!
+
+The one issue I had (10 day history not integrating on a fresh install) was resolved by loading in 50-ish "E" presses at a time, with a several minute pause in between.  The new interface that tracks what's missing / when we're caught up is brilliant!  
+
+One question for you:
+
+In the original MM, I had data accuracy issues if I logged multiple accounts in on the same computer (at the same time).  I got around this by creating a local *Windows User* account for each ESO account.  (i.e. My gaming PC has a Windows User named Hiyde, BBCGuild, BBC1auctions, etc.)  I used the "run as" command to log into all of the accounts from my main Windows user.
+
+In MM 3.x, do you know if this is still an issue?  For now, I only have MM running on @Hiyde characters and I have it disabled on @BBCGuild characters.
+
+
+|cE2BD48A Gaming Guild since 2008; Trading in ESO Since Launch!|r
+
+The Blackbriar Barter Co was formed in 2015 as a sister-guild to Bleakrock Barter Co.  We've recently decided to leave the Mournhold rat-race and hang in cities that aren't as expensive to bid in.  Our exact location will depend on weekly guild donations.  We do NOT have mandatory fees or minimums!
+
+|cFFFF00We'd hope that each member can provide at least 10k to the guild each week between Sales Tax and Gold donations to the guild bank.  <3|r
+
+Benefits:
+
+- Fun, friendly environment
+
+- EPIC, BEAUTIFUL Guild house with all set tables, target dummies, transmute and mundus!
+
+- Weekly PvE and PvP events, minigames and more!
+- Discord, Website
+
+REQUIREMENTS:
+
+We don't do "fees" or "minimums" but that doesn't mean we don't have expectations that each member will help cover the cost of our weekly bid. 
+
+REMOVAL REVIEWS TRIGGERED BY:
+- 7+ days no login w/out notice
+- Being bottom 5%-ish of contributors if we need to make room for new members.
+  (Sales, Purchases, Raffle tix, Gold Donations, Auction bids won/items donated are all counted and we publish 30 day rankings to our website)
+
+
+
+- constant pain
+- 100+ pills a week
+- unable to sit in regular chairs or sleep in a bed
+   (recliner, legs up)
+
+
+job - not being described accurately
+attend meetings
+stand, give presentations
+travel through region incl hotel stays
+live events such as all day concerts 
+
+physical therapy records
+
+=IMPORTRANGE("1Wo2eRqs1qhtfWm5bgXQ5GbH_F8nN_mPPz2jM8oOUg6Q","Incoming BBC1!J3:J")
+
+
