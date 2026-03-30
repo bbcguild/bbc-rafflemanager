@@ -31,8 +31,6 @@
   --line2:rgba(80,120,210,.34);
   --text:#f4f7ff;
   --muted:#9fb0cf;
-  --blue:#244fb3;
-  --blue2:#183a8f;
   --shadow:0 18px 48px rgba(0,0,0,.38);
   --hover:rgba(80,120,210,.08);
 }
@@ -86,34 +84,30 @@ body{
   gap:14px;
   align-items:start;
 }
-
 .prizes-panel,
 .entrants-panel{
   display:flex;
   flex-direction:column;
   min-width:0;
 }
-
 .prizes{
   padding:14px;
   display:grid;
   gap:14px;
   align-content:start;
 }
-
 .entrants-panel{
   overflow:hidden;
 }
-
 .entrants-body{
   display:flex;
   flex-direction:column;
   min-height:0;
 }
-
 .entrants-scroll{
   overflow:auto;
   padding:0 12px 16px 12px;
+  max-height:900px;
 }
 
 /* Prize cards */
@@ -219,7 +213,6 @@ body{
 .row.hoverable:hover{background:var(--hover)}
 .idx,.total{text-align:right;font-variant-numeric:tabular-nums}
 .name{font-weight:750}
-.ticket-range{font-size:.9rem;color:var(--muted);margin-top:4px}
 .empty-state{
   padding:16px 8px;
   margin:0 8px;
@@ -254,7 +247,7 @@ body{
 
 @media (max-width:1100px){
   .mid-row,.bottom-row{grid-template-columns:1fr}
-  .entrants-scroll{overflow:visible}
+  .entrants-scroll{overflow:visible;max-height:none}
 }
 
 @media (max-width:700px){
