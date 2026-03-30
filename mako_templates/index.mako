@@ -1,8 +1,14 @@
 <!DOCTYPE html>
-<head>   
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>BBC Raffle</title>
+
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.js"></script>
 <link rel="stylesheet" media="screen" href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css">
+
 % if "raffle" in request.matchdict:
 <link rel="stylesheet" href="../../static/css/main.css">
 <script type="text/javascript" src="../../static/js/dateformat.js"></script>
@@ -13,115 +19,9 @@
 % else:
 <link rel="stylesheet" href="static/css/main.css">
 <script type="text/javascript" src="static/js/dateformat.js"></script>
-%endif
-%endif
-<title>Raffles!</title>
-<script>
-$(document).ready(function() {
-  $.ajaxSetup({cache:false});
-});
+% endif
+% endif
 
-// Some of my best friends use JSON!
-var refresher = function () {
-        // #guild_header
-        $.getJSON("json/get/guild", function (result) {
-                $("#guild_header").text(result["guild_name"])
-            })
-        // #raffle_subheader, #raffle_time, #raffle_cost
-        $.getJSON("json/get/raffle", function (result) {
-                $("#raffle_subheader").text("Raffle #" + result["raffle_guild_num"])
-                $("#raffle_time").text(result["raffle_time"])
-                $("#raffle_cost").text("Ticket cost: "+result["raffle_ticket_cost"])
-                $("#raffle_notes").html(result["raffle_notes"])
-            })
-        // deal with prizes
-        $.getJSON("json/get/prizes", function (result) {
-                $("#prize_info").empty()
-                $.each(result, function (index, value) {
-                    var template = $("#prize_template").clone()
-                    var new_id = "prize_" + value["prize_text2"] + "_"
-                    template.attr({"id": new_id + "block"})
-                    // fix the prize number
-                    $("#prize_number", template).attr({"id": new_id + "number"}).text(value["prize_text2"])
-                    var pwinner
-                    var pname
-                    if (value["prize_finalised"] == 0) {
-                        pwinner = ""
-                        pname = ""
-                    } else {
-                        pwinner = "#" + value["prize_winner"]
-                        pname = value["prize_winner_name"]
-                    }
-                    $("#prize_winner", template).attr({"id": new_id + "winner"}).text(pwinner)
-                    // we really need to come up with some way of resolving the name simply
-                    // get_prize_winner?
-                    $("#prize_winner_name", template).attr({"id": new_id + "winner_name"}).text(pname)
-                    // at least the prize details are here
-                    $("#prize_item", template).attr({"id": new_id + "item"}).text(value["prize_text"])
-                    $("#prize_info").append(template)
-                })
-            })
-        $.getJSON("json/get/timestamp", function (result) {
-                if (!result) { return; }
-
-                var updated = DateFormat.format.date(parseInt(result) * 1000, "yyyy-MM-dd hh:mm:ss")
-
-                $("#raffle_updated").text("Updated: " + updated.toString())
-                
-                })
-        $.getJSON("json/get/tickets", function (result) {
-                $("#raffle_participants").text(result.length + " unique participants.")
-                var total = 0
-                for (var i = 0; i < result.length; i++) {
-                    total += result[i][2] << 0
-                }
-                $("#raffle_sold").text(total + " tickets sold.")
-                $("#ticket_info").handsontable("destroy")
-                $("#ticket_info").handsontable({
-                        data: result,
-                        rowHeaders: false,
-                        colHeaders: ["Participants", "Name", "Total"],
-                        colWidths: [100, 300, 50],
-                        contextMenu: false,
-			licenseKey: "non-commercial-and-evaluation",			
-                        }).handsontable("updateSettings", {cells: function (row, col, prop) {
-                            return {"readOnly": true}
-                            }})
-                })
-        $.getJSON("json/get/ticket_list", function (result) {
-                $("#ticket_list").handsontable("destroy")
-                $("#ticket_list").handsontable ({
-                        data: result,
-                        rowHeaders: false,
-                        colHeaders: ["Ticket", "Name"],
-                        colWidths: [70, 200],
-                        contextMenu: false,
-			licenseKey: "non-commercial-and-evaluation",
-                        }).handsontable("updateSettings", {cells: function (row, col, prop) {
-                            return {"readOnly": true}
-                            }})
-                })
-}
-
-
-
-$(document).ready(refresher)
-$(document).ready(function () {
-        window.setInterval(refresher, 30000)
-        $("#ticket_list").height($(window).height()-20)
-        })
-$(window).resize(function () {
-        $("#ticket_list").height($(window).height()-20)
-        })
-
-</script>
-</head>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>BBC Public Raffle Mockup</title>
 <style>
 :root{
   --bg:#060a12;
@@ -136,6 +36,7 @@ $(window).resize(function () {
   --shadow:0 18px 48px rgba(0,0,0,.38);
   --hover:rgba(80,120,210,.08);
 }
+
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
 body{
@@ -143,10 +44,11 @@ body{
   color:var(--text);
   background:radial-gradient(circle at top left, rgba(40,76,166,.18), transparent 24%),linear-gradient(180deg,#05070d 0%,#060a12 100%);
 }
-.page{max-width:1880px;margin:0 auto;padding:18px;display:grid;gap:14px}
+
+.page{padding:10px;display:grid;gap:14px}
 .card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow)}
 
-/* HEADER */
+/* Header */
 .header{display:flex;align-items:center;gap:18px;padding:14px 20px}
 .header img#mainLogo{width:72px;height:72px;object-fit:contain}
 .title-block{display:flex;flex-direction:column;gap:2px;min-width:320px}
@@ -157,81 +59,186 @@ body{
 .stat{border-radius:14px;padding:10px 14px;background:rgba(8,17,31,.86);border:1px solid var(--line);text-align:center;min-width:120px}
 .stat .k{color:var(--muted);font-size:.8rem;margin-bottom:4px}
 .stat .v{font-size:1.6rem;font-weight:800}
-.header-right{margin-left:auto;display:flex;align-items:center;gap:18px}
-.live-public{display:flex;align-items:center;justify-content:center;min-width:110px;height:40px}
-.live-neon-red .label{font-size:1.15rem;font-weight:900;letter-spacing:.08em;color:#f3f7ff;text-shadow:0 0 6px rgba(255,255,255,.55),0 0 14px rgba(255,50,90,.55),0 0 26px rgba(255,50,90,.45)}
-.search-wrap{display:flex;align-items:center;border:1px solid var(--line2);border-radius:999px;background:#f3f4f6;padding:6px 12px;height:34px;min-width:220px}
-.search-wrap span{color:#6b7280;margin-right:6px}
-.search-wrap input{border:none;outline:none;background:transparent;color:#000;font-weight:700;width:100%}
-.status-sample{min-width:150px;min-height:78px;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 18px}
-.status-sample .big{font-size:1.25rem;font-weight:900;letter-spacing:.08em}
-.status-sample .small{font-size:.72rem;font-weight:800;letter-spacing:.12em;margin-top:4px}
-.live-neon-red-box{border:2px solid rgba(255,56,96,.7);box-shadow:0 0 8px rgba(255,56,96,.35), inset 0 0 10px rgba(255,56,96,.12);background:rgba(12,10,20,.72)}
-.live-neon-red-box .big{color:#f7fbff;text-shadow:0 0 6px rgba(255,255,255,.65),0 0 14px rgba(255,56,96,.55),0 0 26px rgba(255,56,96,.45)}
-.live-neon-green-box{
+.header-right{margin-left:auto;display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:18px;min-width:0}
+.live-public{
   border:2px solid rgba(56,255,142,.75);
   box-shadow:0 0 10px rgba(56,255,142,.35), inset 0 0 14px rgba(56,255,142,.12);
   background:rgba(8,20,16,.7);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  padding:10px 18px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  width:140px;min-height:72px;padding:10px 18px;border-radius:18px;
 }
-.live-neon-green-box .big{
-  font-size:1.25rem;
-  font-weight:900;
-  letter-spacing:.08em;
-  color:#eefff5;
-  line-height:1.1;
-  text-shadow:0 0 6px rgba(255,255,255,.45),0 0 14px rgba(56,255,142,.38);
-}
-.live-neon-green-box .small{
-  font-size:.75rem;
-  font-weight:800;
-  letter-spacing:.12em;
-  margin-top:6px;
-  color:#eefff5;
-  text-shadow:0 0 6px rgba(255,255,255,.35),0 0 12px rgba(56,255,142,.28);
-}
-.live-neon-green-box .big,.live-neon-green-box .small{color:#eefff5;text-shadow:0 0 6px rgba(255,255,255,.45),0 0 14px rgba(56,255,142,.38)}
-.closed-soft{border:1px solid rgba(255,180,70,.28);background:rgba(28,20,10,.55)}
-.closed-soft .big{color:#ffd18a}
-.complete-soft{border:1px solid rgba(160,170,195,.26);background:rgba(18,22,32,.7)}
-.complete-soft .big{color:#d8dfef}
+.live-public .big{font-size:1.25rem;font-weight:900;letter-spacing:.08em;color:#eefff5;line-height:1.1;text-shadow:0 0 6px rgba(255,255,255,.45),0 0 14px rgba(56,255,142,.38)}
+.live-public .small{font-size:.75rem;font-weight:800;letter-spacing:.12em;margin-top:6px;color:#eefff5;text-shadow:0 0 6px rgba(255,255,255,.35),0 0 12px rgba(56,255,142,.28)}
+.search-wrap{display:flex;align-items:center;border:1px solid var(--line2);border-radius:999px;background:#f3f4f6;padding:6px 12px;height:34px;min-width:220px}
+.search-wrap span{color:#6b7280;margin-right:6px}
+.search-wrap input{border:none;outline:none;background:transparent;color:#000;font-weight:700;width:100%}
 
-/* PUBLIC INFO ROW */
+/* Mid row */
 .mid-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch}
 .info-panel{min-height:190px;border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
 .info-bar{height:34px;display:flex;align-items:center;padding:0 14px;background:linear-gradient(90deg,#17398a 0%, #1f4ca8 100%);color:var(--text);font-size:.95rem;font-weight:800;border-bottom:1px solid rgba(255,255,255,.06)}
 .info-body{min-height:156px;flex:1;background:linear-gradient(180deg,rgba(11,19,35,.96),rgba(8,14,24,.98));padding:16px 18px;white-space:pre-line;line-height:1.55;color:#d7e2f5}
 
-/* CONTENT */
-.bottom-row{display:grid;grid-template-columns:1.25fr .75fr;gap:14px;align-items:start}
-.prizes{padding:0;display:grid;gap:14px}
-.prize{display:grid;grid-template-columns:84px 1fr;gap:16px;align-items:stretch;padding:12px;border-radius:24px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(11,19,35,.96),rgba(8,14,24,.98))}
-.num{display:flex;align-items:center;justify-content:center;min-height:136px;border-radius:20px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(15,28,51,.96),rgba(8,16,29,.98));font-size:2.2rem;font-weight:900}
+/* Bottom row */
+.bottom-row{
+  display:grid;
+  grid-template-columns:1.35fr .75fr;
+  gap:14px;
+  align-items:stretch;
+}
+.prizes-panel,
+.entrants-panel{
+  min-height:880px;
+  display:flex;
+  flex-direction:column;
+}
+.prizes{
+  padding:14px;
+  display:grid;
+  gap:14px;
+  align-content:start;
+  min-height:0;
+}
+.entrants-panel{
+  overflow:hidden;
+}
+.entrants-body{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+}
+.entrants-scroll{
+  flex:1;
+  min-height:0;
+  overflow:auto;
+  padding:0 12px 16px 12px;
+}
+
+/* Prize cards */
+.prize{
+  display:grid;
+  grid-template-columns:84px 1fr;
+  gap:16px;
+  align-items:stretch;
+  padding:12px;
+  border-radius:24px;
+  border:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(11,19,35,.96),rgba(8,14,24,.98));
+}
+.num{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:136px;
+  border-radius:20px;
+  border:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(15,28,51,.96),rgba(8,16,29,.98));
+  font-size:2.2rem;
+  font-weight:900;
+}
 .pmid{display:grid;grid-template-rows:auto auto auto;gap:10px}
-.ptitle{min-height:50px;padding:12px 16px;border-radius:18px;border:1px solid var(--line);background:rgba(10,20,38,.88);display:flex;align-items:center;font-size:1.32rem;font-weight:850;line-height:1.25}
+.ptitle{
+  min-height:50px;
+  padding:12px 16px;
+  border-radius:18px;
+  border:1px solid var(--line);
+  background:rgba(10,20,38,.88);
+  display:flex;
+  align-items:center;
+  font-size:1.32rem;
+  font-weight:850;
+  line-height:1.25;
+}
 .pmeta{color:var(--muted);font-size:.95rem;padding:0 4px}
-.pwinner{padding:12px 16px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);display:grid;gap:6px}
-.pwinner .label{font-size:.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:800}
+.pwinner{
+  padding:12px 16px;
+  border-radius:14px;
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.05);
+  display:grid;
+  gap:6px;
+}
+.pwinner .label{
+  font-size:.8rem;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  font-weight:800;
+}
 .pwinner .value{font-size:1rem;font-weight:700}
 
-.table-card{padding:0;overflow:hidden}
+/* Entrants panel */
 .table-headline{padding:18px 20px 8px 20px;font-size:1.15rem;font-weight:800}
 .table-sub{padding:0 20px 12px 20px;color:var(--muted);font-size:.92rem}
+.entrants-controls{padding:0 20px 12px 20px;display:grid;gap:10px}
+.lookup-input{
+  width:100%;
+  padding:10px 12px;
+  border-radius:10px;
+  border:none;
+  outline:none;
+  background:#fff;
+  color:#000;
+  font:inherit;
+}
+.lookup-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  font-size:.85rem;
+  color:var(--muted);
+  font-weight:800;
+}
+.lookup-btn{
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid var(--line2);
+  background:rgba(255,255,255,.03);
+  color:var(--text);
+  font:inherit;
+  font-weight:800;
+  cursor:pointer;
+}
 .thead,.row{display:grid;grid-template-columns:.5fr 1.8fr .8fr;gap:10px;align-items:center}
-.thead{padding:14px 20px 12px 20px;border-top:1px solid var(--line);color:#eef5ff;font-size:1rem;font-weight:900}
-.rows{padding:0 12px 16px 12px}
-.row{padding:12px 8px;margin:0 8px;border-top:1px solid rgba(255,255,255,.05)}
+.thead{
+  padding:14px 8px 12px 8px;
+  border-top:1px solid var(--line);
+  color:#eef5ff;
+  font-size:1rem;
+  font-weight:900;
+  margin:0 8px;
+}
+.row{
+  padding:12px 8px;
+  margin:0 8px;
+  border-top:1px solid rgba(255,255,255,.05);
+}
 .row.hoverable:hover{background:var(--hover)}
 .idx,.total{text-align:right;font-variant-numeric:tabular-nums}
 .name{font-weight:750}
-.toggle-row{display:flex;gap:10px;align-items:center;padding:0 20px 14px 20px;color:var(--muted);font-size:.9rem}
-.toggle-row input{accent-color:#2f6df6}
-.note{padding:0 20px 14px 20px;color:var(--muted);font-size:.88rem}
+.ticket-range{font-size:.9rem;color:var(--muted);margin-top:4px}
+.empty-state{
+  padding:16px 8px;
+  margin:0 8px;
+  border-top:1px solid rgba(255,255,255,.05);
+  color:var(--muted);
+  font-size:.95rem;
+}
 
+/* Hide old stuff we don't want */
+#ticket_list,
+#raffle_cost,
+#barter_area,
+.barter-area,
+.barter-panel,
+.barter-view,
+.barter-section{
+  display:none !important;
+}
+
+/* Mobile */
 @media (max-width:1180px){
   .header-right{
     width:100%;
@@ -242,75 +249,222 @@ body{
     gap:14px !important;
     flex-wrap:wrap;
   }
-  .header-right > div:first-child{
-    flex:0 0 auto !important;
-    justify-content:flex-start !important;
-  }
 }
 
 @media (max-width:1100px){
   .mid-row,.bottom-row{grid-template-columns:1fr}
-  .header{flex-wrap:wrap}
-  .stats-inline{margin-left:0}
-  .header-right{
-    width:100%;
-    margin-left:0 !important;
-    display:flex !important;
-    justify-content:flex-start !important;
-    align-items:center !important;
-    gap:14px !important;
-    flex-wrap:wrap;
-  }
-  .header-right > div:first-child{
-    flex:0 0 auto !important;
-    justify-content:flex-start !important;
-  }
+  .prizes-panel,.entrants-panel{min-height:unset}
+  .entrants-scroll{overflow:visible}
 }
-  .header{flex-wrap:wrap}
-  .header-right{margin-left:0}
+
+@media (max-width:700px){
+  .page{padding:12px;gap:12px}
+  .header{
+    display:grid;
+    grid-template-columns:56px 1fr;
+    grid-template-areas:
+      'logo title'
+      'stats stats'
+      'right right';
+    align-items:start;
+    gap:12px;
+    padding:14px
+  }
+  .header img#mainLogo{grid-area:logo;width:56px;height:56px}
+  .title-block{grid-area:title;min-width:0}
+  .title-block h1{font-size:1.5rem;line-height:1.06}
+  .title-block .sub{font-size:.92rem}
+  .title-block .updated{font-size:.82rem}
+  .stats-inline{grid-area:stats;margin-left:0;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .stat{min-width:0;padding:10px 10px}
+  .stat .v{font-size:1.25rem}
+  .header-right{grid-area:right !important;width:100%;display:grid !important;grid-template-columns:1fr 1fr;gap:10px !important;align-items:stretch !important}
+  .header-right > div:first-child{justify-content:stretch !important}
+  .live-public{width:100%;min-height:64px;border-radius:16px}
+  .live-public .big{font-size:1.05rem}
+  .live-public .small{font-size:.68rem;margin-top:4px}
+  .search-wrap{min-width:0;width:100%;height:64px;padding:0 14px;border-radius:16px}
+  .search-wrap span{font-size:1rem}
+  .search-wrap input{font-size:.98rem}
+  .info-bar{height:36px;font-size:.92rem}
+  .info-body{padding:14px 15px;font-size:.95rem;line-height:1.5}
+  .prize{grid-template-columns:62px 1fr;gap:12px;padding:10px;border-radius:18px}
+  .num{min-height:98px;border-radius:14px;font-size:1.7rem}
+  .ptitle{min-height:42px;padding:10px 12px;border-radius:12px;font-size:1.06rem}
+  .pmeta{font-size:.88rem}
+  .pwinner{padding:10px 12px;border-radius:12px}
+  .pwinner .value{font-size:.95rem}
 }
 </style>
+
+<script>
+$(document).ready(function() {
+  $.ajaxSetup({cache:false});
+});
+
+function escapeHtml(str) {
+  return String(str == null ? "" : str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function buildPrizeCards(result) {
+  $("#prize_info").empty();
+
+  if (!result || !result.length) {
+    $("#prize_info").append('<div class="empty-state">No prize cards yet.</div>');
+    return;
+  }
+
+  $.each(result, function(index, value) {
+    var winnerName = "TBD";
+    if (value["prize_finalised"] != 0 && value["prize_winner_name"]) {
+      winnerName = value["prize_winner_name"];
+    }
+
+    var metaText = value["prize_text2"] || "";
+    var prizeText = value["prize_text"] || "";
+
+    var card = ''
+      + '<div class="prize">'
+      + '  <div class="num">' + escapeHtml(metaText) + '</div>'
+      + '  <div class="pmid">'
+      + '    <div class="ptitle">' + escapeHtml(prizeText) + '</div>'
+      + '    <div class="pmeta"></div>'
+      + '    <div class="pwinner">'
+      + '      <div class="label">Winner</div>'
+      + '      <div class="value">' + escapeHtml(winnerName) + '</div>'
+      + '    </div>'
+      + '  </div>'
+      + '</div>';
+
+    $("#prize_info").append(card);
+  });
+}
+
+function buildEntrantsTable(result) {
+  var $recent = $("#recentEntrants");
+  var $all = $("#allEntrants");
+
+  $recent.empty();
+  $all.empty();
+
+  if (!result || !result.length) {
+    var empty = '<div class="empty-state">No entrants yet.</div>';
+    $recent.append(empty);
+    $all.append(empty);
+    return;
+  }
+
+  var rows = [];
+  for (var i = 0; i < result.length; i++) {
+    var r = result[i];
+    rows.push(
+      '<div class="row hoverable">'
+      + '<div class="idx">' + escapeHtml(r[0]) + '</div>'
+      + '<div class="name">' + escapeHtml(r[1]) + '</div>'
+      + '<div class="total">' + escapeHtml(r[2]) + '</div>'
+      + '</div>'
+    );
+  }
+
+  var recentCount = Math.min(5, rows.length);
+  $recent.append(rows.slice(0, recentCount).join(''));
+  $all.append(rows.join(''));
+}
+
+function refresher() {
+  $.getJSON("json/get/guild", function(result) {
+    $("#guild_header").text(result["guild_name"]);
+  });
+
+  $.getJSON("json/get/raffle", function(result) {
+    $("#raffle_subheader").text("#" + result["raffle_guild_num"] + " Raffle • Drawing: " + result["raffle_time"]);
+    $("#raffle_lookup").attr("placeholder", "Enter Week #");
+    $("#raffle_notes").html(result["raffle_notes"] || "Welcome to this week's raffle.");
+    $("#entrants_headline").text("#" + result["raffle_guild_num"] + " Raffle Entrants");
+  });
+
+  $.getJSON("json/get/prizes", function(result) {
+    buildPrizeCards(result);
+  });
+
+  $.getJSON("json/get/timestamp", function(result) {
+    if (!result) return;
+    var updated = DateFormat.format.date(parseInt(result) * 1000, "yyyy-MM-dd hh:mm:ss");
+    $("#raffle_updated").text("Last Updated " + updated.toString());
+  });
+
+  $.getJSON("json/get/tickets", function(result) {
+    $("#raffle_participants").text(result.length);
+
+    var total = 0;
+    for (var i = 0; i < result.length; i++) {
+      total += result[i][2] << 0;
+    }
+    $("#raffle_sold").text(total.toLocaleString());
+
+    buildEntrantsTable(result);
+  });
+}
+
+function toggleAllEntrants() {
+  var all = document.getElementById('allEntrants');
+  var recent = document.getElementById('recentEntrants');
+  var btn = document.getElementById('viewAllBtn');
+  var showAll = all.style.display === 'none';
+
+  all.style.display = showAll ? 'block' : 'none';
+  recent.style.display = showAll ? 'none' : 'block';
+  btn.textContent = showAll ? 'Show Recent' : 'View All';
+}
+
+$(document).ready(refresher);
+$(document).ready(function () {
+  window.setInterval(refresher, 30000);
+});
+</script>
 </head>
 <body>
 <div class="page">
+
   <section class="card header">
     <img id="mainLogo" src="https://www.bbcguild.com/wp-content/uploads/2020/04/cropped-cropped-BBC-LOGO-V2-2.gif" alt="BBC logo">
 
     <div class="title-block">
-      <h1>Bleakrock Barter Co</h1>
-      <div class="sub"><strong>#2613 Raffle</strong> • Drawing: Tuesday 11PM EDT</div>
-      <div class="updated">Last Updated 12/12/24 9:30a EDT</div>
+      <h1 id="guild_header">Bleakrock Barter Co</h1>
+      <div class="sub" id="raffle_subheader">#2613 Raffle • Drawing: Tuesday 11PM EDT</div>
+      <div class="updated" id="raffle_updated">Last Updated</div>
     </div>
 
     <div class="stats-inline">
-      <div class="stat"><div class="k">Total Tickets</div><div class="v">23,452</div></div>
-      <div class="stat"><div class="k">Participants</div><div class="v">111</div></div>
+      <div class="stat"><div class="k">Total Tickets</div><div class="v" id="raffle_sold">0</div></div>
+      <div class="stat"><div class="k">Participants</div><div class="v" id="raffle_participants">0</div></div>
     </div>
 
-    <div class="header-right" style="margin-left:auto;display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:18px;min-width:0;">
+    <div class="header-right">
       <div style="display:flex;justify-content:center;">
-        <div class="live-public live-neon-green-box" style="width:140px;min-height:72px;">
+        <div class="live-public">
           <div class="big">LIVE</div>
           <div class="small">GET TICKETS!</div>
         </div>
       </div>
-      <div class="search-wrap">
+      <form id="raffle_lookup_form" action="/${request.matchdict['guild']}/lookup" method="get" class="search-wrap" style="margin:0;">
         <span>🔍</span>
-        <input placeholder="Enter Week #">
-      </div>
+        <input type="text" id="raffle_lookup" name="raffle_lookup" placeholder="Enter Week #" />
+      </form>
     </div>
   </section>
-
-  
 
   <section class="mid-row">
     <div class="card info-panel">
       <div class="info-bar">Raffle Notes</div>
-      <div class="info-body">Welcome to this week's raffle.
-
-Prize values and details are listed below.
-Check back at draw time for finalized ticket numbers and winner updates.</div>
+      <div class="info-body" id="raffle_notes">Welcome to this week's raffle.</div>
     </div>
+
     <div class="card info-panel">
       <div class="info-bar">Raffle Info</div>
       <div class="info-body">🎟 Ticket numbers are assigned just prior to draw and will be listed below.
@@ -323,62 +477,41 @@ Check back at draw time for finalized ticket numbers and winner updates.</div>
   </section>
 
   <section class="bottom-row">
-    <div class="prizes">
-      <div class="prize">
-        <div class="num">1</div>
-        <div class="pmid">
-          <div class="ptitle">Mega Jackpot — On Hiatus</div>
-          <div class="pmeta">Grand prize display card</div>
-          <div class="pwinner">
-            <div class="label">Winner</div>
-            <div class="value">TBD</div>
-          </div>
-        </div>
-      </div>
-      <div class="prize">
-        <div class="num">2</div>
-        <div class="pmid">
-          <div class="ptitle">Equalizer — 1,000,000g</div>
-          <div class="pmeta">All entrants have equal odds</div>
-          <div class="pwinner">
-            <div class="label">Winner</div>
-            <div class="value">TBD</div>
-          </div>
-        </div>
+    <div class="card prizes-panel">
+      <div class="prizes" id="prize_info">
+        <div class="empty-state">No prize cards yet.</div>
       </div>
     </div>
 
-    <div class="card table-card">
-      <div class="table-headline">Purchasers</div>
-      <div class="table-sub">Alphabetical verification list</div>
-      <div class="toggle-row">
-        <label><input type="checkbox" checked> Show subtle hover highlight</label>
+    <div class="card entrants-panel">
+      <div class="table-headline" id="entrants_headline">Raffle Entrants</div>
+      <div class="table-sub">Tickets Lookup</div>
+
+      <div class="entrants-controls">
+        <input type="text" class="lookup-input" placeholder="Find: ex. '@name'">
+        <div class="lookup-row">
+          <span>Recent Entrants:</span>
+          <button type="button" class="lookup-btn" id="viewAllBtn" onclick="toggleAllEntrants()">View All</button>
+        </div>
       </div>
-      <div class="thead"><div class="idx">#</div><div>Name</div><div class="total">Total</div></div>
-      <div class="rows" id="rowsA">
-        <div class="row hoverable"><div class="idx">1</div><div class="name">@Ainaku Moonbender</div><div class="total">750</div></div>
-        <div class="row hoverable"><div class="idx">2</div><div class="name">@Arena25</div><div class="total">800</div></div>
-        <div class="row hoverable"><div class="idx">3</div><div class="name">@Bastet_13</div><div class="total">60</div></div>
-        <div class="row hoverable"><div class="idx">4</div><div class="name">@Bavook</div><div class="total">250</div></div>
-        <div class="row hoverable"><div class="idx">5</div><div class="name">@Ophelia</div><div class="total">650</div></div>
-        <div class="row hoverable"><div class="idx">6</div><div class="name">@SleepyKat</div><div class="total">500</div></div>
+
+      <div class="entrants-body">
+        <div class="thead">
+          <div class="idx">#</div>
+          <div>Name</div>
+          <div class="total">Total</div>
+        </div>
+
+        <div class="entrants-scroll">
+          <div id="recentEntrants">
+            <div class="empty-state">No entrants yet.</div>
+          </div>
+          <div id="allEntrants" style="display:none;"></div>
+        </div>
       </div>
-      <div class="note">This is the plain version. Ticket numbers would appear only in CLOSED and COMPLETE modes.</div>
     </div>
   </section>
 
-  <section class="card table-card">
-    <div class="table-headline">Alternate View — Barter Week</div>
-    <div class="table-sub">Same alphabetical list, with Total / Paid / Barter visible</div>
-    <div class="thead" style="grid-template-columns:.5fr 1.8fr .8fr .8fr .8fr;"><div class="idx">#</div><div>Name</div><div class="total">Total</div><div class="total">Paid</div><div class="total">Barter</div></div>
-    <div class="rows">
-      <div class="row hoverable" style="grid-template-columns:.5fr 1.8fr .8fr .8fr .8fr;"><div class="idx">1</div><div class="name">@Ainaku Moonbender</div><div class="total">750</div><div class="total">750</div><div class="total">0</div></div>
-      <div class="row hoverable" style="grid-template-columns:.5fr 1.8fr .8fr .8fr .8fr;"><div class="idx">2</div><div class="name">@Arena25</div><div class="total">800</div><div class="total">800</div><div class="total">0</div></div>
-      <div class="row hoverable" style="grid-template-columns:.5fr 1.8fr .8fr .8fr .8fr;"><div class="idx">3</div><div class="name">@Ophelia</div><div class="total">650</div><div class="total">500</div><div class="total">150</div></div>
-      <div class="row hoverable" style="grid-template-columns:.5fr 1.8fr .8fr .8fr .8fr;"><div class="idx">4</div><div class="name">@SleepyKat</div><div class="total">500</div><div class="total">500</div><div class="total">0</div></div>
-    </div>
-    <div class="note">This shows the second visual option you asked for: same clean alpha list, but with Paid and Barter visible during barter weeks.</div>
-  </section>
 </div>
 </body>
 </html>
