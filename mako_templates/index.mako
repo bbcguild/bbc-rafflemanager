@@ -24,7 +24,6 @@
 
 <style>
 :root{
-  --bg:#060a12;
   --panel:#091224;
   --panel2:#07101f;
   --line:rgba(80,120,210,.18);
@@ -57,7 +56,7 @@ body{
 .stat{border-radius:14px;padding:10px 14px;background:rgba(8,17,31,.86);border:1px solid var(--line);text-align:center;min-width:120px}
 .stat .k{color:var(--muted);font-size:.8rem;margin-bottom:4px}
 .stat .v{font-size:1.6rem;font-weight:800}
-.header-right{margin-left:auto;display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:18px;min-width:0}
+.header-right{margin-left:auto;display:grid;grid-template-columns:auto auto;align-items:center;gap:18px;min-width:0}
 .live-public{
   border:2px solid rgba(56,255,142,.75);
   box-shadow:0 0 10px rgba(56,255,142,.35), inset 0 0 14px rgba(56,255,142,.12);
@@ -80,7 +79,7 @@ body{
 /* Bottom row */
 .bottom-row{
   display:grid;
-  grid-template-columns:1fr 1fr;
+  grid-template-columns:1.42fr .78fr;
   gap:14px;
   align-items:start;
 }
@@ -113,10 +112,10 @@ body{
 /* Prize cards */
 .prize{
   display:grid;
-  grid-template-columns:84px 1fr;
-  gap:16px;
+  grid-template-columns:96px minmax(0,1fr);
+  gap:18px;
   align-items:stretch;
-  padding:12px;
+  padding:14px;
   border-radius:24px;
   border:1px solid var(--line);
   background:linear-gradient(180deg,rgba(11,19,35,.96),rgba(8,14,24,.98));
@@ -126,35 +125,41 @@ body{
   display:flex;
   align-items:center;
   justify-content:center;
-  min-height:136px;
+  min-height:148px;
   border-radius:20px;
   border:1px solid var(--line);
   background:linear-gradient(180deg,rgba(15,28,51,.96),rgba(8,16,29,.98));
-  font-size:2.2rem;
+  font-size:2.4rem;
   font-weight:900;
 }
 .pmid{
   display:grid;
   grid-template-rows:auto auto auto;
-  gap:10px;
+  gap:12px;
   min-width:0;
 }
 .ptitle{
-  min-height:50px;
-  padding:12px 16px;
+  width:100%;
+  min-height:54px;
+  padding:12px 18px;
   border-radius:18px;
   border:1px solid var(--line);
   background:rgba(10,20,38,.88);
   display:flex;
   align-items:center;
-  font-size:1.32rem;
+  font-size:1.34rem;
   font-weight:850;
-  line-height:1.25;
+  line-height:1.22;
 }
-.pmeta{color:var(--muted);font-size:.95rem;padding:0 4px}
+.pmeta{
+  color:var(--muted);
+  font-size:.95rem;
+  padding:0 6px;
+}
 .pwinner{
-  padding:12px 16px;
-  border-radius:14px;
+  width:100%;
+  padding:12px 18px;
+  border-radius:16px;
   background:rgba(255,255,255,.03);
   border:1px solid rgba(255,255,255,.05);
   display:grid;
@@ -434,7 +439,7 @@ $(document).ready(function () {
     <img id="mainLogo" src="https://www.bbcguild.com/wp-content/uploads/2020/04/cropped-cropped-BBC-LOGO-V2-2.gif" alt="BBC logo">
 
     <div class="title-block">
-      <h1 id="guild_header">Bleakrock Barter Company</h1>
+      <h1 id="guild_header">Bleakrock Barter Co</h1>
       <div class="sub" id="raffle_subheader">#2613 Raffle • Drawing: Tuesday 11PM EDT</div>
       <div class="updated" id="raffle_updated">Last Updated</div>
     </div>
