@@ -84,33 +84,34 @@ body{
   display:grid;
   grid-template-columns:1.35fr .75fr;
   gap:14px;
-  align-items:stretch;
+  align-items:start;
 }
+
 .prizes-panel,
 .entrants-panel{
-  min-height:880px;
   display:flex;
   flex-direction:column;
+  min-width:0;
 }
+
 .prizes{
   padding:14px;
   display:grid;
   gap:14px;
   align-content:start;
-  min-height:0;
 }
+
 .entrants-panel{
   overflow:hidden;
 }
+
 .entrants-body{
-  flex:1;
   display:flex;
   flex-direction:column;
   min-height:0;
 }
+
 .entrants-scroll{
-  flex:1;
-  min-height:0;
   overflow:auto;
   padding:0 12px 16px 12px;
 }
@@ -253,7 +254,6 @@ body{
 
 @media (max-width:1100px){
   .mid-row,.bottom-row{grid-template-columns:1fr}
-  .prizes-panel,.entrants-panel{min-height:unset}
   .entrants-scroll{overflow:visible}
 }
 
@@ -435,7 +435,7 @@ $(document).ready(function () {
     <img id="mainLogo" src="https://www.bbcguild.com/wp-content/uploads/2020/04/cropped-cropped-BBC-LOGO-V2-2.gif" alt="BBC logo">
 
     <div class="title-block">
-      <h1 id="guild_header">Bleakrock Barter Co</h1>
+      <h1 id="guild_header">Bleakrock Barter Company</h1>
       <div class="sub" id="raffle_subheader">#2613 Raffle • Drawing: Tuesday 11PM EDT</div>
       <div class="updated" id="raffle_updated">Last Updated</div>
     </div>
