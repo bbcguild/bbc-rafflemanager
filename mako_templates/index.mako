@@ -1,3 +1,7 @@
+<%
+initial_lookup_raffle = (request.matchdict.get('raffle') or request.params.get('raffle_lookup') or '').strip()
+initial_display_raffle = initial_lookup_raffle if initial_lookup_raffle else '2613'
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -388,9 +392,11 @@ body{
 
 <script>
 const guildSlug = "${request.matchdict['guild']}";
-const isHistoricalLookupPage = ${'true' if "raffle" in request.matchdict else 'false'};
+const initialRequestedRaffleNum = "${initial_lookup_raffle}";
+const liveRaffleEndpoint = "/" + guildSlug + "/json/get/raffle";
 let allEntrantsData = [];
-let currentDisplayedRaffleNum = null;
+let currentDisplayedRaffleNum = initialRequestedRaffleNum || null;
+let liveCurrentRaffleNum = null;
 
 $(document).ready(function() {
   $.ajaxSetup({cache:false});
@@ -479,6 +485,10 @@ function raffleLookupHref(raffleNum) {
   return "/" + guildSlug + "/lookup?raffle_lookup=" + encodeURIComponent(raffleNum);
 }
 
+function isArchiveDisplay() {
+  return !!(liveCurrentRaffleNum && currentDisplayedRaffleNum && liveCurrentRaffleNum !== currentDisplayedRaffleNum);
+}
+
 function updateRaffleNav() {
   var $nav = $("#raffle_nav");
   if (!$nav.length) return;
@@ -498,7 +508,7 @@ function updateRaffleNav() {
     $nav.append('<span class="raffle-nav-disabled">&lt; Prev Raffle</span>');
   }
 
-  if (!isHistoricalLookupPage) {
+  if (!liveCurrentRaffleNum || currentDisplayedRaffleNum === liveCurrentRaffleNum) {
     $nav.append('<span class="raffle-nav-disabled">Next Raffle &gt;</span>');
     return;
   }
@@ -513,7 +523,7 @@ function updateRaffleNav() {
 function updateRaffleStatusLine(timestampValue) {
   var $updated = $("#raffle_updated");
 
-  if (isHistoricalLookupPage) {
+  if (isArchiveDisplay()) {
     $updated
       .text("Raffle Closed")
       .addClass("closed");
@@ -623,6 +633,11 @@ function buildEntrantsTable(result) {
 }
 
 function refresher() {
+  $.getJSON(liveRaffleEndpoint, function(result) {
+    liveCurrentRaffleNum = String(result["raffle_guild_num"] || "");
+    updateRaffleNav();
+  });
+
   $.getJSON("json/get/guild", function(result) {
     $("#guild_header").text(result["guild_name"]);
   });
@@ -674,8 +689,8 @@ $(document).ready(function () {
 
     <div class="title-block">
       <h1 id="guild_header">Bleakrock Barter Co</h1>
-      <div class="sub" id="raffle_subheader">#2613 Raffle • Drawing: Tuesday 11PM EDT</div>
-      <div class="updated${' closed' if "raffle" in request.matchdict else ''}" id="raffle_updated">${'Raffle Closed' if "raffle" in request.matchdict else 'Last Updated'}</div>
+      <div class="sub" id="raffle_subheader">#${initial_display_raffle} Raffle</div>
+      <div class="updated${' closed' if initial_lookup_raffle else ''}" id="raffle_updated">${'Raffle Closed' if initial_lookup_raffle else 'Last Updated'}</div>
     </div>
 
     <div class="stats-inline">
@@ -721,7 +736,7 @@ $(document).ready(function () {
     </div>
 
     <div class="card entrants-panel">
-      <div class="table-headline" id="entrants_headline">Raffle Entrants</div>
+      <div class="table-headline" id="entrants_headline">#${initial_display_raffle} Raffle Entrants</div>
       <div class="table-sub">Tickets Lookup</div>
 
       <div class="entrants-controls">
