@@ -225,7 +225,7 @@ body{
   color:#eef5ff;
   font-size:1rem;
   font-weight:900;
-  margin:0 28px 0 8px;
+  margin:0 44px 0 8px;
 }
 .row{
   padding:12px 8px;
