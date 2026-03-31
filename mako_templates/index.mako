@@ -32,6 +32,7 @@
   --muted:#9fb0cf;
   --shadow:0 18px 48px rgba(0,0,0,.38);
   --hover:rgba(80,120,210,.08);
+  --danger:#ff6b6b;
 }
 
 *{box-sizing:border-box}
@@ -52,14 +53,62 @@ body{
 .title-block h1{margin:0;font-size:2.2rem;line-height:1.05;font-weight:700}
 .title-block .sub{color:var(--muted);font-size:1rem}
 .title-block .updated{color:#e6d77a;font-size:.9rem}
+.title-block .updated.closed{color:var(--danger);font-weight:800}
 .stats-inline{display:flex;gap:10px;margin-left:6px}
 .stat{border-radius:14px;padding:10px 14px;background:rgba(8,17,31,.86);border:1px solid var(--line);text-align:center;min-width:120px}
 .stat .k{color:var(--muted);font-size:.8rem;margin-bottom:4px}
 .stat .v{font-size:1.6rem;font-weight:800}
-.header-right{margin-left:auto;display:grid;grid-template-columns:auto;align-items:center;gap:18px;min-width:0}
+
+.header-right{
+  margin-left:auto;
+  display:grid;
+  grid-template-columns:auto;
+  align-items:start;
+  gap:8px;
+  min-width:0;
+}
+
 .search-wrap{display:flex;align-items:center;border:1px solid var(--line2);border-radius:999px;background:#f3f4f6;padding:6px 12px;height:34px;min-width:220px}
 .search-wrap span{color:#6b7280;margin-right:6px}
 .search-wrap input{border:none;outline:none;background:transparent;color:#000;font-weight:700;width:100%}
+
+.raffle-nav{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+
+.raffle-nav-link,
+.raffle-nav-disabled{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:28px;
+  padding:4px 12px;
+  border-radius:999px;
+  font-size:.82rem;
+  font-weight:800;
+  line-height:1;
+  text-decoration:none;
+}
+
+.raffle-nav-link{
+  color:var(--text);
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--line2);
+}
+
+.raffle-nav-link:hover{
+  background:rgba(255,255,255,.08);
+}
+
+.raffle-nav-disabled{
+  color:rgba(244,247,255,.45);
+  background:rgba(255,255,255,.02);
+  border:1px solid rgba(255,255,255,.08);
+  cursor:default;
+}
 
 /* Mid row */
 .mid-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch}
@@ -260,10 +309,15 @@ body{
     width:100%;
     margin-left:0 !important;
     display:flex !important;
+    flex-direction:column !important;
     justify-content:flex-start !important;
-    align-items:center !important;
-    gap:14px !important;
+    align-items:flex-start !important;
+    gap:10px !important;
     flex-wrap:wrap;
+  }
+
+  .raffle-nav{
+    justify-content:flex-start;
   }
 }
 
@@ -298,6 +352,16 @@ body{
   .search-wrap{min-width:0;width:100%;height:64px;padding:0 14px;border-radius:16px}
   .search-wrap span{font-size:1rem}
   .search-wrap input{font-size:.98rem}
+  .raffle-nav{
+    justify-content:flex-start;
+    gap:6px;
+  }
+  .raffle-nav-link,
+  .raffle-nav-disabled{
+    min-height:30px;
+    padding:5px 10px;
+    font-size:.8rem;
+  }
   .info-bar{height:36px;font-size:.92rem}
   .raffle-live-header{gap:8px}
   .raffle-name-label{font-size:.88rem}
@@ -312,7 +376,10 @@ body{
 </style>
 
 <script>
+const guildSlug = "${request.matchdict['guild']}";
+const isHistoricalLookupPage = ${'true' if "raffle" in request.matchdict else 'false'};
 let allEntrantsData = [];
+let currentDisplayedRaffleNum = null;
 
 $(document).ready(function() {
   $.ajaxSetup({cache:false});
@@ -348,6 +415,116 @@ function normalizeEntrantSearch(value) {
     .toLowerCase()
     .trim()
     .replace(/^@+/, "");
+}
+
+function parseRaffleNum(raffleNum) {
+  var cleaned = String(raffleNum == null ? "" : raffleNum).replace(/\D/g, "");
+  if (!/^\d{4}$/.test(cleaned)) return null;
+
+  return {
+    raw: cleaned,
+    year: parseInt(cleaned.slice(0, 2), 10),
+    week: parseInt(cleaned.slice(2), 10)
+  };
+}
+
+function formatRaffleNum(year, week) {
+  return String(year).padStart(2, '0') + String(week).padStart(2, '0');
+}
+
+function getPrevRaffleNum(raffleNum) {
+  var parsed = parseRaffleNum(raffleNum);
+  if (!parsed) return null;
+
+  var year = parsed.year;
+  var week = parsed.week - 1;
+
+  if (week < 1) {
+    year = year - 1;
+    if (year < 0) year = 99;
+    week = 52;
+  }
+
+  return formatRaffleNum(year, week);
+}
+
+function getNextRaffleNum(raffleNum) {
+  var parsed = parseRaffleNum(raffleNum);
+  if (!parsed) return null;
+
+  var year = parsed.year;
+  var week = parsed.week + 1;
+
+  if (week > 52) {
+    year = year + 1;
+    if (year > 99) year = 0;
+    week = 1;
+  }
+
+  return formatRaffleNum(year, week);
+}
+
+function raffleLookupHref(raffleNum) {
+  return "/" + guildSlug + "/lookup?raffle_lookup=" + encodeURIComponent(raffleNum);
+}
+
+function updateRaffleNav() {
+  var $nav = $("#raffle_nav");
+  if (!$nav.length) return;
+
+  $nav.empty();
+
+  if (!currentDisplayedRaffleNum) {
+    return;
+  }
+
+  if (isHistoricalLookupPage) {
+    var prevNum = getPrevRaffleNum(currentDisplayedRaffleNum);
+    var nextNum = getNextRaffleNum(currentDisplayedRaffleNum);
+
+    if (prevNum) {
+      $nav.append('<a class="raffle-nav-link" href="' + raffleLookupHref(prevNum) + '">Prev Raffle</a>');
+    } else {
+      $nav.append('<span class="raffle-nav-disabled">Prev Raffle</span>');
+    }
+
+    if (nextNum) {
+      $nav.append('<a class="raffle-nav-link" href="' + raffleLookupHref(nextNum) + '">Next Raffle</a>');
+    } else {
+      $nav.append('<span class="raffle-nav-disabled">Next Raffle</span>');
+    }
+  } else {
+    var lastNum = getPrevRaffleNum(currentDisplayedRaffleNum);
+
+    if (lastNum) {
+      $nav.append('<a class="raffle-nav-link" href="' + raffleLookupHref(lastNum) + '">Last Raffle</a>');
+    } else {
+      $nav.append('<span class="raffle-nav-disabled">Last Raffle</span>');
+    }
+
+    $nav.append('<span class="raffle-nav-disabled">Next Raffle</span>');
+  }
+}
+
+function updateRaffleStatusLine(timestampValue) {
+  var $updated = $("#raffle_updated");
+
+  if (isHistoricalLookupPage) {
+    $updated
+      .text("Raffle Closed")
+      .addClass("closed");
+    return;
+  }
+
+  $updated.removeClass("closed");
+
+  if (!timestampValue) {
+    $updated.text("Last Updated");
+    return;
+  }
+
+  var updated = DateFormat.format.date(parseInt(timestampValue) * 1000, "yyyy-MM-dd hh:mm:ss");
+  $updated.text("Last Updated " + updated.toString());
 }
 
 function buildPrizeCards(result) {
@@ -447,10 +624,15 @@ function refresher() {
   });
 
   $.getJSON("json/get/raffle", function(result) {
-    $("#raffle_subheader").text("#" + result["raffle_guild_num"] + " Raffle • Drawing: " + result["raffle_time"]);
-    $("#raffle_lookup").attr("placeholder", "Enter Week #");
+    var raffleNum = String(result["raffle_guild_num"] || "");
+    currentDisplayedRaffleNum = raffleNum;
+
+    $("#raffle_subheader").text("#" + raffleNum + " Raffle • Drawing: " + result["raffle_time"]);
+    $("#raffle_lookup").attr("placeholder", "Enter Raffle #");
     $("#raffle_notes").html(result["raffle_notes"] || "Welcome to this week's raffle.");
-    $("#entrants_headline").text("#" + result["raffle_guild_num"] + " Raffle Entrants");
+    $("#entrants_headline").text("#" + raffleNum + " Raffle Entrants");
+
+    updateRaffleNav();
   });
 
   $.getJSON("json/get/prizes", function(result) {
@@ -458,9 +640,7 @@ function refresher() {
   });
 
   $.getJSON("json/get/timestamp", function(result) {
-    if (!result) return;
-    var updated = DateFormat.format.date(parseInt(result) * 1000, "yyyy-MM-dd hh:mm:ss");
-    $("#raffle_updated").text("Last Updated " + updated.toString());
+    updateRaffleStatusLine(result);
   });
 
   $.getJSON("json/get/tickets", function(result) {
@@ -491,7 +671,7 @@ $(document).ready(function () {
     <div class="title-block">
       <h1 id="guild_header">Bleakrock Barter Co</h1>
       <div class="sub" id="raffle_subheader">#2613 Raffle • Drawing: Tuesday 11PM EDT</div>
-      <div class="updated" id="raffle_updated">Last Updated</div>
+      <div class="updated${' closed' if "raffle" in request.matchdict else ''}" id="raffle_updated">${'Raffle Closed' if "raffle" in request.matchdict else 'Last Updated'}</div>
     </div>
 
     <div class="stats-inline">
@@ -502,8 +682,9 @@ $(document).ready(function () {
     <div class="header-right">
       <form id="raffle_lookup_form" action="/${request.matchdict['guild']}/lookup" method="get" class="search-wrap" style="margin:0;" autocomplete="off">
         <span>🔍</span>
-        <input type="text" id="raffle_lookup" name="raffle_lookup" placeholder="Enter Week #" />
+        <input type="text" id="raffle_lookup" name="raffle_lookup" placeholder="Enter Raffle #" />
       </form>
+      <div class="raffle-nav" id="raffle_nav"></div>
     </div>
   </section>
 
