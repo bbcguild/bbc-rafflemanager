@@ -40,28 +40,89 @@ initial_display_raffle = initial_lookup_raffle if initial_lookup_raffle else '26
 }
 
 *{box-sizing:border-box}
-html,body{margin:0;padding:0}
+html,body{margin:0;padding:0;max-width:100%;overflow-x:hidden}
 body{
   font-family:Inter,system-ui,Arial,sans-serif;
   color:var(--text);
   background:radial-gradient(circle at top left, rgba(40,76,166,.18), transparent 24%),linear-gradient(180deg,#05070d 0%,#060a12 100%);
+  overflow-x:hidden;
 }
 
-.page{padding:10px;display:grid;gap:14px}
-.card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow)}
+.page{
+  padding:10px;
+  display:grid;
+  gap:14px;
+  width:100%;
+  max-width:100%;
+}
+.card{
+  background:linear-gradient(180deg,var(--panel),var(--panel2));
+  border:1px solid var(--line);
+  border-radius:22px;
+  box-shadow:var(--shadow);
+  min-width:0;
+}
 
 /* Header */
-.header{display:flex;align-items:center;gap:18px;padding:14px 20px}
-.header img#mainLogo{width:72px;height:72px;object-fit:contain;flex:0 0 auto}
-.title-block{display:flex;flex-direction:column;gap:2px;min-width:320px}
-.title-block h1{margin:0;font-size:2.2rem;line-height:1.05;font-weight:700}
-.title-block .sub{color:var(--muted);font-size:1rem}
-.title-block .updated{color:#e6d77a;font-size:.9rem}
-.title-block .updated.closed{color:var(--danger);font-weight:800}
-.stats-inline{display:flex;gap:10px;margin-left:6px}
-.stat{border-radius:14px;padding:10px 14px;background:rgba(8,17,31,.86);border:1px solid var(--line);text-align:center;min-width:120px}
-.stat .k{color:var(--muted);font-size:.8rem;margin-bottom:4px}
-.stat .v{font-size:1.6rem;font-weight:800}
+.header{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  padding:14px 20px;
+  min-width:0;
+}
+.header img#mainLogo{
+  width:72px;
+  height:72px;
+  object-fit:contain;
+  flex:0 0 auto;
+}
+.title-block{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  min-width:0;
+}
+.title-block h1{
+  margin:0;
+  font-size:2.2rem;
+  line-height:1.05;
+  font-weight:700;
+}
+.title-block .sub{
+  color:var(--muted);
+  font-size:1rem;
+}
+.title-block .updated{
+  color:#e6d77a;
+  font-size:.9rem;
+}
+.title-block .updated.closed{
+  color:var(--danger);
+  font-weight:800;
+}
+.stats-inline{
+  display:flex;
+  gap:10px;
+  margin-left:6px;
+}
+.stat{
+  border-radius:14px;
+  padding:10px 14px;
+  background:rgba(8,17,31,.86);
+  border:1px solid var(--line);
+  text-align:center;
+  min-width:120px;
+}
+.stat .k{
+  color:var(--muted);
+  font-size:.8rem;
+  margin-bottom:4px;
+}
+.stat .v{
+  font-size:1.6rem;
+  font-weight:800;
+}
 
 .header-right{
   margin-left:auto;
@@ -77,6 +138,10 @@ body{
   display:none;
 }
 
+.mobile-search-toggle-inline{
+  display:none;
+}
+
 .search-wrap{
   display:flex;
   align-items:center;
@@ -87,8 +152,19 @@ body{
   height:34px;
   min-width:220px;
 }
-.search-wrap span{color:#6b7280;margin-right:6px}
-.search-wrap input{border:none;outline:none;background:transparent;color:#000;font-weight:700;width:100%}
+.search-wrap span{
+  color:#6b7280;
+  margin-right:6px;
+}
+.search-wrap input{
+  border:none;
+  outline:none;
+  background:transparent;
+  color:#000;
+  font-weight:700;
+  width:100%;
+  min-width:0;
+}
 
 .raffle-nav{
   display:flex;
@@ -130,8 +206,20 @@ body{
 }
 
 /* Mid row */
-.mid-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch}
-.info-panel{min-height:140px;border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.mid-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  align-items:stretch;
+}
+.info-panel{
+  min-height:140px;
+  border-radius:14px;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+}
 .info-bar{
   height:34px;
   display:flex;
@@ -171,7 +259,15 @@ body{
   overflow:hidden;
   text-overflow:ellipsis;
 }
-.info-body{min-height:106px;flex:1;background:linear-gradient(180deg,rgba(11,19,35,.96),rgba(8,14,24,.98));padding:16px 18px;white-space:pre-line;line-height:1.55;color:#d7e2f5}
+.info-body{
+  min-height:106px;
+  flex:1;
+  background:linear-gradient(180deg,rgba(11,19,35,.96),rgba(8,14,24,.98));
+  padding:16px 18px;
+  white-space:pre-line;
+  line-height:1.55;
+  color:#d7e2f5;
+}
 
 /* Bottom row */
 .bottom-row{
@@ -270,12 +366,27 @@ body{
   letter-spacing:.08em;
   font-weight:800;
 }
-.pwinner .value{font-size:1rem;font-weight:700}
+.pwinner .value{
+  font-size:1rem;
+  font-weight:700;
+}
 
 /* Entrants panel */
-.table-headline{padding:18px 20px 8px 20px;font-size:1.15rem;font-weight:800}
-.table-sub{padding:0 20px 12px 20px;color:var(--muted);font-size:.92rem}
-.entrants-controls{padding:0 20px 12px 20px;display:grid;gap:10px}
+.table-headline{
+  padding:18px 20px 8px 20px;
+  font-size:1.15rem;
+  font-weight:800;
+}
+.table-sub{
+  padding:0 20px 12px 20px;
+  color:var(--muted);
+  font-size:.92rem;
+}
+.entrants-controls{
+  padding:0 20px 12px 20px;
+  display:grid;
+  gap:10px;
+}
 .lookup-input{
   width:100%;
   padding:10px 12px;
@@ -286,7 +397,12 @@ body{
   color:#000;
   font:inherit;
 }
-.thead,.row{display:grid;grid-template-columns:.5fr 1.8fr .8fr;gap:10px;align-items:center}
+.thead,.row{
+  display:grid;
+  grid-template-columns:.5fr 1.8fr .8fr;
+  gap:10px;
+  align-items:center;
+}
 .thead{
   padding:14px 8px 12px 8px;
   border-top:1px solid var(--line);
@@ -301,7 +417,10 @@ body{
   border-top:1px solid rgba(255,255,255,.05);
 }
 .row.hoverable:hover{background:var(--hover)}
-.idx,.total{text-align:right;font-variant-numeric:tabular-nums}
+.idx,.total{
+  text-align:right;
+  font-variant-numeric:tabular-nums;
+}
 .name{font-weight:750}
 .empty-state{
   padding:16px 8px;
@@ -347,52 +466,91 @@ body{
 }
 
 @media (max-width:700px){
-  .page{padding:12px;gap:12px}
+  .page{
+    padding:12px;
+    gap:12px;
+  }
+
   .header{
     display:grid;
-    grid-template-columns:56px 1fr auto;
+    grid-template-columns:56px minmax(0,1fr);
     grid-template-areas:
-      'logo title right'
-      'stats stats stats'
-      'search search search';
+      'logo title'
+      'stats stats'
+      'search search';
     align-items:start;
     gap:12px;
     padding:14px;
   }
-  .header img#mainLogo{grid-area:logo;width:56px;height:56px}
-  .title-block{grid-area:title;min-width:0}
-  .title-block h1{font-size:1.5rem;line-height:1.06}
-  .title-block .sub{font-size:.92rem}
-  .title-block .updated{font-size:.82rem}
-  .stats-inline{grid-area:stats;margin-left:0;display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .stat{min-width:0;padding:10px 10px}
-  .stat .v{font-size:1.25rem}
 
-  .mobile-search-toggle-wrap{
-    grid-area:right;
+  .header img#mainLogo{
+    grid-area:logo;
+    width:56px;
+    height:56px;
+  }
+
+  .title-block{
+    grid-area:title;
+    min-width:0;
+  }
+
+  .title-block h1{
+    font-size:1.5rem;
+    line-height:1.06;
+  }
+
+  .title-block .sub{
+    font-size:.92rem;
+  }
+
+  .title-block .updated{
+    font-size:.82rem;
+  }
+
+  .mobile-subline{
     display:flex;
     align-items:center;
-    justify-content:flex-end;
-    padding-top:6px;
+    justify-content:space-between;
+    gap:10px;
+    min-width:0;
   }
 
-  .mobile-search-toggle{
-    display:inline;
+  .mobile-search-toggle-inline{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
     border:none;
     background:transparent;
-    color:var(--text);
-    font-size:2rem;
+    color:var(--muted);
+    font:inherit;
+    font-size:1rem;
     line-height:1;
+    cursor:pointer;
     padding:0;
     margin:0;
-    box-shadow:none;
-    width:auto;
-    height:auto;
-    cursor:pointer;
+    opacity:.95;
+    flex:0 0 auto;
   }
 
-  .mobile-search-toggle:hover{
+  .mobile-search-toggle-inline:hover{
     background:transparent;
+  }
+
+  .stats-inline{
+    grid-area:stats;
+    margin-left:0;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+
+  .stat{
+    min-width:0;
+    padding:10px 10px;
+  }
+
+  .stat .v{
+    font-size:1.25rem;
   }
 
   .header-right{
@@ -408,17 +566,24 @@ body{
   .search-wrap{
     min-width:0;
     width:100%;
-    height:64px;
+    height:54px;
     padding:0 14px;
-    border-radius:16px;
+    border-radius:10px;
   }
-  .search-wrap span{font-size:1rem}
-  .search-wrap input{font-size:.98rem}
+
+  .search-wrap span{
+    font-size:1rem;
+  }
+
+  .search-wrap input{
+    font-size:.98rem;
+  }
 
   .raffle-nav{
     justify-content:center;
     gap:6px;
   }
+
   .raffle-nav-link,
   .raffle-nav-disabled{
     min-height:26px;
@@ -465,7 +630,7 @@ $(document).ready(function() {
 
   if (initialRequestedRaffleNum) {
     $('#header_right').addClass('mobile-search-open');
-    $('#mobile_search_toggle').attr('aria-expanded', 'true');
+    $('#mobile_search_toggle_inline').attr('aria-expanded', 'true');
   }
 
   $(document).on('input', '.lookup-input', function() {
@@ -484,7 +649,7 @@ $(document).ready(function() {
     $('#raffle_lookup').val(cleanedValue);
   });
 
-  $(document).on('click', '#mobile_search_toggle', function() {
+  $(document).on('click', '#mobile_search_toggle_inline', function() {
     var $headerRight = $('#header_right');
     var isOpen = $headerRight.hasClass('mobile-search-open');
 
@@ -599,9 +764,7 @@ function updateRaffleStatusLine(timestampValue) {
   var $updated = $("#raffle_updated");
 
   if (isArchiveDisplay()) {
-    $updated
-      .text("Raffle Closed")
-      .addClass("closed");
+    $updated.text("Raffle Closed").addClass("closed");
     return;
   }
 
@@ -764,19 +927,18 @@ $(document).ready(function () {
 
     <div class="title-block">
       <h1 id="guild_header">Bleakrock Barter Co</h1>
-      <div class="sub" id="raffle_subheader">#${initial_display_raffle} Raffle</div>
+      <div class="sub mobile-subline">
+        <span id="raffle_subheader">#${initial_display_raffle} Raffle</span>
+        <button
+          type="button"
+          class="mobile-search-toggle-inline"
+          id="mobile_search_toggle_inline"
+          aria-expanded="false"
+          aria-controls="header_right"
+          aria-label="Show raffle search"
+        >🔍</button>
+      </div>
       <div class="updated${' closed' if initial_lookup_raffle else ''}" id="raffle_updated">${'Raffle Closed' if initial_lookup_raffle else 'Last Updated'}</div>
-    </div>
-
-    <div class="mobile-search-toggle-wrap">
-      <button
-        type="button"
-        class="mobile-search-toggle"
-        id="mobile_search_toggle"
-        aria-expanded="false"
-        aria-controls="header_right"
-        aria-label="Show raffle search"
-      >🔎</button>
     </div>
 
     <div class="stats-inline">
