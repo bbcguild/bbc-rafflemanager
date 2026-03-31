@@ -458,7 +458,7 @@ body{
 @media (max-width:1100px){
   .mid-row,.bottom-row{grid-template-columns:1fr}
   .entrants-scroll{overflow:visible;max-height:none}
-  .thead{margin:0 8px}
+  .thead{margin:0 56px 0 8px}
 }
 
 @media (max-width:700px){
