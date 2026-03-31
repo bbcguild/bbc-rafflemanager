@@ -188,25 +188,6 @@ body{
   color:#000;
   font:inherit;
 }
-.lookup-row{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  font-size:.85rem;
-  color:var(--muted);
-  font-weight:800;
-}
-.lookup-btn{
-  padding:6px 10px;
-  border-radius:999px;
-  border:1px solid var(--line2);
-  background:rgba(255,255,255,.03);
-  color:var(--text);
-  font:inherit;
-  font-weight:800;
-  cursor:pointer;
-}
 .thead,.row{display:grid;grid-template-columns:.5fr 1.8fr .8fr;gap:10px;align-items:center}
 .thead{
   padding:14px 8px 12px 8px;
@@ -350,16 +331,11 @@ function buildPrizeCards(result) {
 }
 
 function buildEntrantsTable(result) {
-  var $recent = $("#recentEntrants");
   var $all = $("#allEntrants");
-
-  $recent.empty();
   $all.empty();
 
   if (!result || !result.length) {
-    var empty = '<div class="empty-state">No entrants yet.</div>';
-    $recent.append(empty);
-    $all.append(empty);
+    $all.append('<div class="empty-state">No entrants yet.</div>');
     return;
   }
 
@@ -375,8 +351,6 @@ function buildEntrantsTable(result) {
     );
   }
 
-  var recentCount = Math.min(5, rows.length);
-  $recent.append(rows.slice(0, recentCount).join(''));
   $all.append(rows.join(''));
 }
 
@@ -413,17 +387,6 @@ function refresher() {
 
     buildEntrantsTable(result);
   });
-}
-
-function toggleAllEntrants() {
-  var all = document.getElementById('allEntrants');
-  var recent = document.getElementById('recentEntrants');
-  var btn = document.getElementById('viewAllBtn');
-  var showAll = all.style.display === 'none';
-
-  all.style.display = showAll ? 'block' : 'none';
-  recent.style.display = showAll ? 'none' : 'block';
-  btn.textContent = showAll ? 'Show Recent' : 'View All';
 }
 
 $(document).ready(refresher);
@@ -493,10 +456,6 @@ $(document).ready(function () {
 
       <div class="entrants-controls">
         <input type="text" class="lookup-input" placeholder="Find: ex. '@name'">
-        <div class="lookup-row">
-          <span>Recent Entrants:</span>
-          <button type="button" class="lookup-btn" id="viewAllBtn" onclick="toggleAllEntrants()">View All</button>
-        </div>
       </div>
 
       <div class="entrants-body">
@@ -507,10 +466,9 @@ $(document).ready(function () {
         </div>
 
         <div class="entrants-scroll">
-          <div id="recentEntrants">
+          <div id="allEntrants">
             <div class="empty-state">No entrants yet.</div>
           </div>
-          <div id="allEntrants" style="display:none;"></div>
         </div>
       </div>
     </div>
