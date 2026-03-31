@@ -136,6 +136,7 @@ body{
   overflow:auto;
   padding:0 12px 16px 12px;
   max-height:2200px;
+  margin-right:20px;
 }
 
 /* Prize cards */
