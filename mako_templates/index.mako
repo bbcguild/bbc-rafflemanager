@@ -255,7 +255,7 @@ body{
     gap:12px;
     padding:14px
   }
-  .header img#mainLogo{grid-area:logo;width:56px;height:56px}
+#  .header img#mainLogo{grid-area:logo;width:56px;height:56px}
   .title-block{grid-area:title;min-width:0}
   .title-block h1{font-size:1.5rem;line-height:1.06}
   .title-block .sub{font-size:.92rem}
