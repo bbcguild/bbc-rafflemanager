@@ -489,7 +489,7 @@ body{
   .title-block{
     grid-area:title;
     min-width:0;
-    padding-right:52px;
+    padding-right:0;
   }
 
   .title-block h1{
@@ -517,12 +517,12 @@ body{
     justify-content:center;
     position:absolute;
     right:18px;
-    top:50px;
+    bottom:82px;
     border:none;
     background:transparent;
     color:var(--muted);
     font:inherit;
-    font-size:1.35rem;
+    font-size:1.8rem;
     line-height:1;
     cursor:pointer;
     padding:0;
