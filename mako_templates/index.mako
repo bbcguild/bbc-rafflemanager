@@ -73,6 +73,10 @@ body{
   min-width:0;
 }
 
+.mobile-search-toggle{
+  display:none;
+}
+
 .search-wrap{
   display:flex;
   align-items:center;
@@ -348,9 +352,10 @@ body{
     display:grid;
     grid-template-columns:56px 1fr;
     grid-template-areas:
-      'logo title'
-      'stats stats'
-      'right right';
+      'logo title right'
+      'stats stats stats'
+      'search search search';
+    grid-template-columns:56px 1fr auto;
     align-items:start;
     gap:12px;
     padding:14px
@@ -363,10 +368,55 @@ body{
   .stats-inline{grid-area:stats;margin-left:0;display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .stat{min-width:0;padding:10px 10px}
   .stat .v{font-size:1.25rem}
-  .header-right{grid-area:right !important;width:100%;display:grid !important;grid-template-columns:1fr;gap:10px !important;align-items:center !important}
-  .search-wrap{min-width:0;width:100%;height:64px;padding:0 14px;border-radius:16px}
+
+  .header-right{
+    grid-area:search !important;
+    width:100%;
+    display:grid !important;
+    grid-template-columns:1fr;
+    gap:10px !important;
+    align-items:stretch !important;
+    justify-items:stretch !important;
+  }
+
+  .mobile-search-toggle{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:52px;
+    height:52px;
+    padding:0;
+    border:1px solid var(--line2);
+    border-radius:999px;
+    background:rgba(255,255,255,.04);
+    color:var(--text);
+    font-size:1.35rem;
+    line-height:1;
+    cursor:pointer;
+    box-shadow:0 8px 20px rgba(0,0,0,.22);
+  }
+
+  .mobile-search-toggle:hover{
+    background:rgba(255,255,255,.08);
+  }
+
+  .mobile-search-toggle-wrap{
+    grid-area:right;
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+  }
+
+  .search-wrap{
+    min-width:0;
+    width:100%;
+    height:64px;
+    padding:0 14px;
+    border-radius:16px;
+  }
   .search-wrap span{font-size:1rem}
   .search-wrap input{font-size:.98rem}
+
   .raffle-nav{
     justify-content:center;
     gap:6px;
@@ -377,6 +427,25 @@ body{
     padding:4px 10px;
     font-size:.8rem;
   }
+
+  .header-right .search-wrap,
+  .header-right .raffle-nav{
+    display:none;
+  }
+
+  .header-right.mobile-search-open .search-wrap,
+  .header-right.mobile-search-open .raffle-nav{
+    display:flex;
+  }
+
+  .header-right.mobile-search-open .search-wrap{
+    display:flex;
+  }
+
+  .header-right.mobile-search-open .raffle-nav{
+    display:flex;
+  }
+
   .info-bar{height:36px;font-size:.92rem}
   .raffle-live-header{gap:8px}
   .raffle-name-label{font-size:.88rem}
@@ -415,6 +484,14 @@ $(document).ready(function() {
     }
 
     $('#raffle_lookup').val(cleanedValue);
+  });
+
+  $(document).on('click', '#mobile_search_toggle', function() {
+    var $headerRight = $('#header_right');
+    var isOpen = $headerRight.hasClass('mobile-search-open');
+
+    $headerRight.toggleClass('mobile-search-open', !isOpen);
+    $(this).attr('aria-expanded', !isOpen ? 'true' : 'false');
   });
 });
 
@@ -693,12 +770,23 @@ $(document).ready(function () {
       <div class="updated${' closed' if initial_lookup_raffle else ''}" id="raffle_updated">${'Raffle Closed' if initial_lookup_raffle else 'Last Updated'}</div>
     </div>
 
+    <div class="mobile-search-toggle-wrap">
+      <button
+        type="button"
+        class="mobile-search-toggle"
+        id="mobile_search_toggle"
+        aria-expanded="false"
+        aria-controls="header_right"
+        aria-label="Show raffle search"
+      >🔎</button>
+    </div>
+
     <div class="stats-inline">
       <div class="stat"><div class="k">Total Tickets</div><div class="v" id="raffle_sold">0</div></div>
       <div class="stat"><div class="k">Participants</div><div class="v" id="raffle_participants">0</div></div>
     </div>
 
-    <div class="header-right">
+    <div class="header-right" id="header_right">
       <form id="raffle_lookup_form" action="/${request.matchdict['guild']}/lookup" method="get" class="search-wrap" style="margin:0;" autocomplete="off">
         <span>🔍</span>
         <input type="text" id="raffle_lookup" name="raffle_lookup" placeholder="Enter Raffle #" />
