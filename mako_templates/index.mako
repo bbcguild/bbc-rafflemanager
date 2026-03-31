@@ -64,11 +64,21 @@ body{
   display:grid;
   grid-template-columns:auto;
   align-items:start;
+  justify-items:center;
   gap:8px;
   min-width:0;
 }
 
-.search-wrap{display:flex;align-items:center;border:1px solid var(--line2);border-radius:999px;background:#f3f4f6;padding:6px 12px;height:34px;min-width:220px}
+.search-wrap{
+  display:flex;
+  align-items:center;
+  border:1px solid var(--line2);
+  border-radius:999px;
+  background:#f3f4f6;
+  padding:6px 12px;
+  height:34px;
+  min-width:220px;
+}
 .search-wrap span{color:#6b7280;margin-right:6px}
 .search-wrap input{border:none;outline:none;background:transparent;color:#000;font-weight:700;width:100%}
 
@@ -76,7 +86,8 @@ body{
   display:flex;
   gap:8px;
   flex-wrap:wrap;
-  justify-content:flex-end;
+  justify-content:center;
+  width:100%;
 }
 
 .raffle-nav-link,
@@ -84,9 +95,9 @@ body{
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  min-height:28px;
-  padding:4px 12px;
-  border-radius:999px;
+  min-height:24px;
+  padding:3px 12px;
+  border-radius:0;
   font-size:.82rem;
   font-weight:800;
   line-height:1;
@@ -311,13 +322,13 @@ body{
     display:flex !important;
     flex-direction:column !important;
     justify-content:flex-start !important;
-    align-items:flex-start !important;
+    align-items:center !important;
     gap:10px !important;
     flex-wrap:wrap;
   }
 
   .raffle-nav{
-    justify-content:flex-start;
+    justify-content:center;
   }
 }
 
@@ -348,18 +359,18 @@ body{
   .stats-inline{grid-area:stats;margin-left:0;display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .stat{min-width:0;padding:10px 10px}
   .stat .v{font-size:1.25rem}
-  .header-right{grid-area:right !important;width:100%;display:grid !important;grid-template-columns:1fr;gap:10px !important;align-items:stretch !important}
+  .header-right{grid-area:right !important;width:100%;display:grid !important;grid-template-columns:1fr;gap:10px !important;align-items:center !important}
   .search-wrap{min-width:0;width:100%;height:64px;padding:0 14px;border-radius:16px}
   .search-wrap span{font-size:1rem}
   .search-wrap input{font-size:.98rem}
   .raffle-nav{
-    justify-content:flex-start;
+    justify-content:center;
     gap:6px;
   }
   .raffle-nav-link,
   .raffle-nav-disabled{
-    min-height:30px;
-    padding:5px 10px;
+    min-height:26px;
+    padding:4px 10px;
     font-size:.8rem;
   }
   .info-bar{height:36px;font-size:.92rem}
@@ -478,31 +489,24 @@ function updateRaffleNav() {
     return;
   }
 
-  if (isHistoricalLookupPage) {
-    var prevNum = getPrevRaffleNum(currentDisplayedRaffleNum);
-    var nextNum = getNextRaffleNum(currentDisplayedRaffleNum);
+  var prevNum = getPrevRaffleNum(currentDisplayedRaffleNum);
+  var nextNum = getNextRaffleNum(currentDisplayedRaffleNum);
 
-    if (prevNum) {
-      $nav.append('<a class="raffle-nav-link" href="' + raffleLookupHref(prevNum) + '">Prev Raffle</a>');
-    } else {
-      $nav.append('<span class="raffle-nav-disabled">Prev Raffle</span>');
-    }
-
-    if (nextNum) {
-      $nav.append('<a class="raffle-nav-link" href="' + raffleLookupHref(nextNum) + '">Next Raffle</a>');
-    } else {
-      $nav.append('<span class="raffle-nav-disabled">Next Raffle</span>');
-    }
+  if (prevNum) {
+    $nav.append('<a class="raffle-nav-link" href="' + raffleLookupHref(prevNum) + '">&lt; Prev Raffle</a>');
   } else {
-    var lastNum = getPrevRaffleNum(currentDisplayedRaffleNum);
+    $nav.append('<span class="raffle-nav-disabled">&lt; Prev Raffle</span>');
+  }
 
-    if (lastNum) {
-      $nav.append('<a class="raffle-nav-link" href="' + raffleLookupHref(lastNum) + '">Last Raffle</a>');
-    } else {
-      $nav.append('<span class="raffle-nav-disabled">Last Raffle</span>');
-    }
+  if (!isHistoricalLookupPage) {
+    $nav.append('<span class="raffle-nav-disabled">Next Raffle &gt;</span>');
+    return;
+  }
 
-    $nav.append('<span class="raffle-nav-disabled">Next Raffle</span>');
+  if (nextNum) {
+    $nav.append('<a class="raffle-nav-link" href="' + raffleLookupHref(nextNum) + '">Next Raffle &gt;</a>');
+  } else {
+    $nav.append('<span class="raffle-nav-disabled">Next Raffle &gt;</span>');
   }
 }
 
