@@ -47,7 +47,7 @@ body{
 
 /* Header */
 .header{display:flex;align-items:center;gap:18px;padding:14px 20px}
-.header img#mainLogo{width:72px;height:72px;object-fit:contain}
+.header img mainLogo{width:72px;height:72px;object-fit:contain}
 .title-block{display:flex;flex-direction:column;gap:2px;min-width:320px}
 .title-block h1{margin:0;font-size:2.2rem;line-height:1.05;font-weight:700}
 .title-block .sub{color:var(--muted);font-size:1rem}
@@ -399,7 +399,7 @@ $(document).ready(function () {
 <div class="page">
 
   <section class="card header">
-#    <img id="mainLogo" src="https://www.bbcguild.com/wp-content/uploads/2020/04/cropped-cropped-BBC-LOGO-V2-2.gif" alt="BBC logo">
+    <img id="mainLogo" src="https://www.bbcguild.com/wp-content/uploads/2020/04/cropped-cropped-BBC-LOGO-V2-2.gif" alt="BBC logo">
 
     <div class="title-block">
       <h1 id="guild_header">Bleakrock Barter Co</h1>
