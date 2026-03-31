@@ -311,8 +311,14 @@ body{
 </style>
 
 <script>
+let allEntrantsData = [];
+
 $(document).ready(function() {
   $.ajaxSetup({cache:false});
+
+  $(document).on('input', '.lookup-input', function() {
+    applyEntrantFilter();
+  });
 });
 
 function escapeHtml(str) {
@@ -322,6 +328,13 @@ function escapeHtml(str) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+function normalizeEntrantSearch(value) {
+  return String(value == null ? "" : value)
+    .toLowerCase()
+    .trim()
+    .replace(/^@+/, "");
 }
 
 function buildPrizeCards(result) {
@@ -358,19 +371,19 @@ function buildPrizeCards(result) {
   });
 }
 
-function buildEntrantsTable(result) {
+function renderEntrantsRows(rows) {
   var $all = $("#allEntrants");
   $all.empty();
 
-  if (!result || !result.length) {
-    $all.append('<div class="empty-state">No entrants yet.</div>');
+  if (!rows || !rows.length) {
+    $all.append('<div class="empty-state">No matching entrants found.</div>');
     return;
   }
 
-  var rows = [];
-  for (var i = 0; i < result.length; i++) {
-    var r = result[i];
-    rows.push(
+  var htmlRows = [];
+  for (var i = 0; i < rows.length; i++) {
+    var r = rows[i];
+    htmlRows.push(
       '<div class="row hoverable">'
       + '<div class="idx">' + escapeHtml(r[0]) + '</div>'
       + '<div class="name">' + escapeHtml(r[1]) + '</div>'
@@ -379,7 +392,40 @@ function buildEntrantsTable(result) {
     );
   }
 
-  $all.append(rows.join(''));
+  $all.append(htmlRows.join(''));
+}
+
+function applyEntrantFilter() {
+  var rawQuery = $('.lookup-input').val() || "";
+  var query = normalizeEntrantSearch(rawQuery);
+
+  if (!allEntrantsData || !allEntrantsData.length) {
+    renderEntrantsRows([]);
+    return;
+  }
+
+  if (!query) {
+    renderEntrantsRows(allEntrantsData);
+    return;
+  }
+
+  var filtered = allEntrantsData.filter(function(row) {
+    var name = normalizeEntrantSearch(row[1]);
+    return name.indexOf(query) !== -1;
+  });
+
+  renderEntrantsRows(filtered);
+}
+
+function buildEntrantsTable(result) {
+  allEntrantsData = Array.isArray(result) ? result.slice() : [];
+
+  if (!allEntrantsData.length) {
+    $("#allEntrants").html('<div class="empty-state">No entrants yet.</div>');
+    return;
+  }
+
+  applyEntrantFilter();
 }
 
 function refresher() {
@@ -453,7 +499,7 @@ $(document).ready(function () {
       <div class="info-bar raffle-live-header">
         <span class="live-dot"></span>
         <span class="live-label">LIVE</span>
-        <span class="raffle-name-label">MOPPET UP RAFFLE</span>
+        <span class="raffle-name-label">| MOPPET UP RAFFLE TEST</span>
       </div>
       <div class="info-body" id="raffle_notes">Welcome to this week's raffle.</div>
     </div>
