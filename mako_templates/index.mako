@@ -623,6 +623,15 @@ body{
 const guildSlug = "${request.matchdict['guild']}";
 const initialRequestedRaffleNum = "${initial_lookup_raffle}";
 const liveRaffleEndpoint = "/" + guildSlug + "/json/get/raffle";
+const MAX_HISTORY_DEPTH = 5;
+const urlParams = new URLSearchParams(window.location.search);
+const requestedDepthRaw = urlParams.get('depth');
+let currentDepth = requestedDepthRaw === null ? null : parseInt(requestedDepthRaw, 10);
+
+if (!Number.isFinite(currentDepth) || currentDepth < 0) {
+  currentDepth = null;
+}
+
 let allEntrantsData = [];
 let currentDisplayedRaffleNum = initialRequestedRaffleNum || null;
 let liveCurrentRaffleNum = null;
@@ -718,8 +727,26 @@ function getNextRaffleNum(raffleNum) {
   return formatRaffleNum(year, week);
 }
 
-function raffleLookupHref(raffleNum) {
-  return "/" + guildSlug + "/lookup?raffle_lookup=" + encodeURIComponent(raffleNum);
+function raffleLookupHref(raffleNum, depth) {
+  var href = "/" + guildSlug + "/lookup?raffle_lookup=" + encodeURIComponent(raffleNum);
+  if (Number.isFinite(depth) && depth >= 0) {
+    href += "&depth=" + depth;
+  }
+  return href;
+}
+
+function inferDepthFromLive(liveNum, currentNum) {
+  if (!liveNum || !currentNum) return null;
+  if (liveNum === currentNum) return 0;
+
+  var probe = liveNum;
+  for (var i = 1; i <= MAX_HISTORY_DEPTH; i++) {
+    probe = getPrevRaffleNum(probe);
+    if (!probe) return null;
+    if (probe === currentNum) return i;
+  }
+
+  return null;
 }
 
 function isArchiveDisplay() {
@@ -736,22 +763,30 @@ function updateRaffleNav() {
     return;
   }
 
+  var effectiveDepth = currentDepth;
+  if (effectiveDepth === null) {
+    effectiveDepth = inferDepthFromLive(liveCurrentRaffleNum, currentDisplayedRaffleNum);
+  }
+
   var prevNum = getPrevRaffleNum(currentDisplayedRaffleNum);
   var nextNum = getNextRaffleNum(currentDisplayedRaffleNum);
 
-  if (prevNum) {
-    $nav.append('<a class="raffle-nav-link" href="' + raffleLookupHref(prevNum) + '">&lt; Prev Raffle</a>');
+  if (prevNum && effectiveDepth !== null && effectiveDepth < MAX_HISTORY_DEPTH) {
+    $nav.append(
+      '<a class="raffle-nav-link" href="' +
+      raffleLookupHref(prevNum, effectiveDepth + 1) +
+      '">&lt; Prev Raffle</a>'
+    );
   } else {
     $nav.append('<span class="raffle-nav-disabled">&lt; Prev Raffle</span>');
   }
 
-  if (!liveCurrentRaffleNum || currentDisplayedRaffleNum === liveCurrentRaffleNum) {
-    $nav.append('<span class="raffle-nav-disabled">Next Raffle &gt;</span>');
-    return;
-  }
-
-  if (nextNum) {
-    $nav.append('<a class="raffle-nav-link" href="' + raffleLookupHref(nextNum) + '">Next Raffle &gt;</a>');
+  if (nextNum && effectiveDepth !== null && effectiveDepth > 0) {
+    $nav.append(
+      '<a class="raffle-nav-link" href="' +
+      raffleLookupHref(nextNum, effectiveDepth - 1) +
+      '">Next Raffle &gt;</a>'
+    );
   } else {
     $nav.append('<span class="raffle-nav-disabled">Next Raffle &gt;</span>');
   }
@@ -870,6 +905,15 @@ function buildEntrantsTable(result) {
 function refresher() {
   $.getJSON(liveRaffleEndpoint, function(result) {
     liveCurrentRaffleNum = String(result["raffle_guild_num"] || "");
+
+    if (!currentDisplayedRaffleNum) {
+      currentDisplayedRaffleNum = liveCurrentRaffleNum;
+    }
+
+    if (currentDepth === null) {
+      currentDepth = inferDepthFromLive(liveCurrentRaffleNum, currentDisplayedRaffleNum);
+    }
+
     updateRaffleNav();
   });
 
@@ -880,6 +924,10 @@ function refresher() {
   $.getJSON("json/get/raffle", function(result) {
     var raffleNum = String(result["raffle_guild_num"] || "");
     currentDisplayedRaffleNum = raffleNum;
+
+    if (currentDepth === null) {
+      currentDepth = inferDepthFromLive(liveCurrentRaffleNum, currentDisplayedRaffleNum);
+    }
 
     $("#raffle_subheader").text("#" + raffleNum + " Raffle • Drawing: " + result["raffle_time"]);
     $("#raffle_lookup").attr("placeholder", "Enter Raffle #");
@@ -923,7 +971,7 @@ $(document).ready(function () {
     <img id="mainLogo" src="https://www.bbcguild.com/wp-content/uploads/2020/04/cropped-cropped-BBC-LOGO-V2-2.gif" alt="BBC logo">
 
     <div class="title-block">
-      <h1 id="guild_header">Bleakrock Barter Co</h1>
+      <h1 id="guild_header"></h1>
       <div class="sub mobile-subline">
         <span id="raffle_subheader">#${initial_display_raffle} Raffle</span>
         <button
