@@ -312,7 +312,6 @@ body{
 </style>
 
 <script>
-const isHistoricalLookupPage = ${'true' if "raffle" in request.matchdict else 'false'};
 let allEntrantsData = [];
 
 $(document).ready(function() {
@@ -332,7 +331,6 @@ $(document).ready(function() {
     }
 
     $('#raffle_lookup').val(cleanedValue);
-    this.target = '_blank';
   });
 });
 
@@ -478,11 +476,9 @@ function refresher() {
   });
 }
 
+$(document).ready(refresher);
 $(document).ready(function () {
-  if (!isHistoricalLookupPage) {
-    refresher();
-    window.setInterval(refresher, 30000);
-  }
+  window.setInterval(refresher, 30000);
 });
 </script>
 </head>
@@ -504,7 +500,7 @@ $(document).ready(function () {
     </div>
 
     <div class="header-right">
-      <form id="raffle_lookup_form" action="/${request.matchdict['guild']}/lookup" method="get" class="search-wrap" style="margin:0;" target="_blank" autocomplete="off">
+      <form id="raffle_lookup_form" action="/${request.matchdict['guild']}/lookup" method="get" class="search-wrap" style="margin:0;" autocomplete="off">
         <span>🔍</span>
         <input type="text" id="raffle_lookup" name="raffle_lookup" placeholder="Enter Week #" />
       </form>
