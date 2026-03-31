@@ -489,11 +489,13 @@ body{
   .title-block{
     grid-area:title;
     min-width:0;
+    padding-right:52px;
   }
 
   .title-block h1{
     font-size:1.5rem;
     line-height:1.06;
+    margin:0;
   }
 
   .title-block .sub{
@@ -515,12 +517,12 @@ body{
     justify-content:center;
     position:absolute;
     right:18px;
-    bottom:92px;
+    top:50px;
     border:none;
     background:transparent;
     color:var(--muted);
     font:inherit;
-    font-size:1rem;
+    font-size:1.35rem;
     line-height:1;
     cursor:pointer;
     padding:0;
@@ -537,9 +539,10 @@ body{
     grid-area:stats;
     margin-left:0;
     display:grid;
-    grid-template-columns:1fr 1fr;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
     gap:10px;
     width:100%;
+    min-width:0;
   }
 
   .stat{
@@ -626,11 +629,6 @@ let liveCurrentRaffleNum = null;
 
 $(document).ready(function() {
   $.ajaxSetup({cache:false});
-
-  if (initialRequestedRaffleNum) {
-    $('#header_right').addClass('mobile-search-open');
-    $('#mobile_search_toggle_inline').attr('aria-expanded', 'true');
-  }
 
   $(document).on('input', '.lookup-input', function() {
     applyEntrantFilter();
