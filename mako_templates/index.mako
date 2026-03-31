@@ -294,9 +294,9 @@ body{
 }
 .entrants-scroll{
   overflow:auto;
-  padding:0 12px 16px 12px;
+  padding:0 20px 16px 12px;
   max-height:2200px;
-  margin-right:20px;
+  margin-right:32px;
 }
 
 /* Prize cards */
@@ -405,7 +405,7 @@ body{
   color:#eef5ff;
   font-size:1rem;
   font-weight:900;
-  margin:0 44px 0 8px;
+  margin:0 56px 0 8px;
 }
 .row{
   padding:12px 8px;
