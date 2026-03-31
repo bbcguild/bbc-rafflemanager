@@ -350,15 +350,14 @@ body{
   .page{padding:12px;gap:12px}
   .header{
     display:grid;
-    grid-template-columns:56px 1fr;
+    grid-template-columns:56px 1fr auto;
     grid-template-areas:
       'logo title right'
       'stats stats stats'
       'search search search';
-    grid-template-columns:56px 1fr auto;
     align-items:start;
     gap:12px;
-    padding:14px
+    padding:14px;
   }
   .header img#mainLogo{grid-area:logo;width:56px;height:56px}
   .title-block{grid-area:title;min-width:0}
@@ -369,6 +368,33 @@ body{
   .stat{min-width:0;padding:10px 10px}
   .stat .v{font-size:1.25rem}
 
+  .mobile-search-toggle-wrap{
+    grid-area:right;
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    padding-top:6px;
+  }
+
+  .mobile-search-toggle{
+    display:inline;
+    border:none;
+    background:transparent;
+    color:var(--text);
+    font-size:2rem;
+    line-height:1;
+    padding:0;
+    margin:0;
+    box-shadow:none;
+    width:auto;
+    height:auto;
+    cursor:pointer;
+  }
+
+  .mobile-search-toggle:hover{
+    background:transparent;
+  }
+
   .header-right{
     grid-area:search !important;
     width:100%;
@@ -377,34 +403,6 @@ body{
     gap:10px !important;
     align-items:stretch !important;
     justify-items:stretch !important;
-  }
-
-  .mobile-search-toggle{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    width:52px;
-    height:52px;
-    padding:0;
-    border:1px solid var(--line2);
-    border-radius:999px;
-    background:rgba(255,255,255,.04);
-    color:var(--text);
-    font-size:1.35rem;
-    line-height:1;
-    cursor:pointer;
-    box-shadow:0 8px 20px rgba(0,0,0,.22);
-  }
-
-  .mobile-search-toggle:hover{
-    background:rgba(255,255,255,.08);
-  }
-
-  .mobile-search-toggle-wrap{
-    grid-area:right;
-    display:flex;
-    align-items:center;
-    justify-content:flex-end;
   }
 
   .search-wrap{
@@ -431,11 +429,6 @@ body{
   .header-right .search-wrap,
   .header-right .raffle-nav{
     display:none;
-  }
-
-  .header-right.mobile-search-open .search-wrap,
-  .header-right.mobile-search-open .raffle-nav{
-    display:flex;
   }
 
   .header-right.mobile-search-open .search-wrap{
@@ -469,6 +462,11 @@ let liveCurrentRaffleNum = null;
 
 $(document).ready(function() {
   $.ajaxSetup({cache:false});
+
+  if (initialRequestedRaffleNum) {
+    $('#header_right').addClass('mobile-search-open');
+    $('#mobile_search_toggle').attr('aria-expanded', 'true');
+  }
 
   $(document).on('input', '.lookup-input', function() {
     applyEntrantFilter();
