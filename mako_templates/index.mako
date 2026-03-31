@@ -110,7 +110,7 @@ body{
   border-radius:14px;
   padding:10px 14px;
   background:rgba(8,17,31,.86);
-  border:1px solid var(--line);
+  border:1px solid var #ffffff;
   text-align:center;
   min-width:120px;
 }
