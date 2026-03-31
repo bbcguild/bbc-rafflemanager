@@ -101,28 +101,6 @@ body{
   color:var(--danger);
   font-weight:800;
 }
-.stats-inline{
-  display:flex;
-  gap:10px;
-  margin-left:6px;
-}
-.stat{
-  border-radius:14px;
-  padding:10px 14px;
-  background:rgba(8,17,31,.86);
-  border:1px solid #ffffff !important;
-  text-align:center;
-  min-width:120px;
-}
-.stat .k{
-  color:var(--muted);
-  font-size:.8rem;
-  margin-bottom:4px;
-}
-.stat .v{
-  font-size:1.6rem;
-  font-weight:800;
-}
 
 .header-right{
   margin-left:auto;
@@ -199,6 +177,30 @@ body{
   background:rgba(255,255,255,.02);
   border:1px solid rgba(255,255,255,.08);
   cursor:default;
+}
+
+/* Stats row */
+.stats-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+.stat{
+  border-radius:22px;
+  padding:18px 14px;
+  background:linear-gradient(180deg,var(--panel),var(--panel2));
+  border:1px solid #ffffff !important;
+  text-align:center;
+  min-width:0;
+}
+.stat .k{
+  color:var(--muted);
+  font-size:1rem;
+  margin-bottom:8px;
+}
+.stat .v{
+  font-size:2rem;
+  font-weight:800;
 }
 
 /* Mid row */
@@ -471,25 +473,19 @@ body{
     position:relative;
     display:grid;
     grid-template-columns:56px minmax(0,1fr);
-    grid-template-areas:
-      'logo title'
-      'stats stats'
-      'search search';
     align-items:start;
     gap:12px;
     padding:14px;
   }
 
   .header img#mainLogo{
-    grid-area:logo;
     width:56px;
     height:56px;
   }
 
   .title-block{
-    grid-area:title;
     min-width:0;
-    padding-right:0;
+    padding-right:44px;
   }
 
   .title-block h1{
@@ -517,12 +513,12 @@ body{
     justify-content:center;
     position:absolute;
     right:18px;
-    bottom:82px;
+    bottom:22px;
     border:none;
     background:transparent;
     color:var(--muted);
     font:inherit;
-    font-size:1.8rem;
+    font-size:2rem;
     line-height:1;
     cursor:pointer;
     padding:0;
@@ -535,20 +531,21 @@ body{
     background:transparent;
   }
 
-  .stats-inline{
-    grid-area:stats;
-    margin-left:0;
-    display:grid;
-    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
-    gap:10px;
-    width:100%;
-    min-width:0;
+  .stats-row{
+    grid-template-columns:1fr 1fr;
+    gap:12px;
   }
 
   .stat{
     min-width:0;
     width:100%;
-    padding:10px 10px;
+    padding:14px 10px;
+    border-radius:18px;
+  }
+
+  .stat .k{
+    font-size:.95rem;
+    margin-bottom:6px;
   }
 
   .stat .v{
@@ -556,7 +553,6 @@ body{
   }
 
   .header-right{
-    grid-area:search !important;
     width:100%;
     display:grid !important;
     grid-template-columns:1fr;
@@ -593,9 +589,12 @@ body{
     font-size:.8rem;
   }
 
-  .header-right .search-wrap,
-  .header-right .raffle-nav{
-    display:none;
+  .header-right{
+    display:none !important;
+  }
+
+  .header-right.mobile-search-open{
+    display:grid !important;
   }
 
   .header-right.mobile-search-open .search-wrap{
@@ -986,11 +985,6 @@ $(document).ready(function () {
       <div class="updated${' closed' if initial_lookup_raffle else ''}" id="raffle_updated">${'Raffle Closed' if initial_lookup_raffle else 'Last Updated'}</div>
     </div>
 
-    <div class="stats-inline">
-      <div class="stat"><div class="k">Total Tickets</div><div class="v" id="raffle_sold">0</div></div>
-      <div class="stat"><div class="k">Participants</div><div class="v" id="raffle_participants">0</div></div>
-    </div>
-
     <div class="header-right" id="header_right">
       <form id="raffle_lookup_form" action="/${request.matchdict['guild']}/lookup" method="get" class="search-wrap" style="margin:0;" autocomplete="off">
         <span>🔍</span>
@@ -998,6 +992,11 @@ $(document).ready(function () {
       </form>
       <div class="raffle-nav" id="raffle_nav"></div>
     </div>
+  </section>
+
+  <section class="stats-row">
+    <div class="stat"><div class="k">Total Tickets</div><div class="v" id="raffle_sold">0</div></div>
+    <div class="stat"><div class="k">Participants</div><div class="v" id="raffle_participants">0</div></div>
   </section>
 
   <section class="mid-row">
