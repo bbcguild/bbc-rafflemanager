@@ -72,7 +72,7 @@ body{
 
 /* Mid row */
 .mid-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch}
-.info-panel{min-height:190px;border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.info-panel{min-height:140px;border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
 .info-bar{height:34px;display:flex;align-items:center;padding:0 14px;background:linear-gradient(90deg,#17398a 0%, #1f4ca8 100%);color:var(--text);font-size:.95rem;font-weight:800;border-bottom:1px solid rgba(255,255,255,.06)}
 .info-body{min-height:156px;flex:1;background:linear-gradient(180deg,rgba(11,19,35,.96),rgba(8,14,24,.98));padding:16px 18px;white-space:pre-line;line-height:1.55;color:#d7e2f5}
 
