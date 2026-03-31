@@ -47,7 +47,7 @@ body{
 
 /* Header */
 .header{display:flex;align-items:center;gap:18px;padding:14px 20px}
-.header img #mainLogo{width:72px;height:72px;object-fit:contain}
+.header img#mainLogo{width:72px;height:72px;object-fit:contain;flex:0 0 auto}
 .title-block{display:flex;flex-direction:column;gap:2px;min-width:320px}
 .title-block h1{margin:0;font-size:2.2rem;line-height:1.05;font-weight:700}
 .title-block .sub{color:var(--muted);font-size:1rem}
@@ -56,16 +56,7 @@ body{
 .stat{border-radius:14px;padding:10px 14px;background:rgba(8,17,31,.86);border:1px solid var(--line);text-align:center;min-width:120px}
 .stat .k{color:var(--muted);font-size:.8rem;margin-bottom:4px}
 .stat .v{font-size:1.6rem;font-weight:800}
-.header-right{margin-left:auto;display:grid;grid-template-columns:auto auto;align-items:center;gap:18px;min-width:0}
-.live-public{
-  border:2px solid rgba(56,255,142,.75);
-  box-shadow:0 0 10px rgba(56,255,142,.35), inset 0 0 14px rgba(56,255,142,.12);
-  background:rgba(8,20,16,.7);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  width:140px;min-height:72px;padding:10px 18px;border-radius:18px;
-}
-.live-public .big{font-size:1.25rem;font-weight:900;letter-spacing:.08em;color:#eefff5;line-height:1.1;text-shadow:0 0 6px rgba(255,255,255,.45),0 0 14px rgba(56,255,142,.38)}
-.live-public .small{font-size:.75rem;font-weight:800;letter-spacing:.12em;margin-top:6px;color:#eefff5;text-shadow:0 0 6px rgba(255,255,255,.35),0 0 12px rgba(56,255,142,.28)}
+.header-right{margin-left:auto;display:grid;grid-template-columns:auto;align-items:center;gap:18px;min-width:0}
 .search-wrap{display:flex;align-items:center;border:1px solid var(--line2);border-radius:999px;background:#f3f4f6;padding:6px 12px;height:34px;min-width:220px}
 .search-wrap span{color:#6b7280;margin-right:6px}
 .search-wrap input{border:none;outline:none;background:transparent;color:#000;font-weight:700;width:100%}
@@ -73,8 +64,46 @@ body{
 /* Mid row */
 .mid-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch}
 .info-panel{min-height:140px;border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
-.info-bar{height:34px;display:flex;align-items:center;padding:0 14px;background:linear-gradient(90deg,#17398a 0%, #1f4ca8 100%);color:var(--text);font-size:.95rem;font-weight:800;border-bottom:1px solid rgba(255,255,255,.06)}
-.info-body{min-height:156px;flex:1;background:linear-gradient(180deg,rgba(11,19,35,.96),rgba(8,14,24,.98));padding:16px 18px;white-space:pre-line;line-height:1.55;color:#d7e2f5}
+.info-bar{
+  height:34px;
+  display:flex;
+  align-items:center;
+  padding:0 14px;
+  background:linear-gradient(90deg,#17398a 0%, #1f4ca8 100%);
+  color:var(--text);
+  font-size:.95rem;
+  font-weight:800;
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+.raffle-live-header{
+  gap:10px;
+}
+.live-dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:#36ff8e;
+  box-shadow:0 0 8px rgba(54,255,142,.8);
+  flex:0 0 auto;
+}
+.live-label{
+  font-weight:900;
+  letter-spacing:.08em;
+  font-size:.82rem;
+  color:#eafff3;
+  line-height:1;
+  flex:0 0 auto;
+}
+.raffle-name-label{
+  font-weight:800;
+  font-size:.95rem;
+  line-height:1;
+  flex:0 1 auto;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.info-body{min-height:106px;flex:1;background:linear-gradient(180deg,rgba(11,19,35,.96),rgba(8,14,24,.98));padding:16px 18px;white-space:pre-line;line-height:1.55;color:#d7e2f5}
 
 /* Bottom row */
 .bottom-row{
@@ -263,15 +292,13 @@ body{
   .stats-inline{grid-area:stats;margin-left:0;display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .stat{min-width:0;padding:10px 10px}
   .stat .v{font-size:1.25rem}
-  .header-right{grid-area:right !important;width:100%;display:grid !important;grid-template-columns:1fr 1fr;gap:10px !important;align-items:stretch !important}
-  .header-right > div:first-child{justify-content:stretch !important}
-  .live-public{width:100%;min-height:64px;border-radius:16px}
-  .live-public .big{font-size:1.05rem}
-  .live-public .small{font-size:.68rem;margin-top:4px}
+  .header-right{grid-area:right !important;width:100%;display:grid !important;grid-template-columns:1fr;gap:10px !important;align-items:stretch !important}
   .search-wrap{min-width:0;width:100%;height:64px;padding:0 14px;border-radius:16px}
   .search-wrap span{font-size:1rem}
   .search-wrap input{font-size:.98rem}
   .info-bar{height:36px;font-size:.92rem}
+  .raffle-live-header{gap:8px}
+  .raffle-name-label{font-size:.88rem}
   .info-body{padding:14px 15px;font-size:.95rem;line-height:1.5}
   .prize{grid-template-columns:62px 1fr;gap:12px;padding:10px;border-radius:18px}
   .num{min-height:98px;border-radius:14px;font-size:1.7rem}
@@ -413,7 +440,6 @@ $(document).ready(function () {
     </div>
 
     <div class="header-right">
-      
       <form id="raffle_lookup_form" action="/${request.matchdict['guild']}/lookup" method="get" class="search-wrap" style="margin:0;">
         <span>🔍</span>
         <input type="text" id="raffle_lookup" name="raffle_lookup" placeholder="Enter Week #" />
@@ -423,7 +449,11 @@ $(document).ready(function () {
 
   <section class="mid-row">
     <div class="card info-panel">
-      <div class="info-bar">MOPPET UP</div>
+      <div class="info-bar raffle-live-header">
+        <span class="live-dot"></span>
+        <span class="live-label">LIVE</span>
+        <span class="raffle-name-label">MOPPET UP RAFFLE</span>
+      </div>
       <div class="info-body" id="raffle_notes">Welcome to this week's raffle.</div>
     </div>
 
