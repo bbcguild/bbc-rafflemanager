@@ -106,7 +106,7 @@ body{
 .entrants-scroll{
   overflow:auto;
   padding:0 12px 16px 12px;
-  max-height:900px;
+  max-height:1250px;
 }
 
 /* Prize cards */
