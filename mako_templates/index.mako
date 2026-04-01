@@ -469,6 +469,10 @@ body{
   .page{
     padding:12px;
     gap:12px;
+  #raffle_subheader{
+  display:block;
+  line-height:1.2;
+}
   }
 
   .header{
@@ -504,6 +508,15 @@ body{
   .title-block .sub{
     font-size:.92rem;
   }
+
+.title-block .sub{
+  font-size:.92rem;
+}
+
+#raffle_subheader{
+  display:block;
+  line-height:1.2;
+}
 
   .title-block .updated{
     font-size:.82rem;
@@ -932,7 +945,11 @@ function refresher() {
       currentDepth = inferDepthFromLive(liveCurrentRaffleNum, currentDisplayedRaffleNum);
     }
 
-    $("#raffle_subheader").text("#" + raffleNum + " Raffle • Drawing: " + result["raffle_time"]);
+    if (window.innerWidth <= 700) {
+  $("#raffle_subheader").html("#" + raffleNum + " Raffle<br>Drawing: " + escapeHtml(result["raffle_time"]));
+} else {
+  $("#raffle_subheader").text("#" + raffleNum + " Raffle • Drawing: " + result["raffle_time"]);
+}
     $("#raffle_lookup").attr("placeholder", "Enter Raffle #");
     $("#raffle_notes").html(result["raffle_notes"] || "Welcome to this week's raffle.");
     $("#entrants_headline").text("#" + raffleNum + " Raffle Entrants");
