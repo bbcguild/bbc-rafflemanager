@@ -101,6 +101,32 @@ body{
   color:var(--danger);
   font-weight:800;
 }
+.stats-inline{
+  display:flex;
+  gap:10px;
+  margin-left:6px;
+}
+.stat{
+  border-radius:14px;
+  padding:10px 14px;
+  background:rgba(8,17,31,.86);
+  border:1px solid #ffffff !important;
+  text-align:center;
+  min-width:120px;
+}
+.stat .k{
+  color:var(--muted);
+  font-size:.8rem;
+  margin-bottom:4px;
+}
+.stat .v{
+  font-size:1.6rem;
+  font-weight:800;
+}
+
+.mobile-stats-row{
+  display:none;
+}
 
 .header-right{
   margin-left:auto;
@@ -177,30 +203,6 @@ body{
   background:rgba(255,255,255,.02);
   border:1px solid rgba(255,255,255,.08);
   cursor:default;
-}
-
-/* Stats row */
-.stats-row{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:14px;
-}
-.stat{
-  border-radius:22px;
-  padding:18px 14px;
-  background:linear-gradient(180deg,var(--panel),var(--panel2));
-  border:1px solid #ffffff !important;
-  text-align:center;
-  min-width:0;
-}
-.stat .k{
-  color:var(--muted);
-  font-size:1rem;
-  margin-bottom:8px;
-}
-.stat .v{
-  font-size:2rem;
-  font-weight:800;
 }
 
 /* Mid row */
@@ -473,17 +475,22 @@ body{
     position:relative;
     display:grid;
     grid-template-columns:56px minmax(0,1fr);
+    grid-template-areas:
+      'logo title'
+      'search search';
     align-items:start;
     gap:12px;
     padding:14px;
   }
 
   .header img#mainLogo{
+    grid-area:logo;
     width:56px;
     height:56px;
   }
 
   .title-block{
+    grid-area:title;
     min-width:0;
     padding-right:44px;
   }
@@ -531,28 +538,28 @@ body{
     background:transparent;
   }
 
-  .stats-row{
-    grid-template-columns:1fr 1fr;
-    gap:12px;
+  .stats-inline{
+    display:none !important;
   }
 
-  .stat{
+  .mobile-stats-row{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:10px;
+  }
+
+  .mobile-stats-row .stat{
     min-width:0;
     width:100%;
-    padding:14px 10px;
-    border-radius:18px;
+    padding:10px 10px;
   }
 
-  .stat .k{
-    font-size:.95rem;
-    margin-bottom:6px;
-  }
-
-  .stat .v{
+  .mobile-stats-row .stat .v{
     font-size:1.25rem;
   }
 
   .header-right{
+    grid-area:search !important;
     width:100%;
     display:grid !important;
     grid-template-columns:1fr;
@@ -589,12 +596,9 @@ body{
     font-size:.8rem;
   }
 
-  .header-right{
-    display:none !important;
-  }
-
-  .header-right.mobile-search-open{
-    display:grid !important;
+  .header-right .search-wrap,
+  .header-right .raffle-nav{
+    display:none;
   }
 
   .header-right.mobile-search-open .search-wrap{
@@ -936,24 +940,27 @@ function refresher() {
     updateRaffleNav();
   });
 
+  $.getJSON("json/get/tickets", function(result) {
+    $("#raffle_participants").text(result.length);
+    $("#raffle_participants_mobile").text(result.length);
+
+    var total = 0;
+    for (var i = 0; i < result.length; i++) {
+      total += result[i][2] << 0;
+    }
+    var totalText = total.toLocaleString();
+    $("#raffle_sold").text(totalText);
+    $("#raffle_sold_mobile").text(totalText);
+
+    buildEntrantsTable(result);
+  });
+
   $.getJSON("json/get/prizes", function(result) {
     buildPrizeCards(result);
   });
 
   $.getJSON("json/get/timestamp", function(result) {
     updateRaffleStatusLine(result);
-  });
-
-  $.getJSON("json/get/tickets", function(result) {
-    $("#raffle_participants").text(result.length);
-
-    var total = 0;
-    for (var i = 0; i < result.length; i++) {
-      total += result[i][2] << 0;
-    }
-    $("#raffle_sold").text(total.toLocaleString());
-
-    buildEntrantsTable(result);
   });
 }
 
@@ -985,6 +992,11 @@ $(document).ready(function () {
       <div class="updated${' closed' if initial_lookup_raffle else ''}" id="raffle_updated">${'Raffle Closed' if initial_lookup_raffle else 'Last Updated'}</div>
     </div>
 
+    <div class="stats-inline">
+      <div class="stat"><div class="k">Total Tickets</div><div class="v" id="raffle_sold">0</div></div>
+      <div class="stat"><div class="k">Participants</div><div class="v" id="raffle_participants">0</div></div>
+    </div>
+
     <div class="header-right" id="header_right">
       <form id="raffle_lookup_form" action="/${request.matchdict['guild']}/lookup" method="get" class="search-wrap" style="margin:0;" autocomplete="off">
         <span>🔍</span>
@@ -994,9 +1006,9 @@ $(document).ready(function () {
     </div>
   </section>
 
-  <section class="stats-row">
-    <div class="stat"><div class="k">Total Tickets</div><div class="v" id="raffle_sold">0</div></div>
-    <div class="stat"><div class="k">Participants</div><div class="v" id="raffle_participants">0</div></div>
+  <section class="mobile-stats-row">
+    <div class="stat"><div class="k">Total Tickets</div><div class="v" id="raffle_sold_mobile">0</div></div>
+    <div class="stat"><div class="k">Participants</div><div class="v" id="raffle_participants_mobile">0</div></div>
   </section>
 
   <section class="mid-row">
