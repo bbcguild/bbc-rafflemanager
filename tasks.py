@@ -181,6 +181,11 @@ def set_guild_roster (request):
 @view_config(route_name="get_current_raffle_info", renderer="json")
 @view_config(route_name="get_current_raffle_info_id", renderer="json")
 def get_current_raffle_info (request):
+    raffle_id = request.matchdict.get("raffle")
+
+if raffle_id:
+    info = db.get_raffle_info_by_id(raffle_id)
+else:
     info = db.get_cur_raffle_info()
     if not info:
         return {}
@@ -269,6 +274,11 @@ def get_extended_tickets (request):
     return make_all_tickets(request, True)
 
 def make_all_tickets (request, extended=False):
+    raffle_id = request.matchdict.get("raffle")
+
+if raffle_id:
+    tickets = db.get_tickets_by_raffle_id(raffle_id)
+else:
     tickets = db.get_tickets()
 
     if not tickets:
@@ -446,6 +456,11 @@ def set_extended_tickets (request):
     return change_count
 
 def make_ticket_list (request):
+    raffle_id = request.matchdict.get("raffle")
+
+if raffle_id:
+    ticks = db.get_tickets_by_raffle_id(raffle_id)
+else:
     ticks = db.get_tickets()
 
     if not ticks:
