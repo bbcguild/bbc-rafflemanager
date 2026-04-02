@@ -18,7 +18,6 @@ import hashlib
 import csv
 import io
 import operator
-import re
 
 from waitress import serve
 from pyramid.config import Configurator
@@ -212,6 +211,32 @@ def parse_keys (cur, new, keys, builder):
             n[key] = new[key]
 
     return n
+
+
+def compute_next_raffle_code(current_code):
+    """
+    BBC week code format is YYWW, where WW rolls from 52 -> 01
+    and increments the YY portion.
+    Example: 2652 -> 2701
+    """
+    code = str(current_code or "").strip()
+
+    if not re.match(r'^\d{4}$', code):
+        return code
+
+    year = int(code[:2])
+    week = int(code[2:])
+
+    if week < 1 or week > 52:
+        return code
+
+    if week == 52:
+        year = (year + 1) % 100
+        week = 1
+    else:
+        week += 1
+
+    return f"{year:02d}{week:02d}"
 
 # Admin only
 @view_config(route_name="set_current_raffle_info", renderer="json", permission="akaviri")
@@ -462,8 +487,7 @@ def barter_import (request):
         return {}
 
     data = request.params["barter_import_string"]
-
-    confirm_data = request.params["barter_confirm_string"]
+    confirm_data = request.params.get("barter_confirm_string", "")
 
     confirms = {}
 
@@ -473,7 +497,10 @@ def barter_import (request):
         except:
             continue
         else:
-            confirms[user] = [amount, 0]
+            try:
+                confirms[user] = [int(amount), 0]
+            except:
+                confirms[user] = [0, 0]
 
     lines = data.split("\n")
 
@@ -488,9 +515,12 @@ def barter_import (request):
 
         user, amount = line.split("\t")
 
-        user = user.replace("@", "")
+        user = user.replace("@", "").strip()
 
-        amount = int(amount)
+        try:
+            amount = int(amount)
+        except:
+            continue
 
         if user in barter_data:
             barter_data[user] = barter_data[user] + amount
@@ -509,16 +539,21 @@ def barter_import (request):
             free_tickets = 0
             bart_tickets = 0
 
-        diff = amount - bart_tickets
+        added_amount = amount
+        new_barter_total = bart_tickets + added_amount
 
-        # FIXED: Preserve existing paid tickets (prev_tickets) and free tickets while updating barter
-        db.set_user_tickets(user_name=user, ticket_count=prev_tickets, ticket_free=free_tickets, ticket_barter=amount)
+        db.set_user_tickets(
+            user_name=user,
+            ticket_count=prev_tickets,
+            ticket_free=free_tickets,
+            ticket_barter=new_barter_total
+        )
 
-        if diff != 0:
+        if added_amount != 0:
             if user in confirms:
-                confirms[user][1] = diff
+                confirms[user][1] = confirms[user][1] + added_amount
             else:
-                confirms[user] = [0, diff]
+                confirms[user] = [0, added_amount]
 
     for k, v in confirms.items():
         confirm = confirm + "%s,%s,%s|" % (k, v[0], v[1])
@@ -528,12 +563,11 @@ def barter_import (request):
 
 @view_config(route_name="paid_import", renderer="json", permission="akaviri")
 def paid_import (request):
-    """Import paid tickets - similar to barter_import but updates ticket_count instead of ticket_barter"""
+    """Import paid tickets - adds imported paid tickets to existing paid tickets"""
     if "paid_import_string" not in request.params:
         return {}
 
     data = request.params["paid_import_string"]
-
     confirm_data = request.params.get("paid_confirm_string", "")
 
     confirms = {}
@@ -544,7 +578,10 @@ def paid_import (request):
         except:
             continue
         else:
-            confirms[user] = [amount, 0]
+            try:
+                confirms[user] = [int(amount), 0]
+            except:
+                confirms[user] = [0, 0]
 
     lines = data.split("\n")
 
@@ -559,9 +596,12 @@ def paid_import (request):
 
         user, amount = line.split("\t")
 
-        user = user.replace("@", "")
+        user = user.replace("@", "").strip()
 
-        amount = int(amount)
+        try:
+            amount = int(amount)
+        except:
+            continue
 
         if user in paid_data:
             paid_data[user] = paid_data[user] + amount
@@ -580,19 +620,23 @@ def paid_import (request):
             free_tickets = 0
             bart_tickets = 0
 
-        diff = amount - prev_tickets
+        added_amount = amount
+        new_paid_total = prev_tickets + added_amount
 
-        # FIXED: Preserve existing free and barter tickets while updating paid tickets
-        db.set_user_tickets(user_name=user, ticket_count=amount, ticket_free=free_tickets, ticket_barter=bart_tickets)
+        db.set_user_tickets(
+            user_name=user,
+            ticket_count=new_paid_total,
+            ticket_free=free_tickets,
+            ticket_barter=bart_tickets
+        )
 
-        if diff != 0:
+        if added_amount != 0:
             if user in confirms:
-                confirms[user][1] = diff
+                confirms[user][1] = confirms[user][1] + added_amount
             else:
-                confirms[user] = [0, diff]
+                confirms[user] = [0, added_amount]
 
     for k, v in confirms.items():
-        # FIXED: Use paid ticket format (name,amount) instead of barter format (name,old,new)
         confirm = confirm + "%s,%s|" % (k, v[1])
         names.append("@%s" % k)
 

@@ -1,87 +1,77 @@
-<%
-initial_lookup_raffle = (request.matchdict.get('raffle') or request.params.get('raffle_lookup') or '').strip()
-initial_display_raffle = initial_lookup_raffle if initial_lookup_raffle else '2613'
-%>
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>BBC Raffle</title>
-
+<html>
+<head>   
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.js"></script>
 <link rel="stylesheet" media="screen" href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css">
-
-% if "raffle" in request.matchdict:
-<link rel="stylesheet" href="../../static/css/main.css">
-<script type="text/javascript" src="../../static/js/dateformat.js"></script>
-% else:
 % if "guild" in request.matchdict:
-<link rel="stylesheet" href="../static/css/main.css">
-<script type="text/javascript" src="../static/js/dateformat.js"></script>
+<link rel="stylesheet" href="/static/css/main.css">
+<link rel="stylesheet" href="/static/css/admin.css">
+<link rel="stylesheet" href="/static/css/dropzone.css">
+<script type="text/javascript" src="/static/js/dropzone.js"></script>
+<script type="text/javascript" src="/static/js/dateformat.js"></script>
 % else:
-<link rel="stylesheet" href="static/css/main.css">
-<script type="text/javascript" src="static/js/dateformat.js"></script>
-% endif
-% endif
+<link rel="stylesheet" href="/static/css/main.css">
+<link rel="stylesheet" href="/static/css/admin.css">
+<script type="text/javascript" src="/static/js/dropzone.js"></script>
+<script type="text/javascript" src="/static/js/dateformat.js"></script>
+<link rel="stylesheet" href="/static/css/dropzone.css">
+%endif
+<title>Raffles!</title>
 
 <style>
 :root{
+  --bg:#060a12;
   --panel:#091224;
   --panel2:#07101f;
   --line:rgba(80,120,210,.18);
   --line2:rgba(80,120,210,.34);
   --text:#f4f7ff;
   --muted:#9fb0cf;
+  --blue:#244fb3;
+  --blue2:#183a8f;
   --shadow:0 18px 48px rgba(0,0,0,.38);
-  --hover:rgba(80,120,210,.08);
-  --danger:#ff6b6b;
 }
 
-*{box-sizing:border-box}
-html,body{margin:0;padding:0;max-width:100%;overflow-x:hidden}
-body{
-  font-family:Inter,system-ui,Arial,sans-serif;
-  color:var(--text);
+html,body{
+  margin:0;
+  padding:0;
   background:radial-gradient(circle at top left, rgba(40,76,166,.18), transparent 24%),linear-gradient(180deg,#05070d 0%,#060a12 100%);
-  overflow-x:hidden;
+  color:var(--text);
+  font-family:Inter,system-ui,Arial,sans-serif;
 }
 
-.page{
-  padding:10px;
-  display:grid;
-  gap:14px;
-  width:100%;
-  max-width:100%;
+.page-shell{
+  max-width:1880px;
+  margin:0 auto;
+  padding:18px;
 }
+
 .card{
   background:linear-gradient(180deg,var(--panel),var(--panel2));
   border:1px solid var(--line);
   border-radius:22px;
   box-shadow:var(--shadow);
-  min-width:0;
 }
 
-/* Header */
-.header{
+/* NEW HEADER */
+.admin-header{
   display:flex;
   align-items:center;
   gap:18px;
   padding:14px 20px;
-  min-width:0;
+  margin-bottom:14px;
 }
-.header img#mainLogo{
+.admin-header img#mainLogo{
   width:72px;
   height:72px;
   object-fit:contain;
-  flex:0 0 auto;
 }
 .title-block{
   display:flex;
   flex-direction:column;
   gap:2px;
-  min-width:0;
+  min-width:320px;
 }
 .title-block h1{
   margin:0;
@@ -97,10 +87,6 @@ body{
   color:#e6d77a;
   font-size:.9rem;
 }
-.title-block .updated.closed{
-  color:var(--danger);
-  font-weight:800;
-}
 .stats-inline{
   display:flex;
   gap:10px;
@@ -110,7 +96,7 @@ body{
   border-radius:14px;
   padding:10px 14px;
   background:rgba(8,17,31,.86);
-  border:1px solid #ffffff !important;
+  border:1px solid var(--line);
   text-align:center;
   min-width:120px;
 }
@@ -123,21 +109,36 @@ body{
   font-size:1.6rem;
   font-weight:800;
 }
-
 .header-right{
   margin-left:auto;
-  display:grid;
-  grid-template-columns:auto;
-  align-items:start;
-  justify-items:center;
-  gap:8px;
-  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:12px;
 }
-
-.mobile-search-toggle-inline{
-  display:none;
+.admin-flags{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  align-items:center;
+  margin-right:16px;
+  min-width:70px;
 }
-
+.admin-flag{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  align-items:center;
+  width:100%;
+}
+.admin-flag-label{
+  font-weight:700;
+  line-height:1;
+  text-align:center;
+}
+.admin-flag-bar{
+  height:6px;
+  width:100%;
+}
 .search-wrap{
   display:flex;
   align-items:center;
@@ -146,7 +147,7 @@ body{
   background:#f3f4f6;
   padding:6px 12px;
   height:34px;
-  min-width:220px;
+  min-width:240px;
 }
 .search-wrap span{
   color:#6b7280;
@@ -159,899 +160,1040 @@ body{
   color:#000;
   font-weight:700;
   width:100%;
-  min-width:0;
 }
 
-.raffle-nav{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  justify-content:center;
-  width:100%;
-}
-
-.raffle-nav-link,
-.raffle-nav-disabled{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  min-height:24px;
-  padding:3px 12px;
-  border-radius:0;
-  font-size:.82rem;
-  font-weight:800;
-  line-height:1;
-  text-decoration:none;
-}
-
-.raffle-nav-link{
-  color:var(--text);
-  background:rgba(255,255,255,.04);
-  border:1px solid var(--line2);
-}
-
-.raffle-nav-link:hover{
-  background:rgba(255,255,255,.08);
-}
-
-.raffle-nav-disabled{
-  color:rgba(244,247,255,.45);
-  background:rgba(255,255,255,.02);
-  border:1px solid rgba(255,255,255,.08);
-  cursor:default;
-}
-
-/* Mid row */
-.mid-row{
+/* NEW BUTTON BAR */
+.button-bar{
   display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:14px;
-  align-items:stretch;
-}
-.info-panel{
-  min-height:140px;
-  border-radius:14px;
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
-  min-width:0;
-}
-.info-bar{
-  height:34px;
-  display:flex;
-  align-items:center;
-  padding:0 14px;
-  background:linear-gradient(90deg,#17398a 0%, #1f4ca8 100%);
-  color:var(--text);
-  font-size:.95rem;
-  font-weight:800;
-  border-bottom:1px solid rgba(255,255,255,.06);
-}
-.raffle-live-header{
-  gap:10px;
-}
-.live-dot{
-  width:10px;
-  height:10px;
-  border-radius:50%;
-  background:#36ff8e;
-  box-shadow:0 0 8px rgba(54,255,142,.8);
-  flex:0 0 auto;
-}
-.live-label{
-  font-weight:900;
-  letter-spacing:.08em;
-  font-size:.82rem;
-  color:#eafff3;
-  line-height:1;
-  flex:0 0 auto;
-}
-.raffle-name-label{
-  font-weight:800;
-  font-size:.95rem;
-  line-height:1;
-  flex:0 1 auto;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-.info-body{
-  min-height:106px;
-  flex:1;
-  background:linear-gradient(180deg,rgba(11,19,35,.96),rgba(8,14,24,.98));
-  padding:16px 18px;
-  white-space:pre-line;
-  line-height:1.55;
-  color:#d7e2f5;
-}
-
-/* Bottom row */
-.bottom-row{
-  display:grid;
-  grid-template-columns:1.42fr .78fr;
-  gap:14px;
-  align-items:start;
-}
-.prizes-panel,
-.entrants-panel{
-  display:flex;
-  flex-direction:column;
-  min-width:0;
-}
-.prizes{
-  padding:14px;
-  display:grid;
-  gap:14px;
-  align-content:start;
-}
-.entrants-panel{
-  overflow:hidden;
-}
-.entrants-body{
-  display:flex;
-  flex-direction:column;
-  min-height:0;
-}
-.entrants-scroll{
-  overflow:auto;
-  padding:0 20px 16px 12px;
-  max-height:2200px;
-  margin-right:32px;
-}
-
-/* Prize cards */
-.prize{
-  display:grid;
-  grid-template-columns:96px minmax(0,1fr);
-  gap:18px;
-  align-items:stretch;
-  padding:14px;
-  border-radius:24px;
-  border:1px solid var(--line);
-  background:linear-gradient(180deg,rgba(11,19,35,.96),rgba(8,14,24,.98));
-  width:100%;
-}
-.num{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  min-height:148px;
-  border-radius:20px;
-  border:1px solid var(--line);
-  background:linear-gradient(180deg,rgba(15,28,51,.96),rgba(8,16,29,.98));
-  font-size:2.4rem;
-  font-weight:900;
-}
-.pmid{
-  display:grid;
-  grid-template-rows:auto auto auto;
+  grid-template-columns:repeat(6,minmax(0,1fr));
   gap:12px;
-  min-width:0;
+  margin-bottom:14px;
 }
-.ptitle{
-  width:100%;
-  min-height:54px;
-  padding:12px 18px;
+.action-btn{
+  height:44px;
   border-radius:18px;
-  border:1px solid var(--line);
-  background:rgba(10,20,38,.88);
-  display:flex;
-  align-items:center;
-  font-size:1.34rem;
+  border:1px solid var(--line2);
+  background:linear-gradient(180deg,#0b1a34,#09142a);
+  color:#f4f7ff;
+  font-size:1rem;
   font-weight:850;
-  line-height:1.22;
-}
-.pmeta{
-  color:var(--muted);
-  font-size:.95rem;
-  padding:0 6px;
-}
-.pwinner{
-  width:100%;
-  padding:12px 18px;
-  border-radius:16px;
-  background:rgba(255,255,255,.03);
-  border:1px solid rgba(255,255,255,.05);
-  display:grid;
-  gap:6px;
-}
-.pwinner .label{
-  font-size:.8rem;
-  color:var(--muted);
-  text-transform:uppercase;
-  letter-spacing:.08em;
-  font-weight:800;
-}
-.pwinner .value{
-  font-size:1rem;
-  font-weight:700;
+  box-shadow:var(--shadow);
+  cursor:pointer;
 }
 
-/* Entrants panel */
-.table-headline{
-  padding:18px 20px 8px 20px;
-  font-size:1.15rem;
-  font-weight:800;
-}
-.table-sub{
-  padding:0 20px 12px 20px;
-  color:var(--muted);
-  font-size:.92rem;
-}
-.entrants-controls{
-  padding:0 20px 12px 20px;
-  display:grid;
-  gap:10px;
-}
-.lookup-input{
-  width:100%;
-  padding:10px 12px;
-  border-radius:10px;
-  border:none;
-  outline:none;
-  background:#fff;
-  color:#000;
-  font:inherit;
-}
-.thead,.row{
-  display:grid;
-  grid-template-columns:.5fr 1.8fr .8fr;
-  gap:10px;
-  align-items:center;
-}
-.thead{
-  padding:14px 8px 12px 8px;
-  border-top:1px solid var(--line);
-  color:#eef5ff;
-  font-size:1rem;
-  font-weight:900;
-  margin:0 56px 0 8px;
-}
-.row{
-  padding:12px 8px;
-  margin:0 8px;
-  border-top:1px solid rgba(255,255,255,.05);
-}
-.row.hoverable:hover{background:var(--hover)}
-.idx,.total{
-  text-align:right;
-  font-variant-numeric:tabular-nums;
-}
-.name{font-weight:750}
-.empty-state{
-  padding:16px 8px;
-  margin:0 8px;
-  border-top:1px solid rgba(255,255,255,.05);
-  color:var(--muted);
-  font-size:.95rem;
+/* LEGACY LAYOUT CLEANUP */
+#main{
+  max-width:none;
+  margin:0;
+  padding:0;
 }
 
-/* Hide old stuff we don't want */
-#ticket_list,
-#raffle_cost,
-#barter_area,
-.barter-area,
-.barter-panel,
-.barter-view,
-.barter-section{
+#main_table{
+  width:100%;
+}
+
+#column_guildinfo{
+  width:340px;
+  vertical-align:top;
+}
+
+#column_prizeinfo{
+  vertical-align:top;
+}
+
+#column_ticketinfo{
+  width:420px;
+  vertical-align:top;
+}
+
+#column_ticketlist{
+  width:320px;
+  vertical-align:top;
+}
+
+#left,
+#center,
+#right{
+  background:linear-gradient(180deg,var(--panel),var(--panel2));
+  border:1px solid var(--line);
+  border-radius:22px;
+  box-shadow:var(--shadow);
+  padding:14px;
+  margin:0 6px;
+}
+
+#ticket_list{
+  background:linear-gradient(180deg,var(--panel),var(--panel2));
+  border:1px solid var(--line);
+  border-radius:22px;
+  box-shadow:var(--shadow);
+  padding:10px;
+  margin:0 6px;
+  overflow:hidden;
+}
+
+/* hide legacy top summary now shown in new header */
+.legacy-summary-hide{
   display:none !important;
 }
 
-/* Mobile */
-@media (max-width:1180px){
-  .header-right{
-    width:100%;
-    margin-left:0 !important;
-    display:flex !important;
-    flex-direction:column !important;
-    justify-content:flex-start !important;
-    align-items:center !important;
-    gap:10px !important;
+/* give settings area some structure */
+.settings-block-label{
+  display:block;
+  margin:10px 0 4px 0;
+  color:var(--muted);
+  font-size:.92rem;
+  font-weight:700;
+}
+
+#raffle_notes{
+  width:100%;
+  min-height:180px;
+  background:#07111f;
+  color:#fff;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:10px;
+  box-sizing:border-box;
+}
+
+#raffle_subheader,
+#raffle_time,
+#raffle_cost{
+  width:100%;
+  max-width:220px;
+  background:#07111f;
+  color:#fff;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:8px 10px;
+  box-sizing:border-box;
+}
+
+#add_prize_block{
+  margin-top:12px;
+}
+
+#add_prize_button,
+#new_raffle_button,
+#manual_refresh,
+#clear_imported,
+#reshow_import,
+#reshow_confirm,
+#import_barter,
+#import_paid{
+  border-radius:12px;
+  border:1px solid var(--line2);
+  background:linear-gradient(180deg,#0b1a34,#09142a);
+  color:#f4f7ff;
+  padding:10px 14px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.hidden-original-action{
+  display:none !important;
+}
+
+/* keep legacy prize/table styling functional */
+.prize{
+  width:100%;
+}
+
+@media (max-width:1400px){
+  .admin-header{
     flex-wrap:wrap;
   }
-
-  .raffle-nav{
-    justify-content:center;
+  .header-right{
+    margin-left:0;
+  }
+  .button-bar{
+    grid-template-columns:repeat(3,minmax(0,1fr));
   }
 }
 
 @media (max-width:1100px){
-  .mid-row,.bottom-row{grid-template-columns:1fr}
-  .entrants-scroll{overflow:visible;max-height:none}
-  .thead{margin:0 56px 0 8px}
+  .button-bar{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
 }
 
-@media (max-width:700px){
-  .page{
-    padding:12px;
-    gap:12px;
-  }
-
-  .header{
-    position:relative;
-    display:grid;
-    grid-template-columns:56px minmax(0,1fr);
-    grid-template-areas:
-      'logo title'
-      'stats stats'
-      'search search';
-    align-items:start;
-    gap:12px;
-    padding:14px;
-  }
-
-  .header img#mainLogo{
-    grid-area:logo;
-    width:56px;
-    height:56px;
-  }
-
-  .title-block{
-    grid-area:title;
-    min-width:0;
-    padding-right:0;
-  }
-
-  .title-block h1{
-    font-size:1.5rem;
-    line-height:1.06;
-    margin:0;
-  }
-
-  .title-block .sub{
-    font-size:.92rem;
-  }
-
-  .title-block .updated{
-    font-size:.82rem;
-  }
-
-  .mobile-subline{
-    display:block;
-    min-width:0;
-  }
-
-  .mobile-search-toggle-inline{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    position:absolute;
-    right:18px;
-    bottom:82px;
-    border:none;
-    background:transparent;
-    color:var(--muted);
-    font:inherit;
-    font-size:1.8rem;
-    line-height:1;
-    cursor:pointer;
-    padding:0;
-    margin:0;
-    opacity:.95;
-    z-index:3;
-  }
-
-  .mobile-search-toggle-inline:hover{
-    background:transparent;
-  }
-
-  .stats-inline{
-    grid-area:stats;
-    margin-left:0;
-    display:grid;
-    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
-    gap:10px;
-    width:100%;
-    min-width:0;
-  }
-
-  .stat{
-    min-width:0;
-    width:100%;
-    padding:10px 10px;
-  }
-
-  .stat .v{
-    font-size:1.25rem;
-  }
-
-  .header-right{
-    grid-area:search !important;
-    width:100%;
-    display:grid !important;
+@media (max-width:900px){
+  .button-bar{
     grid-template-columns:1fr;
-    gap:10px !important;
-    align-items:stretch !important;
-    justify-items:stretch !important;
   }
-
-  .search-wrap{
-    min-width:0;
-    width:100%;
-    height:54px;
-    padding:0 14px;
-    border-radius:10px;
-  }
-
-  .search-wrap span{
-    font-size:1rem;
-  }
-
-  .search-wrap input{
-    font-size:.98rem;
-  }
-
-  .raffle-nav{
-    justify-content:center;
-    gap:6px;
-  }
-
-  .raffle-nav-link,
-  .raffle-nav-disabled{
-    min-height:26px;
-    padding:4px 10px;
-    font-size:.8rem;
-  }
-
-  .header-right .search-wrap,
-  .header-right .raffle-nav{
-    display:none;
-  }
-
-  .header-right.mobile-search-open .search-wrap{
-    display:flex;
-  }
-
-  .header-right.mobile-search-open .raffle-nav{
-    display:flex;
-  }
-
-  .info-bar{height:36px;font-size:.92rem}
-  .raffle-live-header{gap:8px}
-  .raffle-name-label{font-size:.88rem}
-  .info-body{padding:14px 15px;font-size:.95rem;line-height:1.5}
-  .prize{grid-template-columns:62px 1fr;gap:12px;padding:10px;border-radius:18px}
-  .num{min-height:98px;border-radius:14px;font-size:1.7rem}
-  .ptitle{min-height:42px;padding:10px 12px;border-radius:12px;font-size:1.06rem}
-  .pmeta{font-size:.88rem}
-  .pwinner{padding:10px 12px;border-radius:12px}
-  .pwinner .value{font-size:.95rem}
 }
 </style>
 
 <script>
-const guildSlug = "${request.matchdict['guild']}";
-const initialRequestedRaffleNum = "${initial_lookup_raffle}";
-const liveRaffleEndpoint = "/" + guildSlug + "/json/get/raffle";
-const MAX_HISTORY_DEPTH = 5;
-const urlParams = new URLSearchParams(window.location.search);
-const requestedDepthRaw = urlParams.get('depth');
-let currentDepth = requestedDepthRaw === null ? null : parseInt(requestedDepthRaw, 10);
-
-if (!Number.isFinite(currentDepth) || currentDepth < 0) {
-  currentDepth = null;
+jQuery.fn.center = function() {
+    var container = $(window);
+    var top = -this.height() / 2;
+    var left = -this.width() / 2;
+    return this.css('position', 'absolute').css({ 'margin-left': left + 'px', 'margin-top': top + 'px', 'left': '50%', 'top': '50%' });
 }
-
-let allEntrantsData = [];
-let currentDisplayedRaffleNum = initialRequestedRaffleNum || null;
-let liveCurrentRaffleNum = null;
 
 $(document).ready(function() {
   $.ajaxSetup({cache:false});
-
-  $(document).on('input', '.lookup-input', function() {
-    applyEntrantFilter();
-  });
-
-  $(document).on('submit', '#raffle_lookup_form', function(e) {
-    var rawValue = $('#raffle_lookup').val() || '';
-    var cleanedValue = rawValue.trim().replace(/^#/, '');
-
-    if (!cleanedValue) {
-      e.preventDefault();
-      return;
-    }
-
-    $('#raffle_lookup').val(cleanedValue);
-  });
-
-  $(document).on('click', '#mobile_search_toggle_inline', function() {
-    var $headerRight = $('#header_right');
-    var isOpen = $headerRight.hasClass('mobile-search-open');
-
-    $headerRight.toggleClass('mobile-search-open', !isOpen);
-    $(this).attr('aria-expanded', !isOpen ? 'true' : 'false');
-  });
 });
 
-function escapeHtml(str) {
-  return String(str == null ? "" : str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+var openRaffleLookup = function () {
+        var raffleCode = $.trim($("#raffle_lookup").val())
+        if (!raffleCode) {
+            return false
+        }
+
+        window.open("/${request.matchdict['guild']}/lookup?raffle_lookup=" + encodeURIComponent(raffleCode), "_blank")
+        return false
 }
 
-function normalizeEntrantSearch(value) {
-  return String(value == null ? "" : value)
-    .toLowerCase()
-    .trim()
-    .replace(/^@+/, "");
+
+// Some of my best friends use JSON!
+var GLOBAL_PRIZE_ALERTED = false
+var CURRENT_RAFFLE_INFO = {
+    raffle_subheader: "",
+    raffle_time: "",
+    raffle_cost: ""
 }
 
-function parseRaffleNum(raffleNum) {
-  var cleaned = String(raffleNum == null ? "" : raffleNum).replace(/\D/g, "");
-  if (!/^\d{4}$/.test(cleaned)) return null;
-
-  return {
-    raw: cleaned,
-    year: parseInt(cleaned.slice(0, 2), 10),
-    week: parseInt(cleaned.slice(2), 10)
-  };
+function normalizeFieldValue(value) {
+    if (value === null || value === undefined) {
+        return ""
+    }
+    return $.trim(String(value))
 }
 
-function formatRaffleNum(year, week) {
-  return String(year).padStart(2, '0') + String(week).padStart(2, '0');
-}
-
-function getPrevRaffleNum(raffleNum) {
-  var parsed = parseRaffleNum(raffleNum);
-  if (!parsed) return null;
-
-  var year = parsed.year;
-  var week = parsed.week - 1;
-
-  if (week < 1) {
-    year = year - 1;
-    if (year < 0) year = 99;
-    week = 52;
-  }
-
-  return formatRaffleNum(year, week);
-}
-
-function getNextRaffleNum(raffleNum) {
-  var parsed = parseRaffleNum(raffleNum);
-  if (!parsed) return null;
-
-  var year = parsed.year;
-  var week = parsed.week + 1;
-
-  if (week > 52) {
-    year = year + 1;
-    if (year > 99) year = 0;
-    week = 1;
-  }
-
-  return formatRaffleNum(year, week);
-}
-
-function raffleLookupHref(raffleNum, depth) {
-  var href = "/" + guildSlug + "/lookup?raffle_lookup=" + encodeURIComponent(raffleNum);
-  if (Number.isFinite(depth) && depth >= 0) {
-    href += "&depth=" + depth;
-  }
-  return href;
-}
-
-function inferDepthFromLive(liveNum, currentNum) {
-  if (!liveNum || !currentNum) return null;
-  if (liveNum === currentNum) return 0;
-
-  var probe = liveNum;
-  for (var i = 1; i <= MAX_HISTORY_DEPTH; i++) {
-    probe = getPrevRaffleNum(probe);
-    if (!probe) return null;
-    if (probe === currentNum) return i;
-  }
-
-  return null;
-}
-
-function isArchiveDisplay() {
-  return !!(liveCurrentRaffleNum && currentDisplayedRaffleNum && liveCurrentRaffleNum !== currentDisplayedRaffleNum);
-}
-
-function updateRaffleNav() {
-  var $nav = $("#raffle_nav");
-  if (!$nav.length) return;
-
-  $nav.empty();
-
-  if (!currentDisplayedRaffleNum) {
-    return;
-  }
-
-  var effectiveDepth = currentDepth;
-  if (effectiveDepth === null) {
-    effectiveDepth = inferDepthFromLive(liveCurrentRaffleNum, currentDisplayedRaffleNum);
-  }
-
-  var prevNum = getPrevRaffleNum(currentDisplayedRaffleNum);
-  var nextNum = getNextRaffleNum(currentDisplayedRaffleNum);
-
-  if (prevNum && effectiveDepth !== null && effectiveDepth < MAX_HISTORY_DEPTH) {
-    $nav.append(
-      '<a class="raffle-nav-link" href="' +
-      raffleLookupHref(prevNum, effectiveDepth + 1) +
-      '">&lt; Prev Raffle</a>'
-    );
-  } else {
-    $nav.append('<span class="raffle-nav-disabled">&lt; Prev Raffle</span>');
-  }
-
-  if (nextNum && effectiveDepth !== null && effectiveDepth > 0) {
-    $nav.append(
-      '<a class="raffle-nav-link" href="' +
-      raffleLookupHref(nextNum, effectiveDepth - 1) +
-      '">Next Raffle &gt;</a>'
-    );
-  } else {
-    $nav.append('<span class="raffle-nav-disabled">Next Raffle &gt;</span>');
-  }
-}
-
-function updateRaffleStatusLine(timestampValue) {
-  var $updated = $("#raffle_updated");
-
-  if (isArchiveDisplay()) {
-    $updated.text("Raffle Closed").addClass("closed");
-    return;
-  }
-
-  $updated.removeClass("closed");
-
-  if (!timestampValue) {
-    $updated.text("Last Updated");
-    return;
-  }
-
-  var updated = DateFormat.format.date(parseInt(timestampValue) * 1000, "yyyy-MM-dd hh:mm:ss");
-  $updated.text("Last Updated " + updated.toString());
-}
-
-function buildPrizeCards(result) {
-  $("#prize_info").empty();
-
-  if (!result || !result.length) {
-    $("#prize_info").append('<div class="empty-state">No prize cards yet.</div>');
-    return;
-  }
-
-  $.each(result, function(index, value) {
-    var winnerName = "TBD";
-    if (value["prize_finalised"] != 0 && value["prize_winner_name"]) {
-      winnerName = value["prize_winner_name"];
+function confirmDangerousFieldChange(fieldId, oldValue, newValue) {
+    if (oldValue === newValue) {
+        return true
     }
 
-    var metaText = value["prize_text2"] || "";
-    var prizeText = value["prize_text"] || "";
-
-    var card = ''
-      + '<div class="prize">'
-      + '  <div class="num">' + escapeHtml(metaText) + '</div>'
-      + '  <div class="pmid">'
-      + '    <div class="ptitle">' + escapeHtml(prizeText) + '</div>'
-      + '    <div class="pmeta"></div>'
-      + '    <div class="pwinner">'
-      + '      <div class="label">Winner</div>'
-      + '      <div class="value">' + escapeHtml(winnerName) + '</div>'
-      + '    </div>'
-      + '  </div>'
-      + '</div>';
-
-    $("#prize_info").append(card);
-  });
-}
-
-function renderEntrantsRows(rows) {
-  var $all = $("#allEntrants");
-  $all.empty();
-
-  if (!rows || !rows.length) {
-    $all.append('<div class="empty-state">No matching entrants found.</div>');
-    return;
-  }
-
-  var htmlRows = [];
-  for (var i = 0; i < rows.length; i++) {
-    var r = rows[i];
-    htmlRows.push(
-      '<div class="row hoverable">'
-      + '<div class="idx">' + escapeHtml(r[0]) + '</div>'
-      + '<div class="name">' + escapeHtml(r[1]) + '</div>'
-      + '<div class="total">' + escapeHtml(r[2]) + '</div>'
-      + '</div>'
-    );
-  }
-
-  $all.append(htmlRows.join(''));
-}
-
-function applyEntrantFilter() {
-  var rawQuery = $('.lookup-input').val() || "";
-  var query = normalizeEntrantSearch(rawQuery);
-
-  if (!allEntrantsData || !allEntrantsData.length) {
-    renderEntrantsRows([]);
-    return;
-  }
-
-  if (!query) {
-    renderEntrantsRows(allEntrantsData);
-    return;
-  }
-
-  var filtered = allEntrantsData.filter(function(row) {
-    var name = normalizeEntrantSearch(row[1]);
-    return name.indexOf(query) !== -1;
-  });
-
-  renderEntrantsRows(filtered);
-}
-
-function buildEntrantsTable(result) {
-  allEntrantsData = Array.isArray(result) ? result.slice() : [];
-
-  if (!allEntrantsData.length) {
-    $("#allEntrants").html('<div class="empty-state">No entrants yet.</div>');
-    return;
-  }
-
-  applyEntrantFilter();
-}
-
-function refresher() {
-  $.getJSON(liveRaffleEndpoint, function(result) {
-    liveCurrentRaffleNum = String(result["raffle_guild_num"] || "");
-
-    if (!currentDisplayedRaffleNum) {
-      currentDisplayedRaffleNum = liveCurrentRaffleNum;
+    if (fieldId === "raffle_subheader") {
+        return confirm("Are you sure you want to change the raffle number from " + oldValue + " to " + newValue + "?")
     }
 
-    if (currentDepth === null) {
-      currentDepth = inferDepthFromLive(liveCurrentRaffleNum, currentDisplayedRaffleNum);
+    if (fieldId === "raffle_time") {
+        return confirm("Are you sure you want to change the raffle drawing time from \"" + oldValue + "\" to \"" + newValue + "\"?")
     }
 
-    updateRaffleNav();
-  });
-
-  $.getJSON("json/get/guild", function(result) {
-    $("#guild_header").text(result["guild_name"]);
-  });
-
-  $.getJSON("json/get/raffle", function(result) {
-    var raffleNum = String(result["raffle_guild_num"] || "");
-    currentDisplayedRaffleNum = raffleNum;
-
-    if (currentDepth === null) {
-      currentDepth = inferDepthFromLive(liveCurrentRaffleNum, currentDisplayedRaffleNum);
+    if (fieldId === "raffle_cost") {
+        return confirm("Are you sure you want to change the ticket cost from " + oldValue + " to " + newValue + "?")
     }
 
-    $("#raffle_subheader").text("#" + raffleNum + " Raffle • Drawing: " + result["raffle_time"]);
-    $("#raffle_lookup").attr("placeholder", "Enter Raffle #");
-    $("#raffle_notes").html(result["raffle_notes"] || "Welcome to this week's raffle.");
-    $("#entrants_headline").text("#" + raffleNum + " Raffle Entrants");
-
-    updateRaffleNav();
-  });
-
-  $.getJSON("json/get/prizes", function(result) {
-    buildPrizeCards(result);
-  });
-
-  $.getJSON("json/get/timestamp", function(result) {
-    updateRaffleStatusLine(result);
-  });
-
-  $.getJSON("json/get/tickets", function(result) {
-    $("#raffle_participants").text(result.length);
-
-    var total = 0;
-    for (var i = 0; i < result.length; i++) {
-      total += result[i][2] << 0;
-    }
-    $("#raffle_sold").text(total.toLocaleString());
-
-    buildEntrantsTable(result);
-  });
+    return true
 }
 
-$(document).ready(refresher);
+
+var get_guild_header = function () {
+        $.getJSON("json/get/guild", function (result) {
+                $("#guild_header").text(result["guild_name"])
+                $("#display_guild_header").text(result["guild_name"])
+            });
+    }
+var get_raffle_info = function () {
+        // #raffle_subheader, #raffle_time, #raffle_cost
+        $.getJSON("json/get/raffle", function (result) {
+                $("#raffle_subheader").val(result["raffle_guild_num"])
+                $("#raffle_time").val(result["raffle_time"])
+                $("#raffle_cost").val(result["raffle_ticket_cost"])
+                $("#raffle_notes").val(result["raffle_notes"])
+
+                CURRENT_RAFFLE_INFO.raffle_subheader = normalizeFieldValue(result["raffle_guild_num"])
+                CURRENT_RAFFLE_INFO.raffle_time = normalizeFieldValue(result["raffle_time"])
+                CURRENT_RAFFLE_INFO.raffle_cost = normalizeFieldValue(result["raffle_ticket_cost"])
+
+                $("#display_raffle_subheader").text("#" + result["raffle_guild_num"] + " Raffle")
+                $("#display_raffle_time").text("Drawing: " + result["raffle_time"])
+            })
+}
+var get_prize_info = function () {
+        // deal with prizes
+        $.getJSON("json/get/prizes", function (result) {
+                $("#prize_info").empty()
+                $.each(result, function (index, value) {
+                    var template = $("#prize_template").clone()
+                    var new_id = "prize_" + value["prize_text2"] + "_"
+                    var id_id = "prize_" + value["prize_id"] + "_"
+                    template.attr({"id": new_id + "block"})
+                    // fix the prize number
+                    $("#prize_number", template).attr({"id": new_id + "number"}).val(value["prize_text2"])
+                    var pwinner = value["prize_winner"]
+                    var pname = value["prize_winner_name"]
+                    $("#prize_winner", template).attr({"id": new_id + "winner"}).val(pwinner)
+                    if (value["prize_finalised"] != 0) {
+                        $("#prize_winner_name", template).addClass("finalised")
+                    }
+                    $("#prize_winner_name", template).attr({"id": new_id + "winner_name"}).text(pname)
+
+                    // at least the prize details are here
+                    $("#prize_item", template).attr({"id": new_id + "item"}).val(value["prize_text"])
+                    if (value["prize_finalised"] != 0) {
+                        $("#prize_finalise", template).remove()
+                        $("#prize_delete", template).remove()
+                        $("#prize_roll", template).remove()
+                    } else {
+                        $("#prize_finalise", template).attr({"id": id_id + "finalise"})
+                        $("#prize_delete", template).attr({"id": id_id + "delete"})
+                        $("#prize_roll", template).attr({"id": id_id + "roll"})
+                    }
+                    $("#prize_template_form", template).attr({"id": "prize_" + value["prize_id"] + "_form"})
+                    $(".prize_id", template).val(value["prize_id"])
+
+                    $(".prize_delete", template).click(function () {
+                        if (GLOBAL_PRIZE_ALERTED == false) {
+                            GLOBAL_PRIZE_ALERTED = true
+                            var r = confirm("Prize deletion is final and irreversible. You will only be shown this message once per session. Press OK to confirm deletion, or cancel to go back.")
+                            if (r == false) {
+                                return
+                            }
+                        }
+
+                        $.getJSON("json/set/prize_delete/" + value["prize_id"], function (result) {
+                            get_prize_info()
+                            })
+                        
+                    })
+                    $(".prize_finalise", template).click(function () {
+                            $.getJSON("json/set/prize_finalise/" + value["prize_id"], function (result) {
+                                get_prize_info()
+                                })
+                            })
+                    $(".prize_roll", template).click(function () {
+                            $.getJSON("json/set/prize_roll/" + value["prize_id"], function (result) {
+                                get_prize_info()
+                                })
+                            })
+
+                    $("input[type='text']", template).change(function () {
+                            $.ajax({
+                                type: "POST",
+                                url: "json/set/prize",
+                                data: $("#" + id_id + "form").serialize(),
+                                success: function (result) {
+                                    get_prize_info()
+                                },
+                                xhrFields: {
+                                    withCredentials: true
+                                },
+                                })
+
+                            })
+
+                    $("#prize_info").append(template)
+                })
+            })
+}
+
+var save_ticket_data = function () {
+}
+
+var GUILD_ROSTER = null
+
+var _get_guild_roster = function (query, process) {
+    if (GUILD_ROSTER == null) {
+        $.getJSON("json/get/roster", function (result) {
+                    GUILD_ROSTER = result
+                    process(result)
+                })
+    } else {
+        process(GUILD_ROSTER)
+    }
+}
+
+var get_ticket_table = function () {
+        function after_row_create (index, amount) {
+            setTimeout(function () {
+                var ti = $("#ticket_info")
+                
+                // Ensure index is a number
+                var rowIndex = parseInt(index, 10)
+                
+                if (isNaN(rowIndex) || rowIndex < 0) {
+                    return
+                }
+
+                // Ensure all parameters are proper numbers
+                var row = Number(rowIndex)
+                var col = 0
+                var value = Number(rowIndex + 1)
+                
+                try {
+                    ti.handsontable("setDataAtCell", row, col, value)
+                } catch (error) {
+                    return
+                }
+% if request.extended_tickets:                
+                // if paid is empty, make it 0
+                var prevRow = Number(rowIndex - 1)
+                if (prevRow >= 0) {
+                    try {
+                        if (ti.handsontable("getDataAtCell", prevRow, 3) == null)
+                        { ti.handsontable("setDataAtCell", prevRow, 3, 0) }
+                        // free
+                        if (ti.handsontable("getDataAtCell", prevRow, 4) == null)
+                        { ti.handsontable("setDataAtCell", prevRow, 4, 0) }
+                        // barter
+                        if (ti.handsontable("getDataAtCell", prevRow, 5) == null)
+                        { ti.handsontable("setDataAtCell", prevRow, 5, 0) }
+                    } catch (error) {
+                        // Ignore errors setting default values
+                    }
+                }
+% endif
+            }, 100)
+
+        }
+
+        function after_cell_change (change, source) {
+            if (source == "ignore") { return }
+
+% if request.extended_tickets:
+            if (change) {
+                var row = parseInt(change[0][0], 10)
+                if (isNaN(row) || row < 0) {
+                    return
+                }
+
+                var ti = $("#ticket_info")
+
+                var paid = ti.handsontable("getDataAtCell", row, 3)
+                var free = ti.handsontable("getDataAtCell", row, 4)
+                var bart = ti.handsontable("getDataAtCell", row, 5)
+                
+                // Ensure values are numbers
+                paid = isNaN(paid) ? 0 : Number(paid)
+                free = isNaN(free) ? 0 : Number(free)
+                bart = isNaN(bart) ? 0 : Number(bart)
+
+                var total = paid + free + bart
+
+                ti.handsontable("setDataAtCell", row, 2, total, "ignore")
+            }
+% endif
+            setTimeout(function () {
+                var data = $("#ticket_info").handsontable("getData")
+                $.ajax({
+                    type: "POST",
+% if request.extended_tickets:
+                    url: "json/set/tickets_extended",
+% else:
+                    url: "json/set/tickets",
+% endif
+                    data: JSON.stringify(data),
+                    contentType: "application/json",
+                    success: function (result) {
+                        if (result && result > 0) {
+                            get_ticket_list()
+                        }
+                    },
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    })
+    
+            }, 100)
+        }
+
+        $.getJSON("json/get/timestamp", function (result) {
+                if (!result) { return; }
+
+                var updated = DateFormat.format.date(parseInt(result) * 1000, "yyyy-MM-dd hh:mm:ss")
+
+                $("#raffle_updated").text("Updated: " + updated.toString())
+                $("#display_raffle_updated").text("Last Updated " + updated.toString())
+                
+                })
+% if request.extended_tickets:
+        $.getJSON("json/get/tickets_extended", function (result) {
+                $("#ticket_info").handsontable("destroy")
+                $("#ticket_info").handsontable({
+                        data: result,
+                        rowHeaders: false,
+                        colHeaders: ["Participants", "Name", "Total", "Paid", "Free", "Bar"],
+                        colWidths: [100, 180, 45, 45, 45, 45],
+                        contextMenu: false,
+                        enterMoves: {row: 0, col: 1},
+                        columnSorting: true,
+			licenseKey: "non-commercial-and-evaluation",
+                        columns: [
+                            {
+                                readOnly: true,
+                            },
+                            {
+                            }, // autocomplete column
+                            {
+                                type: 'numeric',
+                                format: '1,000,000',
+                                readOnly: true,
+                                currentColClassName: 'totals-column',
+                            },
+                            {
+                                type: 'numeric',
+                                format: '1,000,000',
+                                allowInvalid: false,
+                            },
+                            {
+                                type: 'numeric',
+                                format: '1,000,000',
+                                allowInvalid: false,
+                            },
+                            {
+                                type: 'numeric',
+                                format: '1,000,000',
+                                allowInvalid: false,
+                            },
+                        ],
+                        isEmptyRow: function(row) {
+                            var col, colLen, value, meta;
+
+                            var col1 = this.getDataAtCell(row, 1)
+                            var col3 = this.getDataAtCell(row, 3)
+                            var col4 = this.getDataAtCell(row, 4)
+                            var col5 = this.getDataAtCell(row, 5)
+
+                            if ((col1 == null || col1 == '') || ((col3 == null || col3 == '') && (col4 == null || col4 == '') && (col5 == null || col5 == ''))) { return true }
+
+                            return false
+                        },
+                        minSpareRows: 1,
+                        afterCreateRow: after_row_create,
+                        afterChange: after_cell_change,
+                        })
+                    var data = $("#ticket_info").handsontable("getData")
+                    var total_tickets = 0
+                    var total_participants = data.length - 1
+                    for (var i = 0; i < data.length; i++) {
+                        total_tickets = total_tickets + data[i][2]
+                    }
+                    $("#raffle_sold").text(total_tickets + " tickets sold.")
+                    $("#raffle_participants").text(total_participants + " unique participants.")
+                    $("#display_raffle_sold").text(total_tickets)
+                    $("#display_raffle_participants").text(total_participants)
+                })
+% else:
+        $.getJSON("json/get/tickets", function (result) {
+                $("#ticket_info").handsontable("destroy")
+                $("#ticket_info").handsontable({
+                        data: result,
+                        rowHeaders: false,
+                        colHeaders: ["Participants", "Name", "Total"],
+                        colWidths: [100, 300, 50],
+                        contextMenu: false,
+                        enterMoves: {row: 0, col: 1},
+                        columnSorting: true,
+			licenseKey: "non-commercial-and-evaluation",
+                        columns: [
+                            {},
+                            {
+                                type: 'autocomplete',
+                                source: _get_guild_roster,
+                                validator: function (value, callback) {
+                                        var row, rowl, val
+
+                                        var ti = $("#ticket_info")
+
+                                        var rowl = ti.handsontable("countRows")
+
+                                        for (row = 0; row < rowl; row++) {
+                                            val = ti.handsontable("getDataAtCell", row, 1)
+                                            if (this.row !== row && val == value) {
+                                                callback(false)
+                                            }
+                                        }
+
+                                        callback(true)
+                                },
+                                allowInvalid: false,
+                            }, // autocomplete column
+                            {
+                                type: 'numeric',
+                                format: '1,000,000',
+                                allowInvalid: false,
+                            },
+                        ],
+                        isEmptyRow: function(row) {
+                            var col, colLen, value, meta;
+
+                            var col1 = this.getDataAtCell(row, 1)
+                            var col2 = this.getDataAtCell(row, 2)
+
+                            if (col1 == null || col1 == '' || col2 == null || col2 == '') { 
+                                return true
+                            }
+
+                            return false
+                        },
+                        minSpareRows: 1,
+                        afterCreateRow: after_row_create,
+                        afterChange: after_cell_change,
+                        })
+                    var data = $("#ticket_info").handsontable("getData")
+                    var total_tickets = 0
+                    var total_participants = data.length - 1
+                    for (var i = 0; i < data.length; i++) {
+                        total_tickets = total_tickets + data[i][2]
+                    }
+                    $("#raffle_sold").text(total_tickets + " tickets sold.")
+                    $("#raffle_participants").text(total_participants + " unique participants.")
+                    $("#display_raffle_sold").text(total_tickets)
+                    $("#display_raffle_participants").text(total_participants)
+
+                })
+% endif
+}
+
+var get_ticket_list = function () {
+        $.getJSON("json/get/ticket_list", function (result) {
+                $("#ticket_list").handsontable("destroy")
+                $("#ticket_list").handsontable ({
+                        data: result,
+                        rowHeaders: false,
+                        colHeaders: ["Ticket", "Name"],
+                        colWidths: [70, 200],
+                        contextMenu: false,
+			licenseKey: "non-commercial-and-evaluation",
+                        }).handsontable("updateSettings", {cells: function (row, col, prop) {
+                            return {"readOnly": true}
+                            }})
+                })
+}
+
+
+var refresher = function () {
+    get_guild_header()
+    get_raffle_info()
+    get_prize_info()
+    get_ticket_table()
+    get_ticket_list()
+}
+
+$(document).ready(refresher)
 $(document).ready(function () {
-  window.setInterval(refresher, 30000);
-});
+            $(".ginfo_change_save").change(function () {
+                var $field = $(this)
+                var fieldId = $field.attr("id")
+                var trackedMap = {
+                    "raffle_subheader": "raffle_subheader",
+                    "raffle_time": "raffle_time",
+                    "raffle_cost": "raffle_cost"
+                }
+
+                if (trackedMap[fieldId]) {
+                    var oldValue = normalizeFieldValue(CURRENT_RAFFLE_INFO[trackedMap[fieldId]])
+                    var newValue = normalizeFieldValue($field.val())
+
+                    if (oldValue !== "" && oldValue !== newValue) {
+                        if (!confirmDangerousFieldChange(fieldId, oldValue, newValue)) {
+                            $field.val(oldValue)
+                            return
+                        }
+                    }
+                }
+
+                $.ajax({
+                    type: "POST",
+                    url: "json/set/raffle",
+                    data: $("#ginfo_form").serialize(),
+                    success: function (result) {
+                        if (trackedMap[fieldId]) {
+                            CURRENT_RAFFLE_INFO[trackedMap[fieldId]] = normalizeFieldValue($field.val())
+                        }
+                    },
+                    xhrFields: {
+                        withCredentials: true
+                    }
+                })
+            })
+            $("#add_prize_button").click(function () {
+                $.getJSON("json/set/prize_add", function (result) {
+                        if (result) { get_prize_info() }
+                    })
+            })
+            $("#manual_refresh").click(function () {
+                get_ticket_table()
+                get_ticket_list()
+            })
+            $("#new_raffle_button").click(function () {
+                    var r = confirm("This will close the current raffle, open a new raffle, carry forward the drawing time and ticket cost, and auto-increment the raffle number. Are you sure?")
+                    if (r == false) { return }
+
+                    $.getJSON("json/set/open_raffle", function (result) {
+                            refresher()
+                        })
+                    })
+            $("#ticket_list").height($(window).height()-20)
+
+            window.setTimeout(function () {
+            $("#dropzone_uploader")[0].dropzone.on("success", function (file, response) { 
+                // Check if response is a redirect (authentication failure)
+                if (typeof response === 'string' && response.includes('redirected automatically')) {
+                    alert('Authentication required. Please log in as an admin user first.');
+                    window.location.href = 'auth/login';
+                    return;
+                }
+                
+                // Check if response is empty or invalid
+                if (!response || response.length == 0) { 
+                    alert('No ticket data found in uploaded file. Please check the file format.');
+                    return; 
+                }
+                
+                // Check if response is an error object
+                if (response.error) {
+                    alert('Error: ' + response.error);
+                    return;
+                }
+                
+                $("#import_template").css({'width': '900px', 'height': '600px', 'z-index': 100}).addClass("import").center().show()
+                // get the first header
+                var headline = $("#import_data_here tr").first().clone() 
+                $("#import_data_here").empty().append(headline)
+                var table = $("#import_data_here")
+                $.each(response, function (key, item) {
+                    var tr = $("<tr></tr>")
+                    var td = $("<td></td>")
+                    var name_td = td.clone()
+                    var name = $("<input type='text' name='row"+key+"_name' />").val(item[0]).appendTo(name_td)
+                    name_td.appendTo(tr)
+                    var uid = $("<input type='hidden' name='row"+key+"_uid' />").val(item[4]).appendTo(name_td)
+                    var amount = $("<input type='text' name='row"+key+"_amount' />").val(item[1]).appendTo(td.clone().appendTo(tr))
+                    var sub
+                    if (item[2] == "GUILD BANK DEPOSIT") { sub = "[Guild Bank]" } else { sub = item[2] }
+                    var subject = td.clone().text(sub).appendTo(tr)
+                    var time
+                    if (item[3] == "MAILED IN") { time = "[Mail]" } else { time = item[3] }
+                    var time_ = td.clone().text(time).appendTo(tr)
+                    var check = $("<input type='checkbox' name='row"+key+"_confirmed' />").appendTo(td.clone().appendTo(tr))
+                    table.append(tr)
+                })
+                $("#check_all").prop("checked", false)
+            });
+            
+            $("#dropzone_uploader")[0].dropzone.on("error", function (file, errorMessage) {
+                if (typeof errorMessage === 'string') {
+                    alert('Upload error: ' + errorMessage);
+                } else if (errorMessage.error) {
+                    alert('Upload error: ' + errorMessage.error);
+                } else {
+                    alert('Upload failed. Please try again.');
+                }
+            });
+            }, 1000)
+
+            // "Select all" checkbox handler - using event delegation for dynamically created elements
+            $(document).on('click', '#check_all', function () {
+                if ($(this).is(":checked")) {
+                    $("#import_data_here input[type=checkbox]:not(#check_all)").prop("checked", true)
+                } else {
+                    $("#import_data_here input[type=checkbox]:not(#check_all)").prop("checked", false)
+                }
+            })
+
+            $("#import_close_button").click(function () { $("#import_template").hide() })
+            $("#confirm_close_button").click(function () { $("#confirm_template").hide() })
+            $("#barter_close_button").click(function () { $("#barter_template").hide() })
+            $("#paid_close_button").click(function () { $("#paid_template").hide() })
+            $("#clear_imported").click(function () {
+                    $.getJSON("json/set/fix_dupes", function (result) { })
+                    })
+            $("#import_selected").click(function () {
+                if ($("#import_template").is(":visible")) {
+                        var formData = $("#import_this").serialize();
+                        console.log("Form data:", formData);
+                        
+                        $.ajax({
+                                type: "POST",
+                                url: "json/set/tickets_import2",
+                                data: formData,
+                                success: function (result) {
+                                    // refresh everything!
+                                    refresher()
+                                    $("#import_template").hide()
+                                    $("#confirm_template").css({'width': '900px', 'height': '600px', 'z-index': 100}).addClass("import").center().show()
+                                    $("#confirm_string").val(result[0])
+                                    $("#confirm_names").val(result[1])
+                                },
+                                error: function (xhr, status, error) {
+                                    alert("Import failed: " + error + "\nStatus: " + status + "\nResponse: " + xhr.responseText);
+                                },
+                                xhrFields: {
+                                    withCredentials: true
+                                },
+                                })
+
+                }
+                    })
+          $("#reshow_import").click(function () { $("#confirm_template").hide()
+                                                  $("#import_template").show() })
+          $("#reshow_confirm").click(function () { $("#confirm_template").show()
+                                                  $("#import_template").hide() })
+          $("#import_barter").click(function () { $("#confirm_template").hide()
+                                                  $("#barter_template").css({'width': '900px', 'height': '600px', 'z-index': 100}).addClass("barter").center().show() })
+          $("#import_paid").click(function () { $("#confirm_template").hide()
+                                                  $("#paid_template").css({'width': '900px', 'height': '600px', 'z-index': 100, 'background-color': '#f8f8f8', 'border': '1px solid #000000', 'padding': '2px'}).addClass("paid").center().show() })
+          $("#barter_import").click(function () {
+                if ($("#barter_template").is(":visible")) {
+                        $.ajax({
+                                type: "POST",
+                                url: "json/set/barter_import",
+                                data: $("#barter_this").serialize(),
+                                success: function (result) {
+                                    // refresh everything!
+                                    refresher()
+                                    $("#barter_template").hide()
+                                    $("#confirm_template").css({'width': '900px', 'height': '600px', 'z-index': 100}).addClass("import").center().show()
+                                    $("#confirm_string").val(result[0])
+                                    $("#confirm_names").val(result[1])
+                                },
+                                xhrFields: {
+                                    withCredentials: true
+                                },
+                                })
+
+                }
+                    })
+          $("#paid_import").click(function () {
+                if ($("#paid_template").is(":visible")) {
+                        $.ajax({
+                                type: "POST",
+                                url: "json/set/paid_import",
+                                data: $("#paid_this").serialize(),
+                                success: function (result) {
+                                    // refresh everything!
+                                    refresher()
+                                    $("#paid_template").hide()
+                                    $("#confirm_template").css({'width': '900px', 'height': '600px', 'z-index': 100}).addClass("import").center().show()
+                                    $("#confirm_string").val(result[0])
+                                    $("#confirm_names").val(result[1])
+                                },
+                                xhrFields: {
+                                    withCredentials: true
+                                },
+                                })
+
+                }
+                    })
+
+        })
+$(window).resize(function () {
+        $("#ticket_list").height($(window).height()-20)
+        })
 </script>
 </head>
 <body>
-<div class="page">
+<div class="page-shell">
 
-  <section class="card header">
-    <img id="mainLogo" src="https://www.bbcguild.com/wp-content/uploads/2020/04/cropped-cropped-BBC-LOGO-V2-2.gif" alt="BBC logo">
+<section class="card admin-header">
+  <img id="mainLogo" src="https://www.bbcguild.com/wp-content/uploads/2020/04/cropped-cropped-BBC-LOGO-V2-2.gif" alt="BBC logo">
 
-    <div class="title-block">
-      <h1 id="guild_header"></h1>
-      <div class="sub mobile-subline">
-        <span id="raffle_subheader">#${initial_display_raffle} Raffle</span>
-        <button
-          type="button"
-          class="mobile-search-toggle-inline"
-          id="mobile_search_toggle_inline"
-          aria-expanded="false"
-          aria-controls="header_right"
-          aria-label="Show raffle search"
-        >🔍</button>
+  <div class="title-block">
+    <h1 id="display_guild_header">Guild</h1>
+    <div class="sub"><strong id="display_raffle_subheader">Raffle</strong> • <span id="display_raffle_time">Drawing</span></div>
+    <div class="updated" id="display_raffle_updated">Last Updated</div>
+  </div>
+
+  <div class="stats-inline">
+    <div class="stat"><div class="k">Total Tickets</div><div class="v" id="display_raffle_sold">0</div></div>
+    <div class="stat"><div class="k">Participants</div><div class="v" id="display_raffle_participants">0</div></div>
+  </div>
+
+  <div class="header-right">
+    <div class="admin-flags">
+      <div class="admin-flag">
+        <div class="admin-flag-label">ADMIN</div>
+        <div class="admin-flag-bar" style="background:#c97a1f;"></div>
       </div>
-      <div class="updated${' closed' if initial_lookup_raffle else ''}" id="raffle_updated">${'Raffle Closed' if initial_lookup_raffle else 'Last Updated'}</div>
-    </div>
-
-    <div class="stats-inline">
-      <div class="stat"><div class="k">Total Tickets</div><div class="v" id="raffle_sold">0</div></div>
-      <div class="stat"><div class="k">Participants</div><div class="v" id="raffle_participants">0</div></div>
-    </div>
-
-    <div class="header-right" id="header_right">
-      <form id="raffle_lookup_form" action="/${request.matchdict['guild']}/lookup" method="get" class="search-wrap" style="margin:0;" autocomplete="off">
-        <span>🔍</span>
-        <input type="text" id="raffle_lookup" name="raffle_lookup" placeholder="Enter Raffle #" />
-      </form>
-      <div class="raffle-nav" id="raffle_nav"></div>
-    </div>
-  </section>
-
-  <section class="mid-row">
-    <div class="card info-panel">
-      <div class="info-bar raffle-live-header">
-        <span class="live-dot"></span>
-        <span class="live-label">LIVE</span>
-        <span class="raffle-name-label">| MOPPET UP RAFFLE TEST</span>
-      </div>
-      <div class="info-body" id="raffle_notes">Welcome to this week's raffle.</div>
-    </div>
-
-    <div class="card info-panel">
-      <div class="info-bar">Raffle Info</div>
-      <div class="info-body">🎟 Ticket numbers are assigned just prior to draw and will be listed below.
-
-🕒 Ticket Deadline: 10:30P EDT Tuesday
-🎲 Winners announced: 11P EDT Tuesday
-📍 Rolls in Discord #bleakrock-diceroom
-📦 All prizes mailed within 7 days</div>
-    </div>
-  </section>
-
-  <section class="bottom-row">
-    <div class="card prizes-panel">
-      <div class="prizes" id="prize_info">
-        <div class="empty-state">No prize cards yet.</div>
-      </div>
-    </div>
-
-    <div class="card entrants-panel">
-      <div class="table-headline" id="entrants_headline">#${initial_display_raffle} Raffle Entrants</div>
-      <div class="table-sub">Tickets Lookup</div>
-
-      <div class="entrants-controls">
-        <input type="text" class="lookup-input" placeholder="Find: ex. '@name'">
-      </div>
-
-      <div class="entrants-body">
-        <div class="thead">
-          <div class="idx">#</div>
-          <div>Name</div>
-          <div class="total">Total</div>
+      <div class="admin-flag">
+        <div class="admin-flag-label" style="display:flex;align-items:center;gap:6px;justify-content:center;">
+          <span style="width:8px;height:8px;border-radius:50%;background:#ff3b3b;display:inline-block;"></span>
+          LIVE
         </div>
-
-        <div class="entrants-scroll">
-          <div id="allEntrants">
-            <div class="empty-state">No entrants yet.</div>
-          </div>
-        </div>
+        <div class="admin-flag-bar" style="background:#1fe38f;"></div>
       </div>
     </div>
-  </section>
 
+    <div class="search-wrap">
+      <span>🔍</span>
+      <input type="text" id="raffle_lookup" name="raffle_lookup" placeholder="Enter raffle #" onkeydown="if (event.key === 'Enter') { event.preventDefault(); openRaffleLookup(); }" />
+    </div>
+  </div>
+</section>
+
+<section class="button-bar">
+  <button type="button" class="action-btn" onclick="$('#new_raffle_button').click()">Open New Raffle</button>
+  <button type="button" class="action-btn" onclick="$('#reshow_import').click()">Re-Show Imports</button>
+  <button type="button" class="action-btn" onclick="$('#reshow_confirm').click()">Re-Show Confirms</button>
+  <button type="button" class="action-btn" onclick="$('#import_paid').click()">Import Paid</button>
+  <button type="button" class="action-btn" onclick="$('#import_barter').click()">Import Barter</button>
+  <button type="button" class="action-btn" onclick="$('#manual_refresh').click()">Manual Refresh</button>
+</section>
+
+<div id="main">
+<table id="main_table" valign="top">
+    <tr>
+        <td id="column_ticketlist">
+            <div id="ticket_list">
+            </div>
+        </td>
+        <td id="column_guildinfo">
+    <div id="left" class="column">
+            <span class="hidden-original-action"><a href="/bbc/auth/logout">[Logout]</a></span>
+            <form id="ginfo_form">
+            <span id="guild_header" class="legacy-summary-hide"></span>
+
+            <label class="settings-block-label" for="raffle_subheader">Raffle Number</label>
+            <input type="text" id="raffle_subheader" class="ginfo_change_save" name="raffle_guild_num"/>
+
+            <label class="settings-block-label" for="raffle_time">Drawing Time</label>
+            <input type="text" id="raffle_time" class="ginfo_change_save" name="raffle_time"/>
+
+            <label class="settings-block-label" for="raffle_cost">Ticket Cost</label>
+            <input type="text" id="raffle_cost" class="ginfo_change_save" name="raffle_ticket_cost"/>
+
+            <span id="raffle_sold" class="legacy-summary-hide"></span>
+            <span id="raffle_participants" class="legacy-summary-hide"></span>
+            <span id="raffle_updated" class="legacy-summary-hide"></span>
+
+            % if request.bonus_tickets == 5:
+            <br />
+            <br />
+            <span id="bonus_tickets">
+                For every 5 tickets purchased, you get 1 bonus ticket!
+            </span>
+            % elif request.bonus_tickets == 2:
+            <br />
+            <br />
+            <span id="bonus_tickets">
+                For every 2 tickets purchased, you get 1 bonus ticket!
+            </span>
+            % endif
+
+            <label class="settings-block-label" for="raffle_notes">Admin Notes</label>
+            <textarea id="raffle_notes" name="raffle_notes" class="ginfo_change_save">
+            </textarea>
+            <br />
+            <br />
+            </form>
+
+            <input type="submit" value="Open new raffle" id="new_raffle_button" class="hidden-original-action" />
+            <input type="submit" value="Manually refresh" id="manual_refresh" class="hidden-original-action" />
+            <input type="submit" value="Clear dupes" id="clear_imported" />
+            <br />
+            <br />
+            <input type="submit" value="Re-Show Import Pane" id="reshow_import" class="hidden-original-action" />
+            <input type="submit" value="Re-Show Confirmations Pane" id="reshow_confirm" class="hidden-original-action" />
+            <br />
+            <br />
+% if request.extended_tickets:
+            <input type="submit" value="Import barter tickets" id="import_barter" class="hidden-original-action" />
+            <input type="submit" value="Import paid tickets" id="import_paid" class="hidden-original-action" />
+            <br />
+            <br />
+% endif
+            <a href="json/get/csv" target="_blank">Export as CSV</a>
+            <br />
+            <br />
+            <form action="json/set/tickets_import" class="dropzone" id="dropzone_uploader"></form>
+    </div>
+        </td>
+        <td id="column_prizeinfo">
+    <div id="center" class="column">
+        <div id="prize_info">
+        </div>
+        <div id="add_prize_block">
+            <input type="submit" value="Add prize" id="add_prize_button" />
+        </div>
+    </div>
+        </td>
+        <td id="column_ticketinfo">
+    <div id="right" class="column">
+        <div id="ticket_info">
+        </div>
+    </div>
+        </td>
+    </tr>
+</table>
 </div>
+</div>
+
+<div id="prize_template">
+<form id="prize_template_form">
+<table class="prize">
+    <tr>
+        <th rowspan="3" class="prize_number_column"><input type="text" class="prize_number" id="prize_number" name="prize_text2" /></td>
+        <td class="winning_number">Winning Number:</td>
+        <td class="number_column"><input type="text" id="prize_winner" class="prize_winner" name="prize_winner"/></td>
+        <td class="delete_button"><a href="#" id="prize_delete" class="prize_delete">x</a></td>
+    </tr>
+    <tr>
+        <td class="winner">Winner:</td>
+        <td class="winner_column"><span id="prize_winner_name" class="prize_winner_name"></span></td>
+        <td class="roll_button"><a href="#" id="prize_roll" class="prize_roll">R</a></td>
+    </tr>
+    <tr>
+        <td class="winning_prize">Prize:</td>
+        <td class="prize_column"><input type="text" id="prize_item" class="prize_item" name="prize_text" /></td>
+        <td class="finalise_button"><a href="#" id="prize_finalise" class="prize_finalise">f</a></td>
+    </tr>
+</table>
+<input type="hidden" name="prize_id" value="" class="prize_id" />
+</form>
+</div>
+<div id="import_template">
+<div id="import_buttons"><input type="button" value="Close" id="import_close_button" /> <input type="submit" value="Import Selected" id="import_selected" /></div>
+<div id="import_data">
+    <form id="import_this">
+        <table id="import_data_here">
+            <tr>
+                <th>User</th>
+                <th>Amount</th>
+                <th>Subject</th>
+                <th>Time</th>
+                <th><input type="checkbox" id="check_all" /></th>
+            </tr>
+        </table>
+    </form>
+</div>
+</div>
+ 
+<div id="confirm_template" class="confirm">
+<div id="confirm_buttons"><input type="button" value="Close" id="confirm_close_button" /></div>
+<div id="confirm_data">
+    <br />
+    <p>Confirmation string (copy &amp; paste into addon)</p>
+    <textarea id="confirm_string"></textarea>
+    <br />
+    <p>Confirmation names</p>
+    <br />
+    <textarea id="confirm_names"></textarea>
+</div>
+</div>
+
+<div id="barter_template" class="barter">
+<div id="barter_buttons"><input type="button" value="Close" id="barter_close_button" /> <input type="submit" value="Import" id="barter_import" /></div>
+<div id="barter_data">
+    <br />
+    <p>Barter imports:</p>
+    <form id="barter_this">
+    <textarea name="barter_import_string" id="barter_import_string"></textarea>
+    <p>Confirmation string:</p>
+    <textarea name="barter_confirm_string" id="barter_confirm_string"></textarea>
+    </form>
+</div>
+</div>
+
+<div id="paid_template" class="paid">
+<div id="paid_buttons"><input type="button" value="Close" id="paid_close_button" /> <input type="submit" value="Import" id="paid_import" /></div>
+<div id="paid_data">
+    <br />
+    <p>Paid ticket imports:</p>
+    <form id="paid_this">
+    <textarea name="paid_import_string" id="paid_import_string"></textarea>
+    <p>Confirmation string:</p>
+    <textarea name="paid_confirm_string" id="paid_confirm_string"></textarea>
+    </form>
+</div>
+</div>
+
 </body>
 </html>
