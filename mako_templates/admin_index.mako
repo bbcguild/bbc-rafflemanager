@@ -17,8 +17,10 @@
 <script type="text/javascript" src="/static/js/dateformat.js"></script>
 <link rel="stylesheet" href="/static/css/dropzone.css">
 %endif
-<title>Raffles!</title>
-<link rel="icon" type="image/png" href="/static/favicon.png">
+<title>Raffle Admin</title>
+<link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-256.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-256.png">
 
 <style>
 :root{
