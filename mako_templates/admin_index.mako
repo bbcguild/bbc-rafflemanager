@@ -249,9 +249,9 @@ html,body{
 #raffle_notes{
   width:100%;
   min-height:180px;
-  background:#07111f;
-  color:#fff;
-  border:1px solid var(--line);
+  background:#182233;
+  color:#f4f7ff;
+  border:1px solid rgba(140,170,230,.20);
   border-radius:10px;
   padding:10px;
   box-sizing:border-box;
@@ -264,9 +264,9 @@ html,body{
 #raffle_status{
   width:100%;
   max-width:220px;
-  background:#07111f;
-  color:#fff;
-  border:1px solid var(--line);
+  background:#182233;
+  color:#f4f7ff;
+  border:1px solid rgba(140,170,230,.20);
   border-radius:10px;
   padding:8px 10px;
   box-sizing:border-box;
