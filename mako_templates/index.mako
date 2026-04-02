@@ -954,7 +954,8 @@ function refresher() {
   $("#raffle_subheader").text("#" + raffleNum + " Raffle • Drawing: " + result["raffle_time"]);
 }
     $("#raffle_lookup").attr("placeholder", "Enter Raffle #");
-    $("#raffle_notes").html(result["raffle_notes"] || "Welcome to this week's raffle.");
+    $("#raffle_titlebar").text((result["raffle_status"] || "LIVE") + " - " + (result["raffle_title"] || "Raffle"));
+$("#raffle_notes").html(result["raffle_notes"] || "Welcome to this week's raffle.");
     $("#entrants_headline").text("#" + raffleNum + " Raffle Entrants");
 
     updateRaffleNav();
@@ -1032,12 +1033,10 @@ $(document).ready(function () {
   </section>
 
   <section class="mid-row">
-    <div class="card info-panel">
-      <div class="info-bar raffle-live-header">
-        <span class="live-dot"></span>
-        <span class="live-label">LIVE</span>
-        <span class="raffle-name-label">| MOPPET UP RAFFLE TEST</span>
-      </div>
+    <div class="info-bar raffle-live-header">
+  <span class="live-dot"></span>
+  <strong id="raffle_titlebar">LIVE - Raffle</strong>
+</div>
       <div class="info-body" id="raffle_notes">Welcome to this week's raffle.</div>
     </div>
 

@@ -259,7 +259,9 @@ html,body{
 
 #raffle_subheader,
 #raffle_time,
-#raffle_cost{
+#raffle_cost,
+#raffle_title,
+#raffle_status{
   width:100%;
   max-width:220px;
   background:#07111f;
@@ -394,9 +396,11 @@ var get_raffle_info = function () {
         // #raffle_subheader, #raffle_time, #raffle_cost
         $.getJSON("json/get/raffle", function (result) {
                 $("#raffle_subheader").val(result["raffle_guild_num"])
-                $("#raffle_time").val(result["raffle_time"])
-                $("#raffle_cost").val(result["raffle_ticket_cost"])
-                $("#raffle_notes").val(result["raffle_notes"])
+$("#raffle_time").val(result["raffle_time"])
+$("#raffle_cost").val(result["raffle_ticket_cost"])
+$("#raffle_title").val(result["raffle_title"] || "")
+$("#raffle_status").val(result["raffle_status"] || "LIVE")
+$("#raffle_notes").val(result["raffle_notes"])
 
                 CURRENT_RAFFLE_INFO.raffle_subheader = normalizeFieldValue(result["raffle_guild_num"])
                 CURRENT_RAFFLE_INFO.raffle_time = normalizeFieldValue(result["raffle_time"])
@@ -1037,7 +1041,9 @@ $(window).resize(function () {
         </td>
         <td id="column_guildinfo">
     <div id="left" class="column">
-            <span class="hidden-original-action"><a href="/bbc/auth/logout">[Logout]</a></span>
+            <div style="margin-bottom:10px;">
+  <a href="/${request.matchdict.get('guild')}/auth/logout" style="color:#9fb0cf;text-decoration:none;font-weight:700;">Logout</a>
+</div>
             <form id="ginfo_form">
             <span id="guild_header" class="legacy-summary-hide"></span>
 
@@ -1049,6 +1055,16 @@ $(window).resize(function () {
 
             <label class="settings-block-label" for="raffle_cost">Ticket Cost</label>
             <input type="text" id="raffle_cost" class="ginfo_change_save" name="raffle_ticket_cost"/>
+
+            <label class="settings-block-label" for="raffle_title">Raffle Title</label>
+<input type="text" id="raffle_title" class="ginfo_change_save" name="raffle_title"/>
+
+<label class="settings-block-label" for="raffle_status">Status</label>
+<select id="raffle_status" class="ginfo_change_save" name="raffle_status">
+    <option value="LIVE">LIVE</option>
+    <option value="CLOSED">CLOSED</option>
+    <option value="COMPLETE">COMPLETE</option>
+</select>
 
             <span id="raffle_sold" class="legacy-summary-hide"></span>
             <span id="raffle_participants" class="legacy-summary-hide"></span>

@@ -4,12 +4,11 @@
 <title>Raffles!</title>
 </head>
 <body>
-<!-- The main button bar -->
 <div id="main">
-    <p>Pick your poison!</p>
+    <p>Select a guild:</p>
     <p><ul>
-        <li><a href="bbc1/">BBC1</a></li>
-        <li><a href="bbc2/">BBC2</a></li>
+        <li><a href="bbc1/">Bleakrock Barter Co</a></li>
+        <li><a href="bbc2/">Blackbriar Barter Co</a></li>
     </ul></p>
 </div>
 </body>
