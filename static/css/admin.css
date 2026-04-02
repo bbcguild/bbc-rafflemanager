@@ -53,13 +53,17 @@
     height: 3em;
 }
 
-#import_data {
-/*    overflow-y: scroll;
-    overflow-x: hide;*/
+#import_data,
+#confirm_data,
+#barter_data,
+#paid_data {
     height: 90%;
 }
 
-#import_template {
+#import_template,
+#confirm_template,
+#barter_template,
+#paid_template {
     display: none;
 }
 
@@ -67,41 +71,17 @@
     width: 100%;
 }
 
-.import, .confirm, .barter, .paid {
+.import,
+.confirm,
+.barter,
+.paid {
     background-color: #f8f8f8;
     border: 1px solid #000000;
     padding: 2px;
     color: #000000;
 }
 
-#confirm_data {
-/*    overflow-y: scroll;
-    overflow-x: hide;*/
-    height: 90%;
-}
-
-div#paid_data {
-    height: 90%;
-    background-color: #f8f8f8 !important;
-    padding: 5px !important;
-}
-
-div#paid_buttons {
-    background-color: #f8f8f8 !important;
-    padding: 5px !important;
-    border-bottom: 1px solid #ccc !important;
-}
-
-#confirm_template {
-    display: none;
-}
-
-#barter_template {
-    display: none;
-}
-
 div#paid_template {
-    display: none;
     background-color: #f8f8f8 !important;
     border: 1px solid #000000 !important;
     padding: 2px !important;
@@ -109,58 +89,28 @@ div#paid_template {
     z-index: 100 !important;
 }
 
-div#paid_template.paid {
-    background-color: #f8f8f8 !important;
-    border: 1px solid #000000 !important;
-}
-
-#confirm_string, #confirm_names, #barter_import_string, #barter_confirm_string, #paid_import_string, #paid_confirm_string {
-    width: 95%;
-    height: 10em;
-}
-
-/* Force paid template styling - must override any other rules */
-#paid_template,
-#paid_template.paid,
-div#paid_template,
-div#paid_template.paid {
-    background-color: #f8f8f8 !important;
-    border: 1px solid #000000 !important;
-    padding: 2px !important;
-    opacity: 1 !important;
-}
-
-#paid_data,
 div#paid_data {
     background-color: #f8f8f8 !important;
     padding: 5px !important;
-    opacity: 1 !important;
 }
 
-#paid_buttons,
 div#paid_buttons {
     background-color: #f8f8f8 !important;
     padding: 5px !important;
     border-bottom: 1px solid #ccc !important;
-    opacity: 1 !important;
-}
-#import_template,
-#confirm_template,
-#barter_template,
-#paid_template,
-#import_data,
-#confirm_data,
-#barter_data,
-#paid_data,
-#import_data_here,
-#import_data_here th,
-#import_data_here td,
-#confirm_template p,
-#barter_template p,
-#paid_template p {
-color: #000000 !important;
 }
 
+#confirm_string,
+#confirm_names,
+#barter_import_string,
+#barter_confirm_string,
+#paid_import_string,
+#paid_confirm_string {
+    width: 95%;
+    height: 10em;
+}
+
+/* Popup content should always render dark text on light backgrounds */
 #import_template,
 #import_template *,
 #confirm_template,
