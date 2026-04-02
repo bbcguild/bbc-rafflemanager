@@ -4,12 +4,12 @@
 <title>Raffles!</title>
 </head>
 <body>
+<!-- The main button bar -->
 <div id="main">
-    <p>Select a guild:</p>
+    <p>Pick your poison!</p>
     <p><ul>
-    % for guild in guilds:
-        <li><a href="${guild['guild_shortname']}/">${guild['guild_name']}</a></li>
-    % endfor
+        <li><a href="bbc1/">BBC1</a></li>
+        <li><a href="bbc2/">BBC2</a></li>
     </ul></p>
 </div>
 </body>
