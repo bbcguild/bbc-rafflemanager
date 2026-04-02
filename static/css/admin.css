@@ -161,14 +161,26 @@ div#paid_buttons {
 color: #000000 !important;
 }
 
-.htCore td,
-.htCore th,
-.htCore span,
-.htCore div {
+#import_template,
+#import_template *,
+#confirm_template,
+#confirm_template *,
+#barter_template,
+#barter_template *,
+#paid_template,
+#paid_template * {
     color: #000000 !important;
     opacity: 1 !important;
 }
 
-.htDimmed {
+#import_template input,
+#import_template textarea,
+#confirm_template input,
+#confirm_template textarea,
+#barter_template input,
+#barter_template textarea,
+#paid_template input,
+#paid_template textarea {
     color: #000000 !important;
+    background-color: #ffffff !important;
 }
