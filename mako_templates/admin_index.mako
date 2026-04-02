@@ -264,9 +264,9 @@ html,body{
 #raffle_status{
   width:100%;
   max-width:220px;
-  background:#182233;
-  color:#f4f7ff;
-  border:1px solid rgba(140,170,230,.20);
+background:#0f1622;
+color:#d6deeb;
+border:1px solid rgba(140,170,230,.12);
   border-radius:10px;
   padding:8px 10px;
   box-sizing:border-box;
