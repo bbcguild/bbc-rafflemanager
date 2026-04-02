@@ -616,7 +616,7 @@ var get_ticket_table = function () {
         $.getJSON("json/get/timestamp", function (result) {
                 if (!result) { return; }
 
-                var updated = DateFormat.format.date(parseInt(result) * 1000, "yyyy-MM-dd hh:mm:ss")
+                var updated = DateFormat.format.date(parseInt(result) * 1000, "M/d/yyyy h:mm:ss a") + " EDT"
 
                 $("#raffle_updated").text("Updated: " + updated.toString())
                 $("#display_raffle_updated").text("Last Updated " + updated.toString())
