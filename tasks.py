@@ -258,14 +258,37 @@ def close_current_raffle (request):
 
 @view_config(route_name="open_new_raffle", renderer="json", permission="akaviri")
 def open_new_raffle (request):
+    current_info = db.get_cur_raffle_info()
     cur_id = db.get_cur_raffle_id()
 
-    db.close_raffle_by_id(cur_id)
-    
-    if db.create_new_raffle():
-        return True
+    prev_raffle_num = ""
+    prev_raffle_time = ""
+    prev_ticket_cost = ""
+    prev_notes = ""
 
-    return False
+    if current_info:
+        current_info = dict(current_info)
+        prev_raffle_num = str(current_info.get("raffle_guild_num", "") or "").strip()
+        prev_raffle_time = current_info.get("raffle_time", "")
+        prev_ticket_cost = current_info.get("raffle_ticket_cost", "")
+        prev_notes = current_info.get("raffle_notes", "")
+
+    db.close_raffle_by_id(cur_id)
+
+    if not db.create_new_raffle():
+        return False
+
+    new_info = db.get_cur_raffle_info()
+    if not new_info:
+        return False
+
+    new_info = dict(new_info)
+    new_info["raffle_guild_num"] = compute_next_raffle_code(prev_raffle_num)
+    new_info["raffle_time"] = prev_raffle_time
+    new_info["raffle_ticket_cost"] = prev_ticket_cost
+    new_info["raffle_notes"] = prev_notes
+
+    return db.set_cur_raffle_info(new_info)
 
 # For everyone!
 @view_config(route_name="get_all_tickets", renderer="json")
