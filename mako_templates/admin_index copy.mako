@@ -29,6 +29,17 @@ $(document).ready(function() {
   $.ajaxSetup({cache:false});
 });
 
+var openRaffleLookup = function () {
+        var raffleCode = $.trim($("#raffle_lookup").val())
+        if (!raffleCode) {
+            return false
+        }
+
+        window.open("/${request.matchdict['guild']}/lookup?raffle_lookup=" + encodeURIComponent(raffleCode), "_blank")
+        return false
+}
+
+
 // Some of my best friends use JSON!
 var GLOBAL_PRIZE_ALERTED = false
 
@@ -43,8 +54,6 @@ var get_raffle_info = function () {
                 $("#raffle_subheader").val(result["raffle_guild_num"])
                 $("#raffle_time").val(result["raffle_time"])
                 $("#raffle_cost").val(result["raffle_ticket_cost"])
-                $("#raffle_title").val(result["raffle_title"])
-                $("#raffle_status").val(result["raffle_status"] || "LIVE")
                 $("#raffle_notes").val(result["raffle_notes"])
             })
 }
@@ -435,7 +444,7 @@ $(document).ready(function () {
                 get_ticket_list()
             })
             $("#new_raffle_button").click(function () {
-                    var r = confirm("This will close the current raffle, carry forward the title, status, time, ticket cost, and notes, and open a new one. Are you sure?")
+                    var r = confirm("This will close the current raffle and activate a new one.  Are you sure?")
                     if (r == false) { return }
 
                     $.getJSON("json/set/open_raffle", function (result) {
@@ -611,7 +620,7 @@ $(window).resize(function () {
         </td>
         <td id="column_guildinfo">
     <div id="left" class="column">
-            <span><a href="/${request.matchdict['guild']}/auth/logout">[Logout]</a></span>
+            <span><a href="/bbc/auth/logout">[Logout]</a></span>
             <form id="ginfo_form">
             <span id="guild_header"></span>
             <br />
@@ -621,25 +630,16 @@ $(window).resize(function () {
             <br />
             Ticket cost: <input type="text" id="raffle_cost" class="ginfo_change_save" name="raffle_ticket_cost"/>
             <br />
-            Raffle title: <input type="text" id="raffle_title" class="ginfo_change_save" name="raffle_title"/>
-            <br />
-            Status:
-            <select id="raffle_status" class="ginfo_change_save" name="raffle_status">
-                <option value="LIVE">LIVE</option>
-                <option value="CLOSED">CLOSED</option>
-                <option value="COMPLETE">COMPLETE</option>
-            </select>
-            <br />
             <span id="raffle_sold"></span>
             <br />
             <span id="raffle_participants"></span>
             <br >
             <span id="raffle_updated"></span>            <br />
-            <form id="raffle_lookup_form" action="/${request.matchdict['guild']}/lookup" method="get" style="margin: 10px 0 0 0;">
+            <div id="raffle_lookup_form" style="margin: 10px 0 0 0;">
                 <label for="raffle_lookup" style="display:block; margin-bottom:4px;">Previous raffle lookup</label>
-                <input type="text" id="raffle_lookup" name="raffle_lookup" placeholder="Enter raffle #" style="width: 140px;" />
-                <input type="submit" value="Go" />
-            </form>
+                <input type="text" id="raffle_lookup" name="raffle_lookup" placeholder="Enter raffle #" style="width: 140px;" onkeydown="if (event.key === 'Enter') { event.preventDefault(); openRaffleLookup(); }" />
+                <input type="button" value="Go" onclick="openRaffleLookup();" />
+            </div>
             <br />
             % if request.bonus_tickets == 5:
             <br />
