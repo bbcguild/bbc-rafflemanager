@@ -193,7 +193,7 @@ html,body{
 }
 
 #column_guildinfo{
-  width:340px;
+  width:420px;
   vertical-align:top;
 }
 
@@ -202,12 +202,12 @@ html,body{
 }
 
 #column_ticketinfo{
-  width:420px;
+  width:260px;
   vertical-align:top;
 }
 
 #column_ticketlist{
-  width:320px;
+  width:180px;
   vertical-align:top;
 }
 
