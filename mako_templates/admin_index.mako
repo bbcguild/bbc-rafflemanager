@@ -660,17 +660,12 @@ var get_ticket_table = function () {
                         data: result,
                         rowHeaders: false,
                         colHeaders: ["Participants", "Name", "Total", "Paid", "Free", "Bar", "Range"],
-                        colWidths: [100, 180, 45, 45, 45, 45],
+                        colWidths: [100, 180, 55, 45, 45, 45, 110],
                         contextMenu: false,
                         enterMoves: {row: 0, col: 1},
                         columnSorting: true,
 			licenseKey: "non-commercial-and-evaluation",
                         columns: [
-                            {
-                                type: 'numeric',
-                                format: '1,000,000',
-                                allowInvalid: false,
-                            },
                             {
                                 readOnly: true,
                             },
@@ -696,6 +691,9 @@ var get_ticket_table = function () {
                                 type: 'numeric',
                                 format: '1,000,000',
                                 allowInvalid: false,
+                            },
+                            {
+                                readOnly: true,
                             },
                         ],
                         isEmptyRow: function(row) {
@@ -727,11 +725,12 @@ var get_ticket_table = function () {
                 })
 % else:
         $.getJSON("json/get/tickets", function (result) {
+                result = addTicketRanges(result, false)
                 $("#ticket_info").handsontable("destroy")
                 $("#ticket_info").handsontable({
                         data: result,
                         rowHeaders: false,
-                        colHeaders: ["Participants", "Name", "Total"],
+                        colHeaders: ["Participants", "Name", "Total", "Range"],
                         colWidths: [100, 220, 55, 110],
                         contextMenu: false,
                         enterMoves: {row: 0, col: 1},
@@ -765,6 +764,10 @@ var get_ticket_table = function () {
                                 format: '1,000,000',
                                 allowInvalid: false,
                             },
+                                                    {
+                                readOnly: true,
+                            },
+
                         ],
                         isEmptyRow: function(row) {
                             var col, colLen, value, meta;
