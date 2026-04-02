@@ -95,28 +95,9 @@ def Result (res, flash=None):
     
     return {"result": res, "flash": flash}
 
-
-def get_select_guilds():
-    cur = db.cursor()
-    cur.execute("SELECT guild_id, guild_shortname, guild_name FROM guilds ORDER BY guild_id")
-    return [dict(row) for row in cur.fetchall()]
-
-
-def ensure_raffle_schema():
-    cur = db.cursor()
-    cur.execute("PRAGMA table_info(raffles)")
-    columns = {row[1] for row in cur.fetchall()}
-
-    if "raffle_title" not in columns:
-        cur.execute("ALTER TABLE raffles ADD COLUMN raffle_title TEXT DEFAULT ''")
-
-    if "raffle_status" not in columns:
-        cur.execute("ALTER TABLE raffles ADD COLUMN raffle_status TEXT DEFAULT 'LIVE'")
-
-
 @view_config(route_name='home', renderer="mako_templates/select.mako")
 def home (request):
-    return {"guilds": get_select_guilds()}
+    return {}
 
 @view_config(route_name='health', renderer='json')
 def health_check(request):
@@ -152,8 +133,12 @@ def landing_noslash (request):
 @view_config(route_name='guild_landing_raffle', renderer="mako_templates/index.mako")
 def landing (request):
     # Auth system re-enabled - check for admin user
+    # IMPORTANT: Do NOT force admin mode on archived raffle URLs.
+    # Public/archive view for /{guild}/{raffle}/ should work even when logged in.
+    is_archive_view = bool(request.matchdict and request.matchdict.get("raffle"))
+
     if request.user is not None:
-        if request.user.in_group("akaviri"):
+        if request.user.in_group("akaviri") and not is_archive_view:
             request.override_renderer = "mako_templates/admin_index.mako"
         if gdata.extended:
             request.extended_tickets = True
@@ -161,6 +146,25 @@ def landing (request):
             request.extended_tickets = False
 
     return {}
+
+
+@view_config(route_name='raffle_lookup')
+def raffle_lookup(request):
+    guild = request.matchdict.get("guild")
+    raffle_code = request.params.get("raffle_lookup", "").strip()
+
+    if not guild:
+        return HTTPFound(route_url('home', request))
+
+    if not raffle_code:
+        return HTTPFound(route_url('guild_landing', request, guild=guild))
+
+    resolved = db.resolve_raffle_lookup_code(raffle_code=raffle_code)
+
+    if not resolved:
+        return HTTPFound(route_url('guild_landing', request, guild=guild))
+
+    return HTTPFound(route_url('guild_landing_raffle', request, guild=guild, raffle=resolved))
 
 #------------- ALL THE API ------------#
 # Both of these are admin functions
@@ -183,10 +187,11 @@ def set_guild_roster (request):
 def get_current_raffle_info (request):
     raffle_id = request.matchdict.get("raffle")
 
-if raffle_id:
-    info = db.get_raffle_info_by_id(raffle_id)
-else:
-    info = db.get_cur_raffle_info()
+    if raffle_id:
+        info = db.get_raffle_info_by_id(raffle_id)
+    else:
+        info = db.get_cur_raffle_info()
+
     if not info:
         return {}
 
@@ -219,34 +224,10 @@ def parse_keys (cur, new, keys, builder):
 # Admin only
 @view_config(route_name="set_current_raffle_info", renderer="json", permission="akaviri")
 def set_current_raffle_info (request):
-    current_info = db.get_cur_raffle_info()
-    if not current_info:
-        return False
+    data = parse_keys(db.get_cur_raffle_info(), request.params, ["raffle_guild_num", "raffle_time", "raffle_ticket_cost", "raffle_notes"], objects.Raffle)
 
-    data = dict(current_info)
-    data["raffle_guild_num"] = request.params.get("raffle_guild_num", data.get("raffle_guild_num", ""))
-    data["raffle_time"] = request.params.get("raffle_time", data.get("raffle_time", ""))
-    data["raffle_ticket_cost"] = request.params.get("raffle_ticket_cost", data.get("raffle_ticket_cost", ""))
-    data["raffle_notes"] = request.params.get("raffle_notes", data.get("raffle_notes", ""))
-    data["raffle_title"] = request.params.get("raffle_title", data.get("raffle_title", ""))
-    data["raffle_status"] = request.params.get("raffle_status", data.get("raffle_status", "LIVE")) or "LIVE"
-
-    cur = db.cursor()
-    cur.execute(
-        "UPDATE raffles SET raffle_guild=?, raffle_guild_num=?, raffle_time=?, raffle_ticket_cost=?, raffle_closed=?, raffle_notes=?, raffle_title=?, raffle_status=? WHERE raffle_id=?",
-        (
-            data["raffle_guild"],
-            data["raffle_guild_num"],
-            data["raffle_time"],
-            data["raffle_ticket_cost"],
-            data["raffle_closed"],
-            data["raffle_notes"],
-            data["raffle_title"],
-            data["raffle_status"],
-            data["raffle_id"],
-        )
-    )
-    return True
+    # do nothing for now
+    return db.set_cur_raffle_info(data)
 
 @view_config(route_name="close_current_raffle", renderer="json", permission="akaviri")
 def close_current_raffle (request):
@@ -276,10 +257,10 @@ def get_extended_tickets (request):
 def make_all_tickets (request, extended=False):
     raffle_id = request.matchdict.get("raffle")
 
-if raffle_id:
-    tickets = db.get_tickets_by_raffle_id(raffle_id)
-else:
-    tickets = db.get_tickets()
+    if raffle_id:
+        tickets = db.get_tickets_by_raffle_id(raffle_id)
+    else:
+        tickets = db.get_tickets()
 
     if not tickets:
         return []
@@ -377,8 +358,7 @@ def set_all_tickets (request):
             u_name = row.get("1", None)
             u_count = row.get("2", None)
         elif isinstance(row, list):
-            u_name = row[1] if len(row) > 1 else None
-            u_count = row[2] if len(row) > 2 else None
+            p, u_name, u_count = row
 
         if u_name is None or u_count is None:
             continue
@@ -427,10 +407,7 @@ def set_extended_tickets (request):
             u_free = row.get("4", None)
             u_barter = row.get("5", None)
         elif isinstance(row, list):
-            u_name = row[1] if len(row) > 1 else None
-            u_count = row[3] if len(row) > 3 else None
-            u_free = row[4] if len(row) > 4 else None
-            u_barter = row[5] if len(row) > 5 else None
+            p, u_name, ignore, u_count, u_free, u_barter = row
 
         if u_name is None or u_count is None:
             continue
@@ -458,10 +435,10 @@ def set_extended_tickets (request):
 def make_ticket_list (request):
     raffle_id = request.matchdict.get("raffle")
 
-if raffle_id:
-    ticks = db.get_tickets_by_raffle_id(raffle_id)
-else:
-    ticks = db.get_tickets()
+    if raffle_id:
+        ticks = db.get_tickets_by_raffle_id(raffle_id)
+    else:
+        ticks = db.get_tickets()
 
     if not ticks:
         return []
@@ -503,8 +480,7 @@ def barter_import (request):
         return {}
 
     data = request.params["barter_import_string"]
-
-    confirm_data = request.params["barter_confirm_string"]
+    confirm_data = request.params.get("barter_confirm_string", "")
 
     confirms = {}
 
@@ -514,7 +490,10 @@ def barter_import (request):
         except:
             continue
         else:
-            confirms[user] = [amount, 0]
+            try:
+                confirms[user] = [int(amount), 0]
+            except:
+                confirms[user] = [0, 0]
 
     lines = data.split("\n")
 
@@ -529,9 +508,12 @@ def barter_import (request):
 
         user, amount = line.split("\t")
 
-        user = user.replace("@", "")
+        user = user.replace("@", "").strip()
 
-        amount = int(amount)
+        try:
+            amount = int(amount)
+        except:
+            continue
 
         if user in barter_data:
             barter_data[user] = barter_data[user] + amount
@@ -550,16 +532,21 @@ def barter_import (request):
             free_tickets = 0
             bart_tickets = 0
 
-        diff = amount - bart_tickets
+        added_amount = amount
+        new_barter_total = bart_tickets + added_amount
 
-        # FIXED: Preserve existing paid tickets (prev_tickets) and free tickets while updating barter
-        db.set_user_tickets(user_name=user, ticket_count=prev_tickets, ticket_free=free_tickets, ticket_barter=amount)
+        db.set_user_tickets(
+            user_name=user,
+            ticket_count=prev_tickets,
+            ticket_free=free_tickets,
+            ticket_barter=new_barter_total
+        )
 
-        if diff != 0:
+        if added_amount != 0:
             if user in confirms:
-                confirms[user][1] = diff
+                confirms[user][1] = confirms[user][1] + added_amount
             else:
-                confirms[user] = [0, diff]
+                confirms[user] = [0, added_amount]
 
     for k, v in confirms.items():
         confirm = confirm + "%s,%s,%s|" % (k, v[0], v[1])
@@ -569,12 +556,11 @@ def barter_import (request):
 
 @view_config(route_name="paid_import", renderer="json", permission="akaviri")
 def paid_import (request):
-    """Import paid tickets - similar to barter_import but updates ticket_count instead of ticket_barter"""
+    """Import paid tickets - adds imported paid tickets to existing paid tickets"""
     if "paid_import_string" not in request.params:
         return {}
 
     data = request.params["paid_import_string"]
-
     confirm_data = request.params.get("paid_confirm_string", "")
 
     confirms = {}
@@ -585,7 +571,10 @@ def paid_import (request):
         except:
             continue
         else:
-            confirms[user] = [amount, 0]
+            try:
+                confirms[user] = [int(amount), 0]
+            except:
+                confirms[user] = [0, 0]
 
     lines = data.split("\n")
 
@@ -600,9 +589,12 @@ def paid_import (request):
 
         user, amount = line.split("\t")
 
-        user = user.replace("@", "")
+        user = user.replace("@", "").strip()
 
-        amount = int(amount)
+        try:
+            amount = int(amount)
+        except:
+            continue
 
         if user in paid_data:
             paid_data[user] = paid_data[user] + amount
@@ -621,19 +613,23 @@ def paid_import (request):
             free_tickets = 0
             bart_tickets = 0
 
-        diff = amount - prev_tickets
+        added_amount = amount
+        new_paid_total = prev_tickets + added_amount
 
-        # FIXED: Preserve existing free and barter tickets while updating paid tickets
-        db.set_user_tickets(user_name=user, ticket_count=amount, ticket_free=free_tickets, ticket_barter=bart_tickets)
+        db.set_user_tickets(
+            user_name=user,
+            ticket_count=new_paid_total,
+            ticket_free=free_tickets,
+            ticket_barter=bart_tickets
+        )
 
-        if diff != 0:
+        if added_amount != 0:
             if user in confirms:
-                confirms[user][1] = diff
+                confirms[user][1] = confirms[user][1] + added_amount
             else:
-                confirms[user] = [0, diff]
+                confirms[user] = [0, added_amount]
 
     for k, v in confirms.items():
-        # FIXED: Use paid ticket format (name,amount) instead of barter format (name,old,new)
         confirm = confirm + "%s,%s|" % (k, v[1])
         names.append("@%s" % k)
 
@@ -1206,8 +1202,6 @@ def make_app ():
     except Exception as e:
         print(f"Database initialization error: {e}")
         # Continue anyway - the app might still work if database exists
-
-    ensure_raffle_schema()
     
     session_factory = SignedCookieSessionFactory("supersupersecretpasswordgoeshereYAY!!!1")
     config = Configurator(settings=pconf.settings, session_factory=session_factory)
@@ -1228,6 +1222,7 @@ def make_app ():
     g_route('guild_landing', '/{guild}/')
     g_route('guild_landing_noslash', '/{guild}')
     g_route('guild_landing_raffle', '/{guild}/{raffle}/')
+    g_route('raffle_lookup', '/{guild}/lookup')
 
     g_route('home', '/')
     config.add_route('health', '/health')
