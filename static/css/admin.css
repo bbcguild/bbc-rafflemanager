@@ -71,6 +71,7 @@
     background-color: #f8f8f8;
     border: 1px solid #000000;
     padding: 2px;
+    color: #000000;
 }
 
 #confirm_data {
@@ -142,4 +143,20 @@ div#paid_buttons {
     padding: 5px !important;
     border-bottom: 1px solid #ccc !important;
     opacity: 1 !important;
+}
+#import_template,
+#confirm_template,
+#barter_template,
+#paid_template,
+#import_data,
+#confirm_data,
+#barter_data,
+#paid_data,
+#import_data_here,
+#import_data_here th,
+#import_data_here td,
+#confirm_template p,
+#barter_template p,
+#paid_template p {
+    color: #000000 !important;
 }
