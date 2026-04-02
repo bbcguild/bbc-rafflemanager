@@ -213,8 +213,7 @@ html,body{
 }
 
 #column_ticketlist{
-  width:180px;
-  vertical-align:top;
+  display:none;
 }
 
 #left,
@@ -1053,10 +1052,7 @@ $(window).resize(function () {
 <div id="main">
 <table id="main_table" valign="top">
     <tr>
-        <td id="column_ticketlist">
-            <div id="ticket_list">
-            </div>
-        </td>
+        
         <td id="column_guildinfo">
     <div id="left" class="column">
             <div style="margin-bottom:10px;">
