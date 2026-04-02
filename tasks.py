@@ -212,6 +212,32 @@ def parse_keys (cur, new, keys, builder):
 
     return n
 
+
+def compute_next_raffle_code(current_code):
+    """
+    BBC week code format is YYWW, where WW rolls from 52 -> 01
+    and increments the YY portion.
+    Example: 2652 -> 2701
+    """
+    code = str(current_code or "").strip()
+
+    if not re.match(r'^\d{4}$', code):
+        return code
+
+    year = int(code[:2])
+    week = int(code[2:])
+
+    if week < 1 or week > 52:
+        return code
+
+    if week == 52:
+        year = (year + 1) % 100
+        week = 1
+    else:
+        week += 1
+
+    return f"{year:02d}{week:02d}"
+
 # Admin only
 @view_config(route_name="set_current_raffle_info", renderer="json", permission="akaviri")
 def set_current_raffle_info (request):
