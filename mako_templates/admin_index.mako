@@ -142,24 +142,27 @@ html,body{
 .search-wrap{
   display:flex;
   align-items:center;
-  border:1px solid var(--line2);
+  border:1px solid rgba(140,170,230,.12);
   border-radius:999px;
-  background:#f3f4f6;
+  background:#0f1622;
   padding:6px 12px;
   height:34px;
   min-width:240px;
 }
 .search-wrap span{
-  color:#6b7280;
+  color:#8ea0bf;
   margin-right:6px;
 }
 .search-wrap input{
   border:none;
   outline:none;
   background:transparent;
-  color:#000;
+  color:#d6deeb;
   font-weight:700;
   width:100%;
+}
+.search-wrap input::placeholder{
+  color:#8ea0bf;
 }
 
 /* NEW BUTTON BAR */
@@ -300,6 +303,18 @@ border:1px solid rgba(140,170,230,.12);
 /* keep legacy prize/table styling functional */
 .prize{
   width:100%;
+}
+
+.prize input[type="text"]{
+  background:#0f1622;
+  color:#d6deeb;
+  border:1px solid rgba(140,170,230,.12);
+  border-radius:8px;
+}
+
+.prize input[type="text"]:focus{
+  outline:none;
+  border-color:rgba(140,170,230,.28);
 }
 
 @media (max-width:1400px){
