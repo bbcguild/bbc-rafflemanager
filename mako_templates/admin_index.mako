@@ -521,6 +521,34 @@ var _get_guild_roster = function (query, process) {
     }
 }
 
+function addTicketRanges(rows, extended) {
+    var runningStart = 1
+    var output = []
+
+    for (var i = 0; i < rows.length; i++) {
+        var row = rows[i]
+        if (!row) {
+            output.push(row)
+            continue
+        }
+
+        var total = Number(row[2]) || 0
+        var rangeText = ""
+
+        if (total > 0) {
+            var runningEnd = runningStart + total - 1
+            rangeText = runningStart + "-" + runningEnd
+            runningStart = runningEnd + 1
+        }
+
+        var newRow = row.slice()
+        newRow.push(rangeText)
+        output.push(newRow)
+    }
+
+    return output
+}
+
 var get_ticket_table = function () {
         function after_row_create (index, amount) {
             setTimeout(function () {
@@ -626,17 +654,23 @@ var get_ticket_table = function () {
                 })
 % if request.extended_tickets:
         $.getJSON("json/get/tickets_extended", function (result) {
+                result = addTicketRanges(result, true)
                 $("#ticket_info").handsontable("destroy")
                 $("#ticket_info").handsontable({
                         data: result,
                         rowHeaders: false,
-                        colHeaders: ["Participants", "Name", "Total", "Paid", "Free", "Bar"],
+                        colHeaders: ["Participants", "Name", "Total", "Paid", "Free", "Bar", "Range"],
                         colWidths: [100, 180, 45, 45, 45, 45],
                         contextMenu: false,
                         enterMoves: {row: 0, col: 1},
                         columnSorting: true,
 			licenseKey: "non-commercial-and-evaluation",
                         columns: [
+                            {
+                                type: 'numeric',
+                                format: '1,000,000',
+                                allowInvalid: false,
+                            },
                             {
                                 readOnly: true,
                             },
@@ -698,7 +732,7 @@ var get_ticket_table = function () {
                         data: result,
                         rowHeaders: false,
                         colHeaders: ["Participants", "Name", "Total"],
-                        colWidths: [100, 300, 50],
+                        colWidths: [100, 220, 55, 110],
                         contextMenu: false,
                         enterMoves: {row: 0, col: 1},
                         columnSorting: true,

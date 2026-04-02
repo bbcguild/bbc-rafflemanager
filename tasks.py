@@ -367,7 +367,8 @@ def set_all_tickets (request):
             u_name = row.get("1", None)
             u_count = row.get("2", None)
         elif isinstance(row, list):
-            p, u_name, u_count = row
+            u_name = row[1] if len(row) > 1 else None
+            u_count = row[2] if len(row) > 2 else None
 
         if u_name is None or u_count is None:
             continue
@@ -416,7 +417,10 @@ def set_extended_tickets (request):
             u_free = row.get("4", None)
             u_barter = row.get("5", None)
         elif isinstance(row, list):
-            p, u_name, ignore, u_count, u_free, u_barter = row
+            u_name = row[1] if len(row) > 1 else None
+            u_count = row[3] if len(row) > 3 else None
+            u_free = row[4] if len(row) > 4 else None
+            u_barter = row[5] if len(row) > 5 else None
 
         if u_name is None or u_count is None:
             continue
