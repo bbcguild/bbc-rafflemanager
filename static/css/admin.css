@@ -134,3 +134,12 @@ div#paid_buttons {
     color: #000000 !important;
     background-color: #ffffff !important;
 }
+#dropzone_uploader,
+#dropzone_uploader .dz-message,
+#dropzone_uploader .dz-message span {
+    color: #444444 !important;
+}
+
+#dropzone_uploader {
+    background-color: #f8f8f8 !important;
+}
