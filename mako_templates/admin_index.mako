@@ -18,6 +18,7 @@
 <link rel="stylesheet" href="/static/css/dropzone.css">
 %endif
 <title>Raffles!</title>
+<link rel="icon" type="image/png" href="/static/favicon.png">
 
 <style>
 :root{
