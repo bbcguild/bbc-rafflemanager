@@ -653,7 +653,7 @@ var get_ticket_table = function () {
                 
                 })
 % if request.extended_tickets:
-        $.getJSON("json/get/tickets_extended", function (result) {
+        $.getJSON(window.location.pathname + "json/get/tickets_extended", function (result) {
                 result = addTicketRanges(result, true)
                 $("#ticket_info").handsontable("destroy")
                 $("#ticket_info").handsontable({
@@ -724,7 +724,7 @@ var get_ticket_table = function () {
                     $("#display_raffle_participants").text(total_participants)
                 })
 % else:
-        $.getJSON("json/get/tickets", function (result) {
+        $.getJSON(window.location.pathname + "json/get/tickets", function (result) {
                 result = addTicketRanges(result, false)
                 $("#ticket_info").handsontable("destroy")
                 $("#ticket_info").handsontable({
