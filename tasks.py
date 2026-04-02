@@ -18,6 +18,7 @@ import hashlib
 import csv
 import io
 import operator
+import re
 
 from waitress import serve
 from pyramid.config import Configurator
@@ -217,15 +218,20 @@ def compute_next_raffle_code(current_code):
     """
     BBC week code format is YYWW, where WW rolls from 52 -> 01
     and increments the YY portion.
-    Example: 2652 -> 2701
+    Suffixes like 2614b or 2614c are treated as one-off variants,
+    so the next raffle becomes 2615.
+    Example: 2652 -> 2701, 2652b -> 2701
     """
     code = str(current_code or "").strip()
 
-    if not re.match(r'^\d{4}$', code):
+    match = re.match(r'^(\d{4})([A-Za-z]*)$', code)
+    if not match:
         return code
 
-    year = int(code[:2])
-    week = int(code[2:])
+    base_code = match.group(1)
+
+    year = int(base_code[:2])
+    week = int(base_code[2:])
 
     if week < 1 or week > 52:
         return code
