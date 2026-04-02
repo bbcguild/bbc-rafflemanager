@@ -5,6 +5,9 @@ initial_display_raffle = initial_lookup_raffle if initial_lookup_raffle else '26
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-256.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-256.png">
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>BBC Raffle</title>
