@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<html>
 <head>   
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.js"></script>
@@ -17,333 +16,7 @@
 <script type="text/javascript" src="/static/js/dateformat.js"></script>
 <link rel="stylesheet" href="/static/css/dropzone.css">
 %endif
-<title>Raffle Admin</title>
-<link rel="icon" type="image/x-icon" href="/static/favicon.ico">
-<link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-256.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-256.png">
-
-<style>
-:root{
-  --bg:#060a12;
-  --panel:#091224;
-  --panel2:#07101f;
-  --line:rgba(80,120,210,.18);
-  --line2:rgba(80,120,210,.34);
-  --text:#f4f7ff;
-  --muted:#9fb0cf;
-  --blue:#244fb3;
-  --blue2:#183a8f;
-  --shadow:0 18px 48px rgba(0,0,0,.38);
-}
-
-html,body{
-  margin:0;
-  padding:0;
-  background:radial-gradient(circle at top left, rgba(40,76,166,.18), transparent 24%),linear-gradient(180deg,#05070d 0%,#060a12 100%);
-  color:var(--text);
-  font-family:Inter,system-ui,Arial,sans-serif;
-}
-
-.page-shell{
-  max-width:1880px;
-  margin:0 auto;
-  padding:18px;
-}
-
-.card{
-  background:linear-gradient(180deg,var(--panel),var(--panel2));
-  border:1px solid var(--line);
-  border-radius:22px;
-  box-shadow:var(--shadow);
-}
-
-/* NEW HEADER */
-.admin-header{
-  display:flex;
-  align-items:center;
-  gap:18px;
-  padding:14px 20px;
-  margin-bottom:14px;
-}
-.admin-header img#mainLogo{
-  width:72px;
-  height:72px;
-  object-fit:contain;
-}
-.title-block{
-  display:flex;
-  flex-direction:column;
-  gap:2px;
-  min-width:320px;
-}
-.title-block h1{
-  margin:0;
-  font-size:2.2rem;
-  line-height:1.05;
-  font-weight:700;
-}
-.title-block .sub{
-  color:var(--muted);
-  font-size:1rem;
-}
-.title-block .updated{
-  color:#e6d77a;
-  font-size:.9rem;
-}
-.stats-inline{
-  display:flex;
-  gap:10px;
-  margin-left:6px;
-}
-.stat{
-  border-radius:14px;
-  padding:10px 14px;
-  background:rgba(8,17,31,.86);
-  border:1px solid var(--line);
-  text-align:center;
-  min-width:120px;
-}
-.stat .k{
-  color:var(--muted);
-  font-size:.8rem;
-  margin-bottom:4px;
-}
-.stat .v{
-  font-size:1.6rem;
-  font-weight:800;
-}
-.header-right{
-  margin-left:auto;
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-.admin-flags{
-  display:flex;
-  flex-direction:column;
-  gap:4px;
-  align-items:center;
-  margin-right:16px;
-  min-width:70px;
-}
-.admin-flag{
-  display:flex;
-  flex-direction:column;
-  gap:2px;
-  align-items:center;
-  width:100%;
-}
-.admin-flag-label{
-  font-weight:700;
-  line-height:1;
-  text-align:center;
-}
-.admin-flag-bar{
-  height:6px;
-  width:100%;
-}
-.search-wrap{
-  display:flex;
-  align-items:center;
-  border:1px solid rgba(140,170,230,.12);
-  border-radius:999px;
-  background:#0f1622;
-  padding:6px 12px;
-  height:34px;
-  min-width:240px;
-}
-.search-wrap span{
-  color:#8ea0bf;
-  margin-right:6px;
-}
-.search-wrap input{
-  border:none;
-  outline:none;
-  background:transparent;
-  color:#d6deeb;
-  font-weight:700;
-  width:100%;
-}
-.search-wrap input::placeholder{
-  color:#8ea0bf;
-}
-
-/* NEW BUTTON BAR */
-.button-bar{
-  display:grid;
-  grid-template-columns:repeat(6,minmax(0,1fr));
-  gap:12px;
-  margin-bottom:14px;
-}
-.action-btn{
-  height:44px;
-  border-radius:18px;
-  border:1px solid var(--line2);
-  background:linear-gradient(180deg,#0b1a34,#09142a);
-  color:#f4f7ff;
-  font-size:1rem;
-  font-weight:850;
-  box-shadow:var(--shadow);
-  cursor:pointer;
-}
-
-/* LEGACY LAYOUT CLEANUP */
-#main{
-  max-width:none;
-  margin:0;
-  padding:0;
-}
-
-#main_table{
-  width:100%;
-}
-
-#column_guildinfo{
-  width:420px;
-  vertical-align:top;
-}
-
-#column_prizeinfo{
-  vertical-align:top;
-}
-
-#column_ticketinfo{
-  width:260px;
-  vertical-align:top;
-}
-
-#column_ticketlist{
-  display:none;
-}
-
-#left,
-#center,
-#right{
-  background:linear-gradient(180deg,var(--panel),var(--panel2));
-  border:1px solid var(--line);
-  border-radius:22px;
-  box-shadow:var(--shadow);
-  padding:14px;
-  margin:0 6px;
-}
-
-#ticket_list{
-  background:linear-gradient(180deg,var(--panel),var(--panel2));
-  border:1px solid var(--line);
-  border-radius:22px;
-  box-shadow:var(--shadow);
-  padding:10px;
-  margin:0 6px;
-  overflow:hidden;
-}
-
-/* hide legacy top summary now shown in new header */
-.legacy-summary-hide{
-  display:none !important;
-}
-
-/* give settings area some structure */
-.settings-block-label{
-  display:block;
-  margin:10px 0 4px 0;
-  color:var(--muted);
-  font-size:.92rem;
-  font-weight:700;
-}
-
-#raffle_notes{
-  width:100%;
-  min-height:180px;
-  background:#182233;
-  color:#f4f7ff;
-  border:1px solid rgba(140,170,230,.20);
-  border-radius:10px;
-  padding:10px;
-  box-sizing:border-box;
-}
-
-#raffle_subheader,
-#raffle_time,
-#raffle_cost,
-#raffle_title,
-#raffle_status{
-  width:100%;
-  max-width:220px;
-background:#0f1622;
-color:#d6deeb;
-border:1px solid rgba(140,170,230,.12);
-  border-radius:10px;
-  padding:8px 10px;
-  box-sizing:border-box;
-}
-
-#add_prize_block{
-  margin-top:12px;
-}
-
-#add_prize_button,
-#new_raffle_button,
-#manual_refresh,
-#clear_imported,
-#reshow_import,
-#reshow_confirm,
-#import_barter,
-#import_paid{
-  border-radius:12px;
-  border:1px solid var(--line2);
-  background:linear-gradient(180deg,#0b1a34,#09142a);
-  color:#f4f7ff;
-  padding:10px 14px;
-  font-weight:800;
-  cursor:pointer;
-}
-
-.hidden-original-action{
-  display:none !important;
-}
-
-/* keep legacy prize/table styling functional */
-.prize{
-  width:100%;
-}
-
-.prize input[type="text"]{
-  background:#0f1622;
-  color:#d6deeb;
-  border:1px solid rgba(140,170,230,.12);
-  border-radius:8px;
-}
-
-.prize input[type="text"]:focus{
-  outline:none;
-  border-color:rgba(140,170,230,.28);
-}
-
-@media (max-width:1400px){
-  .admin-header{
-    flex-wrap:wrap;
-  }
-  .header-right{
-    margin-left:0;
-  }
-  .button-bar{
-    grid-template-columns:repeat(3,minmax(0,1fr));
-  }
-}
-
-@media (max-width:1100px){
-  .button-bar{
-    grid-template-columns:repeat(2,minmax(0,1fr));
-  }
-}
-
-@media (max-width:900px){
-  .button-bar{
-    grid-template-columns:1fr;
-  }
-}
-</style>
-
+<title>Raffles!</title>
 <script>
 jQuery.fn.center = function() {
     var container = $(window);
@@ -369,62 +42,19 @@ var openRaffleLookup = function () {
 
 // Some of my best friends use JSON!
 var GLOBAL_PRIZE_ALERTED = false
-var CURRENT_RAFFLE_INFO = {
-    raffle_subheader: "",
-    raffle_time: "",
-    raffle_cost: ""
-}
-
-function normalizeFieldValue(value) {
-    if (value === null || value === undefined) {
-        return ""
-    }
-    return $.trim(String(value))
-}
-
-function confirmDangerousFieldChange(fieldId, oldValue, newValue) {
-    if (oldValue === newValue) {
-        return true
-    }
-
-    if (fieldId === "raffle_subheader") {
-        return confirm("Are you sure you want to change the raffle number from " + oldValue + " to " + newValue + "?")
-    }
-
-    if (fieldId === "raffle_time") {
-        return confirm("Are you sure you want to change the raffle drawing time from \"" + oldValue + "\" to \"" + newValue + "\"?")
-    }
-
-    if (fieldId === "raffle_cost") {
-        return confirm("Are you sure you want to change the ticket cost from " + oldValue + " to " + newValue + "?")
-    }
-
-    return true
-}
-
 
 var get_guild_header = function () {
         $.getJSON("json/get/guild", function (result) {
                 $("#guild_header").text(result["guild_name"])
-                $("#display_guild_header").text(result["guild_name"])
             });
     }
 var get_raffle_info = function () {
         // #raffle_subheader, #raffle_time, #raffle_cost
         $.getJSON("json/get/raffle", function (result) {
                 $("#raffle_subheader").val(result["raffle_guild_num"])
-$("#raffle_time").val(result["raffle_time"])
-$("#raffle_cost").val(result["raffle_ticket_cost"])
-$("#raffle_title").val(result["raffle_title"] || "")
-$("#raffle_status").val(result["raffle_status"] || "LIVE")
-$("#raffle_notes").val(result["raffle_notes"])
-
-                CURRENT_RAFFLE_INFO.raffle_subheader = normalizeFieldValue(result["raffle_guild_num"])
-                CURRENT_RAFFLE_INFO.raffle_time = normalizeFieldValue(result["raffle_time"])
-                CURRENT_RAFFLE_INFO.raffle_cost = normalizeFieldValue(result["raffle_ticket_cost"])
-
-                $("#display_raffle_subheader").text("#" + result["raffle_guild_num"] + " Raffle")
-                $("#display_raffle_time").text("Drawing: " + result["raffle_time"])
+                $("#raffle_time").val(result["raffle_time"])
+                $("#raffle_cost").val(result["raffle_ticket_cost"])
+                $("#raffle_notes").val(result["raffle_notes"])
             })
 }
 var get_prize_info = function () {
@@ -521,34 +151,6 @@ var _get_guild_roster = function (query, process) {
     }
 }
 
-function addTicketRanges(rows, extended) {
-    var runningStart = 1
-    var output = []
-
-    for (var i = 0; i < rows.length; i++) {
-        var row = rows[i]
-        if (!row) {
-            output.push(row)
-            continue
-        }
-
-        var total = Number(row[2]) || 0
-        var rangeText = ""
-
-        if (total > 0) {
-            var runningEnd = runningStart + total - 1
-            rangeText = runningStart + "-" + runningEnd
-            runningStart = runningEnd + 1
-        }
-
-        var newRow = row.slice()
-        newRow.push(rangeText)
-        output.push(newRow)
-    }
-
-    return output
-}
-
 var get_ticket_table = function () {
         function after_row_create (index, amount) {
             setTimeout(function () {
@@ -572,15 +174,18 @@ var get_ticket_table = function () {
                     return
                 }
 % if request.extended_tickets:                
-                // if paid or bar is empty, make it 0
+                // if paid is empty, make it 0
                 var prevRow = Number(rowIndex - 1)
                 if (prevRow >= 0) {
                     try {
                         if (ti.handsontable("getDataAtCell", prevRow, 3) == null)
                         { ti.handsontable("setDataAtCell", prevRow, 3, 0) }
-                        // barter
+                        // free
                         if (ti.handsontable("getDataAtCell", prevRow, 4) == null)
                         { ti.handsontable("setDataAtCell", prevRow, 4, 0) }
+                        // barter
+                        if (ti.handsontable("getDataAtCell", prevRow, 5) == null)
+                        { ti.handsontable("setDataAtCell", prevRow, 5, 0) }
                     } catch (error) {
                         // Ignore errors setting default values
                     }
@@ -643,21 +248,19 @@ var get_ticket_table = function () {
         $.getJSON("json/get/timestamp", function (result) {
                 if (!result) { return; }
 
-                var updated = DateFormat.format.date(parseInt(result) * 1000, "M/d/yyyy h:mm:ss a") + " EDT"
+                var updated = DateFormat.format.date(parseInt(result) * 1000, "yyyy-MM-dd hh:mm:ss")
 
                 $("#raffle_updated").text("Updated: " + updated.toString())
-                $("#display_raffle_updated").text("Last Updated " + updated.toString())
                 
                 })
 % if request.extended_tickets:
-        $.getJSON(window.location.pathname + "json/get/tickets_extended", function (result) {
-                result = addTicketRanges(result, true)
+        $.getJSON("json/get/tickets_extended", function (result) {
                 $("#ticket_info").handsontable("destroy")
                 $("#ticket_info").handsontable({
                         data: result,
                         rowHeaders: false,
-                        colHeaders: ["#", "Name", "Total", "Paid", "Bar", "Range"],
-                        colWidths: [42, 180, 55, 55, 55, 110],
+                        colHeaders: ["Participants", "Name", "Total", "Paid", "Free", "Bar"],
+                        colWidths: [100, 180, 45, 45, 45, 45],
                         contextMenu: false,
                         enterMoves: {row: 0, col: 1},
                         columnSorting: true,
@@ -685,7 +288,9 @@ var get_ticket_table = function () {
                                 allowInvalid: false,
                             },
                             {
-                                readOnly: true,
+                                type: 'numeric',
+                                format: '1,000,000',
+                                allowInvalid: false,
                             },
                         ],
                         isEmptyRow: function(row) {
@@ -694,8 +299,9 @@ var get_ticket_table = function () {
                             var col1 = this.getDataAtCell(row, 1)
                             var col3 = this.getDataAtCell(row, 3)
                             var col4 = this.getDataAtCell(row, 4)
+                            var col5 = this.getDataAtCell(row, 5)
 
-                            if ((col1 == null || col1 == '') || ((col3 == null || col3 == '') && (col4 == null || col4 == ''))) { return true }
+                            if ((col1 == null || col1 == '') || ((col3 == null || col3 == '') && (col4 == null || col4 == '') && (col5 == null || col5 == ''))) { return true }
 
                             return false
                         },
@@ -711,18 +317,21 @@ var get_ticket_table = function () {
                     }
                     $("#raffle_sold").text(total_tickets + " tickets sold.")
                     $("#raffle_participants").text(total_participants + " unique participants.")
-                    $("#display_raffle_sold").text(total_tickets)
-                    $("#display_raffle_participants").text(total_participants)
                 })
 % else:
-        $.getJSON(window.location.pathname + "json/get/tickets", function (result) {
-                result = addTicketRanges(result, false)
+        $.getJSON("json/get/tickets", function (result) {
+                //$("#raffle_participants").text(result.length + " unique participants.")
+                //var total = 0
+                //for (var i = 0; i < result.length; i++) {
+                //    total += result[i][2] << 0
+                //}
+                // $("#raffle_sold").text(total + " tickets sold.")
                 $("#ticket_info").handsontable("destroy")
                 $("#ticket_info").handsontable({
                         data: result,
                         rowHeaders: false,
-                        colHeaders: ["#", "Name", "Total", "Range"],
-                        colWidths: [100, 220, 55, 110],
+                        colHeaders: ["Participants", "Name", "Total"],
+                        colWidths: [100, 300, 50],
                         contextMenu: false,
                         enterMoves: {row: 0, col: 1},
                         columnSorting: true,
@@ -755,10 +364,6 @@ var get_ticket_table = function () {
                                 format: '1,000,000',
                                 allowInvalid: false,
                             },
-                                                    {
-                                readOnly: true,
-                            },
-
                         ],
                         isEmptyRow: function(row) {
                             var col, colLen, value, meta;
@@ -775,7 +380,9 @@ var get_ticket_table = function () {
                         minSpareRows: 1,
                         afterCreateRow: after_row_create,
                         afterChange: after_cell_change,
-                        })
+                        })//.handsontable("updateSettings", {cells: function (row, col, prop) {
+                           /// if (col == 0) { return {"readOnly": true} }
+                           /// }})
                     var data = $("#ticket_info").handsontable("getData")
                     var total_tickets = 0
                     var total_participants = data.length - 1
@@ -784,8 +391,6 @@ var get_ticket_table = function () {
                     }
                     $("#raffle_sold").text(total_tickets + " tickets sold.")
                     $("#raffle_participants").text(total_participants + " unique participants.")
-                    $("#display_raffle_sold").text(total_tickets)
-                    $("#display_raffle_participants").text(total_participants)
 
                 })
 % endif
@@ -819,35 +424,11 @@ var refresher = function () {
 $(document).ready(refresher)
 $(document).ready(function () {
             $(".ginfo_change_save").change(function () {
-                var $field = $(this)
-                var fieldId = $field.attr("id")
-                var trackedMap = {
-                    "raffle_subheader": "raffle_subheader",
-                    "raffle_time": "raffle_time",
-                    "raffle_cost": "raffle_cost"
-                }
-
-                if (trackedMap[fieldId]) {
-                    var oldValue = normalizeFieldValue(CURRENT_RAFFLE_INFO[trackedMap[fieldId]])
-                    var newValue = normalizeFieldValue($field.val())
-
-                    if (oldValue !== "" && oldValue !== newValue) {
-                        if (!confirmDangerousFieldChange(fieldId, oldValue, newValue)) {
-                            $field.val(oldValue)
-                            return
-                        }
-                    }
-                }
-
                 $.ajax({
                     type: "POST",
                     url: "json/set/raffle",
                     data: $("#ginfo_form").serialize(),
-                    success: function (result) {
-                        if (trackedMap[fieldId]) {
-                            CURRENT_RAFFLE_INFO[trackedMap[fieldId]] = normalizeFieldValue($field.val())
-                        }
-                    },
+                    success: function (result) { },
                     xhrFields: {
                         withCredentials: true
                     }
@@ -863,7 +444,7 @@ $(document).ready(function () {
                 get_ticket_list()
             })
             $("#new_raffle_button").click(function () {
-                    var r = confirm("This will close the current raffle, open a new raffle, carry forward the drawing time and ticket cost, and auto-increment the raffle number. Are you sure?")
+                    var r = confirm("This will close the current raffle and activate a new one.  Are you sure?")
                     if (r == false) { return }
 
                     $.getJSON("json/set/open_raffle", function (result) {
@@ -1027,91 +608,65 @@ $(document).ready(function () {
 $(window).resize(function () {
         $("#ticket_list").height($(window).height()-20)
         })
+
+
+const bbcMenuWrap=document.getElementById('bbcMenuWrap');
+const bbcMenuTrigger=document.getElementById('bbcMenuTrigger');
+const templateSubmenuWrap=document.getElementById('templateSubmenuWrap');
+if (bbcMenuWrap && bbcMenuTrigger) {
+    bbcMenuTrigger.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const open = bbcMenuWrap.classList.toggle('open');
+        bbcMenuTrigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (!open && templateSubmenuWrap) {
+            templateSubmenuWrap.classList.remove('open');
+        }
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!bbcMenuWrap.contains(e.target)) {
+            bbcMenuWrap.classList.remove('open');
+            if (templateSubmenuWrap) {
+                templateSubmenuWrap.classList.remove('open');
+            }
+            bbcMenuTrigger.setAttribute('aria-expanded', 'false');
+        }
+    });
+}
+
 </script>
 </head>
 <body>
-<div class="page-shell">
-
-<section class="card admin-header">
-  <img id="mainLogo" src="https://www.bbcguild.com/wp-content/uploads/2020/04/cropped-cropped-BBC-LOGO-V2-2.gif" alt="BBC logo">
-
-  <div class="title-block">
-    <h1 id="display_guild_header">Guild</h1>
-    <div class="sub"><strong id="display_raffle_subheader">Raffle</strong> • <span id="display_raffle_time">Drawing</span></div>
-    <div class="updated" id="display_raffle_updated">Last Updated</div>
-  </div>
-
-  <div class="stats-inline">
-    <div class="stat"><div class="k">Total Tickets</div><div class="v" id="display_raffle_sold">0</div></div>
-    <div class="stat"><div class="k">Participants</div><div class="v" id="display_raffle_participants">0</div></div>
-  </div>
-
-  <div class="header-right">
-    <div class="admin-flags">
-      <div class="admin-flag">
-        <div class="admin-flag-label">ADMIN</div>
-        <div class="admin-flag-bar" style="background:#c97a1f;"></div>
-      </div>
-      <div class="admin-flag">
-        <div class="admin-flag-label" style="display:flex;align-items:center;gap:6px;justify-content:center;">
-          <span style="width:8px;height:8px;border-radius:50%;background:#ff3b3b;display:inline-block;"></span>
-          LIVE
-        </div>
-        <div class="admin-flag-bar" style="background:#1fe38f;"></div>
-      </div>
-    </div>
-
-    <div class="search-wrap">
-      <span>🔍</span>
-      <input type="text" id="raffle_lookup" name="raffle_lookup" placeholder="Enter raffle #" onkeydown="if (event.key === 'Enter') { event.preventDefault(); openRaffleLookup(); }" />
-    </div>
-  </div>
-</section>
-
-<section class="button-bar">
-  <button type="button" class="action-btn" onclick="$('#new_raffle_button').click()">Open New Raffle</button>
-  <button type="button" class="action-btn" onclick="$('#reshow_import').click()">Re-Show Imports</button>
-  <button type="button" class="action-btn" onclick="$('#reshow_confirm').click()">Re-Show Confirms</button>
-  <button type="button" class="action-btn" onclick="$('#import_paid').click()">Import Paid</button>
-  <button type="button" class="action-btn" onclick="$('#import_barter').click()">Import Barter</button>
-  <button type="button" class="action-btn" onclick="$('#manual_refresh').click()">Manual Refresh</button>
-</section>
-
 <div id="main">
 <table id="main_table" valign="top">
     <tr>
-        
+        <td id="column_ticketlist">
+            <div id="ticket_list">
+            </div>
+        </td>
         <td id="column_guildinfo">
     <div id="left" class="column">
-            <div style="margin-bottom:10px;">
-  <a href="/${request.matchdict.get('guild')}/auth/logout" style="color:#9fb0cf;text-decoration:none;font-weight:700;">Logout</a>
-</div>
+            <span><a href="/bbc/auth/logout">[Logout]</a></span>
             <form id="ginfo_form">
-            <span id="guild_header" class="legacy-summary-hide"></span>
-
-            <label class="settings-block-label" for="raffle_subheader">Raffle Number</label>
-            <input type="text" id="raffle_subheader" class="ginfo_change_save" name="raffle_guild_num"/>
-
-            <label class="settings-block-label" for="raffle_time">Drawing Time</label>
+            <span id="guild_header"></span>
+            <br />
+            Raffle #<input type="text" id="raffle_subheader" class="ginfo_change_save" name="raffle_guild_num"/>
+            <br />
             <input type="text" id="raffle_time" class="ginfo_change_save" name="raffle_time"/>
-
-            <label class="settings-block-label" for="raffle_cost">Ticket Cost</label>
-            <input type="text" id="raffle_cost" class="ginfo_change_save" name="raffle_ticket_cost"/>
-
-            <label class="settings-block-label" for="raffle_title">Raffle Title</label>
-<input type="text" id="raffle_title" class="ginfo_change_save" name="raffle_title"/>
-
-<label class="settings-block-label" for="raffle_status">Status</label>
-<select id="raffle_status" class="ginfo_change_save" name="raffle_status">
-    <option value="LIVE">LIVE</option>
-    <option value="CLOSED">CLOSED</option>
-    <option value="COMPLETE">COMPLETE</option>
-</select>
-
-            <span id="raffle_sold" class="legacy-summary-hide"></span>
-            <span id="raffle_participants" class="legacy-summary-hide"></span>
-            <span id="raffle_updated" class="legacy-summary-hide"></span>
-
+            <br />
+            Ticket cost: <input type="text" id="raffle_cost" class="ginfo_change_save" name="raffle_ticket_cost"/>
+            <br />
+            <span id="raffle_sold"></span>
+            <br />
+            <span id="raffle_participants"></span>
+            <br >
+            <span id="raffle_updated"></span>            <br />
+            <div id="raffle_lookup_form" style="margin: 10px 0 0 0;">
+                <label for="raffle_lookup" style="display:block; margin-bottom:4px;">Previous raffle lookup</label>
+                <input type="text" id="raffle_lookup" name="raffle_lookup" placeholder="Enter raffle #" style="width: 140px;" onkeydown="if (event.key === 'Enter') { event.preventDefault(); openRaffleLookup(); }" />
+                <input type="button" value="Go" onclick="openRaffleLookup();" />
+            </div>
+            <br />
             % if request.bonus_tickets == 5:
             <br />
             <br />
@@ -1125,26 +680,32 @@ $(window).resize(function () {
                 For every 2 tickets purchased, you get 1 bonus ticket!
             </span>
             % endif
-
-            <label class="settings-block-label" for="raffle_notes">Admin Notes</label>
+            <br />
             <textarea id="raffle_notes" name="raffle_notes" class="ginfo_change_save">
             </textarea>
             <br />
             <br />
             </form>
-
-            <input type="submit" value="Open new raffle" id="new_raffle_button" class="hidden-original-action" />
-            <input type="submit" value="Manually refresh" id="manual_refresh" class="hidden-original-action" />
+            <input type="submit" value="Open new raffle" id="new_raffle_button" />
+            <br />
+            <br />
+            <input type="submit" value="Manually refresh" id="manual_refresh" />
+            <br />
+            <br />
             <input type="submit" value="Clear dupes" id="clear_imported" />
             <br />
             <br />
-            <input type="submit" value="Re-Show Import Pane" id="reshow_import" class="hidden-original-action" />
-            <input type="submit" value="Re-Show Confirmations Pane" id="reshow_confirm" class="hidden-original-action" />
+            <input type="submit" value="Re-Show Import Pane" id="reshow_import" />
+            <br />
+            <br />
+            <input type="submit" value="Re-Show Confirmations Pane" id="reshow_confirm" />
             <br />
             <br />
 % if request.extended_tickets:
-            <input type="submit" value="Import barter tickets" id="import_barter" class="hidden-original-action" />
-            <input type="submit" value="Import paid tickets" id="import_paid" class="hidden-original-action" />
+            <input type="submit" value="Import barter tickets" id="import_barter" />
+            <br />
+            <br />
+            <input type="submit" value="Import paid tickets" id="import_paid" />
             <br />
             <br />
 % endif
@@ -1172,8 +733,6 @@ $(window).resize(function () {
     </tr>
 </table>
 </div>
-</div>
-
 <div id="prize_template">
 <form id="prize_template_form">
 <table class="prize">
