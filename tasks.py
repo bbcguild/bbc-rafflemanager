@@ -287,7 +287,7 @@ def make_all_tickets (request, extended=False):
     build = []
 
     for i in data:
-        if i["ticket_count"] != 0 or i["ticket_free"] != 0 or i["ticket_barter"] != 0:
+        if i["ticket_count"] != 0 or i["ticket_barter"] != 0:
             build.append(i)
 
     data = sorted(build, key=lambda x: x["ticket_user_name"].lower())
@@ -300,7 +300,7 @@ def make_all_tickets (request, extended=False):
         except:
             barter_val = 0
 
-        total = d["ticket_count"] + d["ticket_free"] + barter_val
+        total = d["ticket_count"] + barter_val
 
         if total == 0:
             continue
@@ -325,7 +325,7 @@ def export_csv (request):
             barter_val = int(i["ticket_barter"])
         except:
             barter_val = 0
-        if i["ticket_count"] != 0 or i["ticket_free"] != 0 or barter_val != 0:
+        if i["ticket_count"] != 0 or barter_val != 0:
             i["ticket_user_name"] = i["ticket_user_name"].replace('"', "'")
             build.append(i)
 
@@ -336,7 +336,7 @@ def export_csv (request):
             barter_val = int(i["ticket_barter"])
         except:
             barter_val = 0
-        total = i["ticket_count"] + i["ticket_free"] + barter_val
+        total = i["ticket_count"] + barter_val
         writer.writerow([i["ticket_user_name"], "note", total])
 
     f.seek(0)
@@ -468,10 +468,9 @@ def make_ticket_list (request):
         cu = gdata.prefix + user["ticket_user_name"]
 
         count = user["ticket_count"]
-        free = user["ticket_free"]
         barter = user["ticket_barter"]
 
-        total = count + free + barter
+        total = count + barter
 
         if guild_bonus_five(request):
             if total % 5 == 0:
