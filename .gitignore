@@ -131,6 +131,8 @@ Thumbs.db
 *.old
 *.orig
 *.save
+*.hold
+backups/
 
 # Production database files
 raffle.db
@@ -189,7 +191,6 @@ import/*.tsv
 htmlcov/
 
 # Docker
-.dockerignore
 docker-compose.override.yml
 
 # SSL certificates
