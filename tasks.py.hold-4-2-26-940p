@@ -306,7 +306,7 @@ def make_all_tickets (request, extended=False):
             continue
 
         if extended:
-            new = [i+1, d["ticket_user_name"], total, d["ticket_count"], barter_val]
+            new = [i+1, d["ticket_user_name"], total, d["ticket_count"], d["ticket_free"], barter_val]
         else:
             new = [i+1, d["ticket_user_name"], total]
 
@@ -415,22 +415,21 @@ def set_extended_tickets (request):
         if not row:
             continue
 
-        u_name, u_count, u_free, u_barter = None, None, 0, None
+        u_name, u_count, u_free, u_barter = None, None, None, None
 
         if hasattr(row, "get"):
             u_name = row.get("1", None)
             u_count = row.get("3", None)
-            u_barter = row.get("4", None)
+            u_free = row.get("4", None)
+            u_barter = row.get("5", None)
         elif isinstance(row, list):
             u_name = row[1] if len(row) > 1 else None
             u_count = row[3] if len(row) > 3 else None
-            u_barter = row[4] if len(row) > 4 else None
+            u_free = row[4] if len(row) > 4 else None
+            u_barter = row[5] if len(row) > 5 else None
 
         if u_name is None or u_count is None:
             continue
-
-        if u_barter is None or u_barter == "":
-            u_barter = 0
 
         found_name = False
 
