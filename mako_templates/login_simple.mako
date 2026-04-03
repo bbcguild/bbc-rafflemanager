@@ -2,92 +2,94 @@
 <html>
 <head>
     <title>${title}</title>
-    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-256.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-256.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
         :root {
             --bg: #060a12;
-            --panel: #0b1220;
-            --panel2: #0f1728;
-            --line: rgba(90, 125, 210, 0.22);
+            --bg2: #0b1220;
+            --panel: #0c1526;
+            --panel2: #08101d;
+            --line: rgba(95, 132, 212, 0.24);
             --text: #f4f7ff;
-            --muted: #a6b5d1;
-            --input-bg: #182233;
-            --input-line: rgba(140, 170, 230, 0.24);
-            --button1: #0f58c9;
-            --button2: #0a459e;
-            --shadow: 0 18px 48px rgba(0, 0, 0, 0.38);
+            --muted: #b1bfd9;
+            --input-bg: #111a2a;
+            --input-border: rgba(140, 170, 230, 0.18);
+            --button1: #1e63d8;
+            --button2: #164ca8;
+            --shadow: 0 22px 60px rgba(0, 0, 0, 0.42);
         }
 
         * { box-sizing: border-box; }
 
-        body {
+        html, body {
             margin: 0;
+            padding: 0;
+            min-height: 100%;
+            font-family: Inter, system-ui, Arial, sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top left, rgba(40, 76, 166, 0.20), transparent 24%),
+                linear-gradient(180deg, #05070d 0%, #060a12 100%);
+        }
+
+        body {
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 32px;
-            background:
-                radial-gradient(circle at top left, rgba(40, 76, 166, 0.18), transparent 24%),
-                linear-gradient(180deg, #05070d 0%, #060a12 100%);
-            color: var(--text);
-            font-family: Inter, Arial, sans-serif;
+            padding: 24px;
         }
 
-        .login-form {
-            width: min(100%, 760px);
-            padding: 34px 40px 38px;
-            border: 1px solid var(--line);
-            border-radius: 22px;
+        .login-wrap {
+            width: min(100%, 520px);
             background: linear-gradient(180deg, var(--panel), var(--panel2));
+            border: 1px solid var(--line);
+            border-radius: 24px;
             box-shadow: var(--shadow);
+            padding: 28px 28px 24px;
         }
 
         .brand {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             text-align: center;
-            margin-bottom: 28px;
+            margin-bottom: 18px;
         }
 
         .brand img {
-            width: 110px;
-            height: 110px;
+            width: 86px;
+            height: 86px;
             object-fit: contain;
-            margin-bottom: 8px;
+            display: block;
+            margin: 0 auto 10px;
         }
 
-        .brand h1 {
+        .brand-title {
             margin: 0;
-            font-size: 2.25rem;
+            font-size: 1.9rem;
             line-height: 1;
-            letter-spacing: 0.04em;
             font-weight: 800;
+            letter-spacing: 0.06em;
         }
 
-        .brand-spacer {
-            height: 28px;
-        }
-
-        .intro {
-            margin: 0 0 22px;
-            font-size: 1.1rem;
+        .prompt {
+            margin: 18px 0 18px;
             color: var(--muted);
+            font-size: 1rem;
             text-align: center;
         }
 
+        .login-form h2 {
+            display: none;
+        }
+
         .form-group {
-            margin-bottom: 22px;
+            margin-bottom: 16px;
         }
 
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 7px;
+            font-size: 1rem;
             font-weight: 800;
-            font-size: 1.05rem;
             color: var(--text);
         }
 
@@ -95,72 +97,97 @@
         input[type="password"] {
             width: 100%;
             padding: 14px 16px;
-            border: 1px solid var(--input-line);
             border-radius: 12px;
+            border: 1px solid var(--input-border);
             background: var(--input-bg);
             color: var(--text);
-            font-size: 1.2rem;
+            font-size: 1.05rem;
             outline: none;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
         }
 
         input[type="text"]:focus,
         input[type="password"]:focus {
-            border-color: rgba(140, 170, 230, 0.4);
-            box-shadow: 0 0 0 3px rgba(61, 112, 223, 0.14);
+            border-color: rgba(140, 170, 230, 0.36);
+            box-shadow: 0 0 0 3px rgba(50, 94, 184, 0.18);
         }
 
         input[type="submit"] {
+            margin-top: 4px;
+            min-width: 150px;
+            padding: 13px 22px;
+            border: none;
+            border-radius: 14px;
             background: linear-gradient(180deg, var(--button1), var(--button2));
             color: white;
-            padding: 14px 28px;
-            border: 1px solid rgba(140, 170, 230, 0.2);
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 800;
-            min-width: 150px;
+            cursor: pointer;
+            box-shadow: 0 12px 28px rgba(14, 38, 84, 0.35);
         }
 
         input[type="submit"]:hover {
-            filter: brightness(1.08);
+            filter: brightness(1.05);
         }
 
-        .fallback {
+        .login-missing {
             color: var(--muted);
             text-align: center;
             margin: 0;
         }
+
+        @media (max-width: 640px) {
+            body {
+                align-items: flex-start;
+                padding: 16px;
+            }
+
+            .login-wrap {
+                padding: 22px 18px 20px;
+                border-radius: 20px;
+            }
+
+            .brand img {
+                width: 74px;
+                height: 74px;
+            }
+
+            .brand-title {
+                font-size: 1.65rem;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="login-form">
+    <div class="login-wrap">
         <div class="brand">
             <img src="https://www.bbcguild.com/wp-content/uploads/2020/04/cropped-cropped-BBC-LOGO-V2-2.gif" alt="BBC logo">
-            <h1>RAFFLES</h1>
+            <h1 class="brand-title">RAFFLES</h1>
         </div>
 
-        <div class="brand-spacer"></div>
+        <div class="prompt">Please log in:</div>
 
-        <p class="intro">Please log in:</p>
-
-        % if form:
-            <form method="POST" action="">
-                ${csrf_token_field | n}
-                <div class="form-group">
-                    <label for="username">Username:</label>
-                    ${form.username()}
-                </div>
-                <div class="form-group">
-                    <label for="password">Password:</label>
-                    ${form.password()}
-                </div>
-                <div class="form-group">
-                    <input type="submit" value="Login">
-                </div>
-            </form>
-        % else:
-            <p class="fallback">Login form not available.</p>
-        % endif
+        <div class="login-form">
+            <h2>${title}</h2>
+            % if form:
+                <form method="POST" action="">
+                    ${csrf_token_field | n}
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        ${form.username()}
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        ${form.password()}
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" value="Login">
+                    </div>
+                </form>
+            % else:
+                <p class="login-missing">Login form not available.</p>
+            % endif
+        </div>
     </div>
 </body>
 </html>
