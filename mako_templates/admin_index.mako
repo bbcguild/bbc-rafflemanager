@@ -659,9 +659,13 @@ var get_ticket_table = function () {
                 $("#ticket_info").handsontable({
                         data: result,
                         rowHeaders: false,
-                        colHeaders: ["Participants", "Name", "Total", "Paid", "Free", "Bar", "Range"],
-                        colWidths: [100, 180, 55, 45, 45, 45, 110],
+                        colHeaders: ["#", "Name", "Total", "Paid", "Free", "Bar", "Range"],
+                        colWidths: [42, 180, 55, 45, 45, 45, 110],
                         contextMenu: false,
+                        hiddenColumns: {
+                            columns: [4],
+                            indicators: false
+                        },
                         enterMoves: {row: 0, col: 1},
                         columnSorting: true,
 			licenseKey: "non-commercial-and-evaluation",

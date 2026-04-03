@@ -4,7 +4,6 @@ from dbconf import DATABASE
 
 import sqlite3
 import time
-import re
 from get_request import get_request
 from functools import wraps
 
@@ -229,7 +228,13 @@ def close_raffle_by_id (cur, raffle_id):
 
 @with_cursor_boolean
 def create_new_raffle (cur, guild_id):
-    cur.execute("INSERT INTO raffles VALUES (NULL, ?, 0, 'Time here', 'Ticket cost', 0, '')", (guild_id, ))
+    cur.execute("PRAGMA table_info(raffles)")
+    columns = [row[1] for row in cur.fetchall()]
+
+    if "raffle_title" in columns and "raffle_status" in columns:
+        cur.execute("INSERT INTO raffles (raffle_guild, raffle_guild_num, raffle_time, raffle_ticket_cost, raffle_closed, raffle_notes, raffle_title, raffle_status) VALUES (?, 0, 'Time here', 'Ticket cost', 0, '', '', 'LIVE')", (guild_id, ))
+    else:
+        cur.execute("INSERT INTO raffles VALUES (NULL, ?, 0, 'Time here', 'Ticket cost', 0, '')", (guild_id, ))
 
 gcri = get_cur_raffle_id
 
@@ -251,51 +256,6 @@ def get_cur_raffle_info (cur, guild_id):
     cur.execute("SELECT * FROM raffles WHERE raffle_id=?", (cur_id, ))
     return cur.fetchone()
 
-
-
-@with_cursor
-def get_raffle_info_by_id(cur, guild_id, raf_id=None):
-    if not raf_id:
-        return None
-
-    cur.execute("SELECT * FROM raffles WHERE raffle_id=? AND raffle_guild=?", (raf_id, guild_id))
-    return cur.fetchone()
-
-@with_cursor
-def get_tickets_by_raffle_id(cur, guild_id, raf_id=None):
-    if not raf_id:
-        return []
-
-    cur.execute("SELECT tickets.*, user_name AS ticket_user_name FROM tickets LEFT JOIN users ON ticket_user=user_id WHERE ticket_raffle=?", (raf_id, ))
-    res = cur.fetchall()
-
-    if not res:
-        return []
-
-    return res
-
-@with_cursor
-def resolve_raffle_lookup_code(cur, guild_id, raffle_code):
-    code = str(raffle_code or "").strip()
-    if not code:
-        return None
-
-    cur.execute("SELECT raffle_guild_num FROM raffles WHERE raffle_guild=? AND raffle_guild_num=?", (guild_id, code))
-    res = cur.fetchone()
-    if res:
-        return res["raffle_guild_num"]
-
-    if re.search(r"[A-Za-z]", code):
-        return None
-
-    cur.execute("SELECT raffle_guild_num FROM raffles WHERE raffle_guild=? AND raffle_guild_num LIKE ? ORDER BY raffle_id DESC", (guild_id, code + "%"))
-    matches = cur.fetchall()
-
-    if len(matches) == 1:
-        return matches[0]["raffle_guild_num"]
-
-    return None
-
 @with_cursor_boolean
 def set_cur_raffle_info (cur, guild_id, raffle_info):
     cur_id = gcri()
@@ -304,7 +264,13 @@ def set_cur_raffle_info (cur, guild_id, raffle_info):
 
     r = raffle_info
 
-    cur.execute("UPDATE raffles SET raffle_guild=?, raffle_guild_num=?, raffle_time=?, raffle_ticket_cost=?, raffle_closed=?, raffle_notes=? WHERE raffle_id=?", (r["raffle_guild"], r["raffle_guild_num"], r["raffle_time"], r["raffle_ticket_cost"], r["raffle_closed"], r["raffle_notes"], cur_id))
+    cur.execute("PRAGMA table_info(raffles)")
+    columns = [row[1] for row in cur.fetchall()]
+
+    if "raffle_title" in columns and "raffle_status" in columns:
+        cur.execute("UPDATE raffles SET raffle_guild=?, raffle_guild_num=?, raffle_time=?, raffle_ticket_cost=?, raffle_closed=?, raffle_notes=?, raffle_title=?, raffle_status=? WHERE raffle_id=?", (r["raffle_guild"], r["raffle_guild_num"], r["raffle_time"], r["raffle_ticket_cost"], r["raffle_closed"], r["raffle_notes"], r.get("raffle_title", ""), r.get("raffle_status", "LIVE"), cur_id))
+    else:
+        cur.execute("UPDATE raffles SET raffle_guild=?, raffle_guild_num=?, raffle_time=?, raffle_ticket_cost=?, raffle_closed=?, raffle_notes=? WHERE raffle_id=?", (r["raffle_guild"], r["raffle_guild_num"], r["raffle_time"], r["raffle_ticket_cost"], r["raffle_closed"], r["raffle_notes"], cur_id))
 
 @with_cursor_boolean
 def close_current_raffle (cur, guild_id):
@@ -316,7 +282,13 @@ def close_current_raffle (cur, guild_id):
 
 @with_cursor_boolean
 def open_new_raffle (cur, guild_id):
-    cur.execute("INSERT INTO raffles VALUES (null, ?, 0, 'Fill this in!', '1000g', 0, '')", (guild_id, ))
+    cur.execute("PRAGMA table_info(raffles)")
+    columns = [row[1] for row in cur.fetchall()]
+
+    if "raffle_title" in columns and "raffle_status" in columns:
+        cur.execute("INSERT INTO raffles (raffle_guild, raffle_guild_num, raffle_time, raffle_ticket_cost, raffle_closed, raffle_notes, raffle_title, raffle_status) VALUES (?, 0, 'Fill this in!', '1000g', 0, '', '', 'LIVE')", (guild_id, ))
+    else:
+        cur.execute("INSERT INTO raffles VALUES (null, ?, 0, 'Fill this in!', '1000g', 0, '')", (guild_id, ))
 
 # users
 @with_cursor

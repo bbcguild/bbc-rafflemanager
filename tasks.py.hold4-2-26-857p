@@ -95,6 +95,22 @@ def Result (res, flash=None):
     
     return {"result": res, "flash": flash}
 
+def get_select_guilds():
+    cur = db.cursor()
+    cur.execute("SELECT guild_id, guild_shortname, guild_name FROM guilds ORDER BY guild_id")
+    return [dict(row) for row in cur.fetchall()]
+
+def ensure_raffle_schema():
+    cur = db.cursor()
+    cur.execute("PRAGMA table_info(raffles)")
+    columns = {row[1] for row in cur.fetchall()}
+
+    if "raffle_title" not in columns:
+        cur.execute("ALTER TABLE raffles ADD COLUMN raffle_title TEXT DEFAULT ''")
+
+    if "raffle_status" not in columns:
+        cur.execute("ALTER TABLE raffles ADD COLUMN raffle_status TEXT DEFAULT 'LIVE'")
+
 @view_config(route_name='home', renderer="mako_templates/select.mako")
 def home (request):
     return {"guilds": get_select_guilds()}
@@ -133,12 +149,8 @@ def landing_noslash (request):
 @view_config(route_name='guild_landing_raffle', renderer="mako_templates/index.mako")
 def landing (request):
     # Auth system re-enabled - check for admin user
-    # IMPORTANT: Do NOT force admin mode on archived raffle URLs.
-    # Public/archive view for /{guild}/{raffle}/ should work even when logged in.
-    is_archive_view = bool(request.matchdict and request.matchdict.get("raffle"))
-
     if request.user is not None:
-        if request.user.in_group("akaviri") and not is_archive_view:
+        if request.user.in_group("akaviri"):
             request.override_renderer = "mako_templates/admin_index.mako"
         if gdata.extended:
             request.extended_tickets = True
@@ -146,7 +158,6 @@ def landing (request):
             request.extended_tickets = False
 
     return {}
-
 
 @view_config(route_name='raffle_lookup')
 def raffle_lookup(request):
@@ -181,11 +192,17 @@ def set_guild_roster (request):
     # Do something here at some point
 
     return {"roster": True}
+
 # Available to all
 @view_config(route_name="get_current_raffle_info", renderer="json")
 @view_config(route_name="get_current_raffle_info_id", renderer="json")
 def get_current_raffle_info (request):
-    info = db.get_cur_raffle_info()
+    raffle_id = request.matchdict.get("raffle")
+
+    if raffle_id:
+        info = db.get_raffle_info_by_id(raffle_id)
+    else:
+        info = db.get_cur_raffle_info()
 
     if not info:
         return {}
@@ -275,7 +292,12 @@ def get_extended_tickets (request):
     return make_all_tickets(request, True)
 
 def make_all_tickets (request, extended=False):
-    tickets = db.get_tickets()
+    raffle_id = request.matchdict.get("raffle")
+
+    if raffle_id:
+        tickets = db.get_tickets_by_raffle_id(raffle_id)
+    else:
+        tickets = db.get_tickets()
 
     if not tickets:
         return []
@@ -452,7 +474,12 @@ def set_extended_tickets (request):
     return change_count
 
 def make_ticket_list (request):
-    ticks = db.get_tickets()
+    raffle_id = request.matchdict.get("raffle")
+
+    if raffle_id:
+        ticks = db.get_tickets_by_raffle_id(raffle_id)
+    else:
+        ticks = db.get_tickets()
 
     if not ticks:
         return []
@@ -670,7 +697,6 @@ def normalize_lua_table_records(section):
 
     return []
 
-
 @view_config(route_name="import_tickets", renderer="json", permission="akaviri")
 def import_tickets (request):
     if "file" not in request.POST:
@@ -866,9 +892,6 @@ def import_tickets2 (request):
         else:
             data[row["name"]] = row["amount"]
 
-    # actually set tickets!
-
-
     confirms = ""
 
     names = []
@@ -886,12 +909,6 @@ def import_tickets2 (request):
             free_tickets = 0
             barter_tickets = 0
 
-        #if not isinstance(free_tickets, int):
-        #    free_tickets = 0
-        #if not isinstance(barter_tickets, int):
-        #    barter_tickets = 0
-
-        # FIXED: Preserve existing free and barter tickets while adding new paid tickets
         db.set_user_tickets(user_name, prev_tickets+tickets, free_tickets, barter_tickets)
 
         confirms = confirms + "%s,%s|" % (user_name, tickets)
@@ -917,6 +934,7 @@ def fix_tickets (request):
 @view_config(route_name="set_user_tickets", renderer="json", permission="akaviri")
 def set_user_tickets (request):
     return {}
+
 # Prizes, everyone needs to see this
 @view_config(route_name="get_all_prizes", renderer="json")
 @view_config(route_name="get_all_prizes_id", renderer="json")
@@ -952,7 +970,6 @@ def get_all_prizes (request):
                     p["prize_winner_name"] = "*** INVALID TICKET ***"
                 else:
                     p["prize_winner_name"] = winner
-
 
     return prizes
 
@@ -1168,7 +1185,6 @@ def parse_roster (request):
 
         full_path, filename = gdata.get_import()
 
-        #with open(filename, "w") as f:
         with open(os.path.join(full_path, filename), "w") as f:
             writer = csv.writer(f, delimiter="\t", quotechar='"', quoting=csv.QUOTE_MINIMAL)
             writer.writerow(["Name", "Joined", "Sales30", "Sales10", "Purchases30", "Purchases10"])
@@ -1216,7 +1232,9 @@ def make_app ():
     except Exception as e:
         print(f"Database initialization error: {e}")
         # Continue anyway - the app might still work if database exists
-    
+
+    ensure_raffle_schema()
+
     session_factory = SignedCookieSessionFactory("supersupersecretpasswordgoeshereYAY!!!1")
     config = Configurator(settings=pconf.settings, session_factory=session_factory)
 
@@ -1264,7 +1282,7 @@ def make_app ():
     g_route("get_extended_tickets_id", "/{guild}/{raffle}/json/get/tickets_extended")
     g_route("set_extended_tickets", "/{guild}/json/set/tickets_extended")
 
-    g_route("get_ticket_list", "{guild}/json/get/ticket_list")
+    g_route("get_ticket_list", "/{guild}/json/get/ticket_list")
     g_route("import_tickets", "/{guild}/json/set/tickets_import")
     g_route("import_tickets2", "/{guild}/json/set/tickets_import2")
     g_route("barter_import", "/{guild}/json/set/barter_import")
@@ -1280,7 +1298,7 @@ def make_app ():
     g_route("export_csv", "/{guild}/json/get/csv")
 
     g_route("get_all_tickets_id", "/{guild}/{raffle}/json/get/tickets")
-    g_route("get_ticket_list_id", "{guild}/{raffle}/json/get/ticket_list")
+    g_route("get_ticket_list_id", "/{guild}/{raffle}/json/get/ticket_list")
     g_route("get_user_tickets_id", "/{guild}/{raffle}/json/get/tickets_{username}")
     # -- Prizes
     g_route("get_all_prizes", "/{guild}/json/get/prizes")
