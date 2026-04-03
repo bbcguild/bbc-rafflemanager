@@ -95,6 +95,11 @@ def Result (res, flash=None):
     
     return {"result": res, "flash": flash}
 
+def get_select_guilds():
+    cur = db.cursor()
+    cur.execute("SELECT guild_id, guild_shortname, guild_name FROM guilds ORDER BY guild_id")
+    return [dict(row) for row in cur.fetchall()]
+
 @view_config(route_name='home', renderer="mako_templates/select.mako")
 def home (request):
     return {"guilds": get_select_guilds()}
