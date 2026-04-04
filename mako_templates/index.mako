@@ -541,9 +541,17 @@ body{
   gap:10px;
   align-items:center;
 }
-.thead.has-range,
-.row.has-range{
+.thead.mode-range,
+.row.mode-range{
   grid-template-columns:minmax(34px,.38fr) minmax(0,2.15fr) minmax(72px,.66fr) minmax(122px,.96fr);
+}
+.thead.mode-barter,
+.row.mode-barter{
+  grid-template-columns:minmax(34px,.34fr) minmax(0,1.7fr) minmax(70px,.56fr) minmax(70px,.56fr) minmax(62px,.5fr);
+}
+.thead.mode-barter-range,
+.row.mode-barter-range{
+  grid-template-columns:minmax(34px,.32fr) minmax(0,1.5fr) minmax(66px,.5fr) minmax(66px,.5fr) minmax(56px,.42fr) minmax(116px,.9fr);
 }
 .thead{
   padding:14px 8px 12px 8px;
@@ -558,8 +566,16 @@ body{
   margin:0 8px;
   border-top:1px solid rgba(255,255,255,.05);
 }
+.thead.mode-barter,
+.thead.mode-barter-range{
+  font-size:.92rem;
+}
+.row.mode-barter,
+.row.mode-barter-range{
+  font-size:.96rem;
+}
 .row.hoverable:hover{background:var(--hover)}
-.idx,.total,.range{
+.idx,.total,.paid,.bar,.range{
   text-align:right;
   font-variant-numeric:tabular-nums;
   justify-self:end;
@@ -741,6 +757,7 @@ const guildSlug = "${request.matchdict['guild']}";
 const initialRequestedRaffleNum = "${initial_lookup_raffle}";
 const liveRaffleEndpoint = "/" + guildSlug + "/json/get/raffle";
 const MAX_HISTORY_DEPTH = 5;
+const publicExtendedTicketsEnabled = ${'true' if request.extended_tickets else 'false'};
 const urlParams = new URLSearchParams(window.location.search);
 const requestedDepthRaw = urlParams.get('depth');
 let currentDepth = requestedDepthRaw === null ? null : parseInt(requestedDepthRaw, 10);
@@ -753,6 +770,7 @@ let allEntrantsData = [];
 let currentDisplayedRaffleNum = initialRequestedRaffleNum || null;
 let liveCurrentRaffleNum = null;
 let currentRaffleStatus = "LIVE";
+let currentEntrantsMode = "standard";
 
 $(document).ready(function() {
   $.ajaxSetup({cache:false});
@@ -775,6 +793,16 @@ function escapeHtml(str) {
 function shouldShowPublicTicketRanges(status) {
   var normalizedStatus = normalizeRaffleStatus(status);
   return normalizedStatus === "ROLLING" || normalizedStatus === "COMPLETE" || isArchiveDisplay();
+}
+
+function shouldUseBarterMode(rows) {
+  if (!publicExtendedTicketsEnabled || !Array.isArray(rows)) {
+    return false;
+  }
+
+  return rows.some(function(row) {
+    return row && Number(row[4]) > 0;
+  });
 }
 
 function addTicketRanges(rows) {
@@ -803,16 +831,36 @@ function getEntrantsColumns() {
     { key: "total", label: "Total", className: "total", value: function(row) { return row[2]; } }
   ];
 
-  if (shouldShowPublicTicketRanges(currentRaffleStatus)) {
+  if (currentEntrantsMode === "barter" || currentEntrantsMode === "barter-range") {
+    columns.push(
+      { key: "paid", label: "Paid", className: "paid", value: function(row) { return row[3] || 0; } },
+      { key: "bar", label: "Bar", className: "bar", value: function(row) { return row[4] || 0; } }
+    );
+  }
+
+  if (currentEntrantsMode === "range" || currentEntrantsMode === "barter-range") {
     columns.push({
       key: "range",
       label: "Range",
       className: "range",
-      value: function(row) { return row[3] || ""; }
+      value: function(row) {
+        var rangeIndex = currentEntrantsMode === "barter-range" ? 5 : 3;
+        return row[rangeIndex] || "";
+      }
     });
   }
 
   return columns;
+}
+
+function determineEntrantsMode(rows) {
+  var barterMode = shouldUseBarterMode(rows);
+  var showRanges = shouldShowPublicTicketRanges(currentRaffleStatus);
+
+  if (barterMode && showRanges) return "barter-range";
+  if (barterMode) return "barter";
+  if (showRanges) return "range";
+  return "standard";
 }
 
 function renderEntrantsHeader() {
@@ -820,10 +868,7 @@ function renderEntrantsHeader() {
   if (!$head.length) return;
 
   var columns = getEntrantsColumns();
-  var headClass = "thead";
-  if (columns.length > 3) {
-    headClass += " has-range";
-  }
+  var headClass = "thead mode-" + currentEntrantsMode;
 
   var html = '<div class="' + headClass + '">';
   columns.forEach(function(column) {
@@ -1101,10 +1146,7 @@ function renderEntrantsRows(rows) {
   }
 
   var columns = getEntrantsColumns();
-  var rowClass = "row hoverable";
-  if (columns.length > 3) {
-    rowClass += " has-range";
-  }
+  var rowClass = "row hoverable mode-" + currentEntrantsMode;
 
   var htmlRows = [];
   for (var i = 0; i < rows.length; i++) {
@@ -1144,7 +1186,8 @@ function applyEntrantFilter() {
 
 function buildEntrantsTable(result) {
   var rows = Array.isArray(result) ? result.slice() : [];
-  if (shouldShowPublicTicketRanges(currentRaffleStatus)) {
+  currentEntrantsMode = determineEntrantsMode(rows);
+  if (currentEntrantsMode === "range" || currentEntrantsMode === "barter-range") {
     rows = addTicketRanges(rows);
   }
 
@@ -1199,7 +1242,7 @@ function refresher() {
     updateRaffleNav();
   });
 
-  $.getJSON("json/get/tickets", function(result) {
+  $.getJSON(publicExtendedTicketsEnabled ? "json/get/tickets_extended" : "json/get/tickets", function(result) {
     $("#raffle_participants").text(result.length);
     $("#raffle_participants_mobile").text(result.length);
 
