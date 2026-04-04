@@ -395,7 +395,7 @@ body{
 /* Bottom row */
 .bottom-row{
   display:grid;
-  grid-template-columns:1.42fr .78fr;
+  grid-template-columns:minmax(0,.94fr) minmax(0,1.06fr);
   gap:14px;
   align-items:start;
 }
@@ -543,7 +543,7 @@ body{
 }
 .thead.has-range,
 .row.has-range{
-  grid-template-columns:minmax(34px,.45fr) minmax(0,1.55fr) minmax(72px,.72fr) minmax(122px,1.08fr);
+  grid-template-columns:minmax(34px,.38fr) minmax(0,2.15fr) minmax(72px,.66fr) minmax(122px,.96fr);
 }
 .thead{
   padding:14px 8px 12px 8px;
@@ -571,7 +571,6 @@ body{
 .name{
   min-width:0;
   overflow:hidden;
-  text-overflow:ellipsis;
   white-space:nowrap;
 }
 .empty-state{
