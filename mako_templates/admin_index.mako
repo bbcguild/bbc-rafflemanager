@@ -640,7 +640,7 @@ border:1px solid rgba(140,170,230,.12);
   background:#0f1622;
   color:#d6deeb;
   border:1px solid rgba(140,170,230,.12);
-  border-radius:14px;
+  border-radius:0;
   font-size:1.25em;
   line-height:1.2;
   padding:10px 14px;
@@ -674,7 +674,7 @@ border:1px solid rgba(140,170,230,.12);
   box-sizing:border-box;
   padding:10px;
   border:1px solid rgba(80,120,210,.18);
-  border-radius:18px;
+  border-radius:0;
   background:linear-gradient(180deg,rgba(9,18,35,.96),rgba(8,15,28,.98));
 }
 
@@ -717,7 +717,7 @@ border:1px solid rgba(140,170,230,.12);
   box-sizing:border-box;
   padding:10px 14px;
   border:1px solid rgba(140,170,230,.12);
-  border-radius:14px;
+  border-radius:0;
   background:#0f1622;
   color:#f4f7ff;
   font-size:1.25em;
@@ -1872,9 +1872,9 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
     </div>
     <div class="prize-actions">
-        <a href="#" id="prize_finalise" class="prize_finalise prize-action" title="Finalize winner">f</a>
-        <a href="#" id="prize_roll" class="prize_roll prize-action" title="Roll winner">R</a>
-        <a href="#" id="prize_delete" class="prize_delete prize-action" title="Delete prize">x</a>
+        <a href="#" id="prize_finalise" class="prize_finalise prize-action" title="Finalize winner">🔒</a>
+        <a href="#" id="prize_roll" class="prize_roll prize-action" title="Roll winner">🎲</a>
+        <a href="#" id="prize_delete" class="prize_delete prize-action" title="Delete prize">🗑️</a>
     </div>
 </div>
 <input type="hidden" name="prize_id" value="" class="prize_id" />
