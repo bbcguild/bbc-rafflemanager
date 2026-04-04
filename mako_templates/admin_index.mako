@@ -34,6 +34,8 @@
   --blue:#244fb3;
   --blue2:#183a8f;
   --shadow:0 18px 48px rgba(0,0,0,.38);
+  --page-gutter:18px;
+  --scrollbar-comp:18px;
 }
 
 *,
@@ -61,7 +63,7 @@ body{
   position:static !important;
   min-height:100vh;
   overflow-x:hidden;
-  padding:0 18px;
+  padding:0 calc(var(--page-gutter) + var(--scrollbar-comp)) 0 var(--page-gutter);
 }
 
 .page-shell{
