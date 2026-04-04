@@ -2674,7 +2674,7 @@ document.addEventListener('DOMContentLoaded', function () {
         <button type="button" class="note-tool" data-cmd="bold" title="Bold">B</button>
         <button type="button" class="note-tool" data-cmd="italic" title="Italic">I</button>
         <button type="button" class="note-tool" data-cmd="underline" title="Underline">U</button>
-        <button type="button" class="note-tool" data-cmd="insertUnorderedList" title="Bulleted list">â€¢ List</button>
+        <button type="button" class="note-tool" data-cmd="insertUnorderedList" title="Bulleted list">Bullet List</button>
         <button type="button" class="note-tool" data-cmd="insertOrderedList" title="Numbered list">1. List</button>
         <button type="button" class="note-tool note-link" data-cmd="createLink" title="Insert link">Link</button>
         <input type="color" id="notesTextColor" class="note-color" value="#f4f7ff" title="Text color" />
@@ -2712,9 +2712,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
             <label class="settings-block-label" for="raffle_status">Status</label>
             <select id="raffle_status" class="ginfo_change_save" name="raffle_status">
-                <option value="LIVE">ðŸŸ¢ LIVE</option>
-                <option value="ROLLING">ðŸŽ² ROLLING</option>
-                <option value="COMPLETE">ðŸ”´ CLOSED</option>
+                <option value="LIVE">LIVE</option>
+                <option value="ROLLING">ROLLING</option>
+                <option value="COMPLETE">CLOSED</option>
             </select>
 
             <label class="settings-block-label" for="raffle_subheader">Raffle Number</label>
@@ -2820,9 +2820,9 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
     </div>
     <div class="prize-actions">
-        <a href="#" id="prize_finalise" class="prize_finalise prize-action" title="Finalize winner">ðŸ”’</a>
-        <a href="#" id="prize_roll" class="prize_roll prize-action" title="Roll winner">ðŸŽ²</a>
-        <a href="#" id="prize_delete" class="prize_delete prize-action" title="Delete prize">ðŸ—‘ï¸</a>
+        <a href="#" id="prize_finalise" class="prize_finalise prize-action" title="Finalize winner">L</a>
+        <a href="#" id="prize_roll" class="prize_roll prize-action" title="Roll winner">R</a>
+        <a href="#" id="prize_delete" class="prize_delete prize-action" title="Delete prize">X</a>
     </div>
 </div>
 <input type="hidden" name="prize_id" value="" class="prize_id" />
