@@ -788,6 +788,19 @@ border:1px solid rgba(140,170,230,.12);
   box-shadow:0 28px 90px rgba(0,0,0,.48);
 }
 
+div#paid_template{
+  position:fixed !important;
+  left:50% !important;
+  top:50% !important;
+  transform:translate(-50%, -50%) !important;
+  z-index:2000 !important;
+  width:min(1100px, calc(100vw - 48px)) !important;
+  max-height:calc(100vh - 48px) !important;
+  padding:0 !important;
+  background:linear-gradient(180deg,#d7dade,#cfd4da) !important;
+  border:1px solid #6b727c !important;
+}
+
 #import_buttons,
 #confirm_buttons,
 #barter_buttons,
