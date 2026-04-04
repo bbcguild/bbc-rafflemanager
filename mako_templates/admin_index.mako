@@ -1781,7 +1781,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     <div class="search-wrap">
       <span>🔍</span>
-      <input type="text" id="raffle_lookup" name="raffle_lookup" placeholder="Enter raffle #" onkeydown="if (event.key === 'Enter') { event.preventDefault(); openRaffleLookup(); }" />
+      <input type="text" id="raffle_lookup" name="raffle_lookup" placeholder="Raffle #" onkeydown="if (event.key === 'Enter') { event.preventDefault(); openRaffleLookup(); }" />
     </div>
     <div class="profile-menu" id="adminProfileMenu">
       <button type="button" class="profile-menu-trigger" id="adminProfileMenuTrigger" aria-expanded="false" aria-haspopup="true">
