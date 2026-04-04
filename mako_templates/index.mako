@@ -408,7 +408,7 @@ body{
   gap:18px;
   align-items:stretch;
   padding:14px;
-  border-radius:24px;
+  border-radius:0;
   border:1px solid var(--line);
   background:linear-gradient(180deg,rgba(11,19,35,.96),rgba(8,14,24,.98));
   width:100%;
@@ -418,7 +418,7 @@ body{
   align-items:center;
   justify-content:center;
   min-height:148px;
-  border-radius:20px;
+  border-radius:0;
   border:1px solid var(--line);
   background:linear-gradient(180deg,rgba(15,28,51,.96),rgba(8,16,29,.98));
   font-size:2.4rem;
@@ -434,7 +434,7 @@ body{
   width:100%;
   min-height:54px;
   padding:12px 18px;
-  border-radius:18px;
+  border-radius:0;
   border:1px solid var(--line);
   background:rgba(10,20,38,.88);
   display:flex;
@@ -450,10 +450,6 @@ body{
 }
   .pwinner{
     width:100%;
-    padding:12px 18px;
-    border-radius:16px;
-    background:rgba(255,255,255,.03);
-    border:1px solid rgba(255,255,255,.05);
     display:grid;
     grid-template-columns:minmax(110px,.9fr) minmax(0,1.45fr) minmax(132px,1fr);
     gap:12px;
@@ -463,6 +459,10 @@ body{
     min-width:0;
     display:grid;
     gap:6px;
+    padding:12px 18px;
+    border-radius:0;
+    background:rgba(255,255,255,.03);
+    border:1px solid rgba(255,255,255,.05);
   }
   .pwinner .label{
     font-size:.8rem;
@@ -746,18 +746,17 @@ body{
   .raffle-live-header{gap:8px}
   .raffle-name-label{font-size:.88rem}
   .info-body{padding:14px 15px;font-size:.95rem;line-height:1.5}
-  .prize{grid-template-columns:62px 1fr;gap:12px;padding:10px;border-radius:18px}
-  .num{min-height:98px;border-radius:14px;font-size:1.7rem}
-  .ptitle{min-height:42px;padding:10px 12px;border-radius:12px;font-size:1.06rem}
+  .prize{grid-template-columns:62px 1fr;gap:12px;padding:10px;border-radius:0}
+  .num{min-height:98px;border-radius:0;font-size:1.7rem}
+  .ptitle{min-height:42px;padding:10px 12px;border-radius:0;font-size:1.06rem}
   .pmeta{font-size:.88rem}
-    .pwinner{
-      padding:10px 12px;
-      border-radius:12px;
-      grid-template-columns:minmax(92px,.9fr) minmax(0,1.3fr) minmax(116px,1fr);
-      gap:10px;
-    }
-    .pwinner .value{font-size:.95rem}
+  .pwinner{
+    grid-template-columns:minmax(92px,.9fr) minmax(0,1.3fr) minmax(116px,1fr);
+    gap:10px;
   }
+  .winner-cell{padding:10px 12px;border-radius:0}
+  .pwinner .value{font-size:.95rem}
+}
 </style>
 
 <script>
