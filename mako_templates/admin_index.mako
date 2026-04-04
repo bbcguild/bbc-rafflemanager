@@ -86,78 +86,92 @@ body.legacy-modal-open{
 
 /* NEW HEADER */
 .admin-header{
-  display:flex;
-  align-items:center;
-  gap:18px;
-  padding:14px 20px;
+  display:grid;
+  grid-template-columns:minmax(0,1.4fr) auto;
+  align-items:start;
+  gap:18px 24px;
+  padding:18px 22px;
   margin-bottom:14px;
   min-width:0;
 }
 .header-left{
-  display:flex;
-  align-items:center;
+  display:grid;
+  grid-template-columns:84px minmax(0,1fr);
+  align-items:start;
   gap:18px;
   min-width:0;
-  flex:1 1 auto;
 }
 .admin-header img#mainLogo{
-  width:72px;
-  height:72px;
+  width:84px;
+  height:84px;
   object-fit:contain;
   flex:0 0 auto;
 }
 .title-block{
   display:flex;
   flex-direction:column;
-  gap:2px;
+  gap:8px;
   min-width:0;
-  flex:0 1 auto;
 }
 .title-block h1{
   margin:0;
-  font-size:2.2rem;
-  line-height:1.05;
+  font-size:clamp(2rem,2.8vw,3.35rem);
+  line-height:1;
   font-weight:700;
-  white-space:nowrap;
+  letter-spacing:-.03em;
 }
 .title-block .sub{
-  color:var(--muted);
-  font-size:1rem;
+  color:#b8c7e4;
+  font-size:clamp(1rem,1.3vw,1.15rem);
+  font-weight:600;
 }
 .title-block .updated{
   color:#e6d77a;
-  font-size:.9rem;
+  font-size:clamp(.96rem,1.05vw,1.1rem);
+  font-weight:600;
 }
 .stats-inline{
   display:flex;
   gap:10px;
-  margin-left:6px;
-  flex:0 1 auto;
+  flex-wrap:wrap;
+  justify-content:flex-end;
 }
 .stat{
-  border-radius:14px;
-  padding:10px 12px;
+  border-radius:18px;
+  padding:12px 18px;
   background:rgba(8,17,31,.86);
   border:1px solid var(--line);
   text-align:center;
-  min-width:104px;
+  min-width:138px;
 }
 .stat .k{
   color:var(--muted);
-  font-size:.8rem;
-  margin-bottom:4px;
+  font-size:.72rem;
+  font-weight:700;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  margin-bottom:8px;
 }
 .stat .v{
-  font-size:1.6rem;
+  font-size:2rem;
   font-weight:800;
+  line-height:1;
 }
 .header-right{
   display:flex;
-  align-items:center;
-  gap:10px;
+  flex-direction:column;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:16px;
   position:relative;
-  flex:0 1 auto;
   min-width:0;
+}
+.header-tools{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
 }
 .admin-flags{
   display:flex;
@@ -251,17 +265,17 @@ body.legacy-modal-open{
   display:flex;
   align-items:center;
   border:1px solid rgba(140,170,230,.12);
-  border-radius:999px;
+  border-radius:14px;
   background:#0f1622;
-  padding:6px 8px;
-  height:34px;
-  min-width:96px;
-  max-width:106px;
-  flex:0 0 96px;
+  padding:8px 10px;
+  min-height:42px;
+  min-width:170px;
+  max-width:none;
+  flex:1 1 170px;
 }
 .search-wrap span{
   color:#8ea0bf;
-  margin-right:2px;
+  margin-right:6px;
 }
 .search-wrap input{
   border:none;
@@ -285,7 +299,7 @@ body.legacy-modal-open{
   display:flex;
   align-items:center;
   gap:10px;
-  min-height:52px;
+  min-height:50px;
   padding:5px 14px 5px 10px;
   border-radius:999px;
   border:1px solid rgba(80,120,210,.34);
@@ -315,7 +329,7 @@ body.legacy-modal-open{
   position:absolute;
   top:calc(100% + 14px);
   right:0;
-  min-width:250px;
+  min-width:290px;
   padding:18px;
   border-radius:28px;
   border:1px solid rgba(80,120,210,.34);
@@ -326,6 +340,9 @@ body.legacy-modal-open{
 }
 .profile-menu.open .profile-menu-panel{
   display:block;
+}
+.profile-menu-lookup{
+  margin-bottom:14px;
 }
 .profile-menu-list,
 .profile-submenu-list{
@@ -415,27 +432,43 @@ body.legacy-modal-open{
 
 /* NEW BUTTON BAR */
 .button-bar{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  display:flex;
+  flex-wrap:wrap;
   gap:12px;
   margin-bottom:14px;
   width:100%;
+  padding:12px 14px;
+  align-items:center;
+  background:linear-gradient(180deg,var(--panel),var(--panel2));
+  border:1px solid var(--line);
+  border-radius:22px;
+  box-shadow:var(--shadow);
+}
+.button-bar-label{
+  color:var(--muted);
+  font-size:.82rem;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  white-space:nowrap;
+  margin-right:2px;
 }
 .action-btn{
-  height:44px;
+  min-height:36px;
   min-width:0;
   padding:0 14px;
-  border-radius:18px;
+  border-radius:12px;
   border:1px solid var(--line2);
-  background:linear-gradient(180deg,#0b1a34,#09142a);
+  background:rgba(13,24,44,.92);
   color:#f4f7ff;
-  font-size:.98rem;
-  font-weight:850;
+  font-size:.9rem;
+  font-weight:750;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
-  box-shadow:var(--shadow);
+  box-shadow:none;
   cursor:pointer;
+  flex:0 0 auto;
 }
 
 .admin-utility-band{
@@ -1233,37 +1266,26 @@ div#paid_template{
 
 @media (max-width:1200px){
   .admin-header{
-    flex-wrap:wrap;
+    grid-template-columns:1fr;
   }
   .header-left{
-    width:100%;
-    flex-wrap:wrap;
+    grid-template-columns:72px minmax(0,1fr);
   }
   .header-right{
     width:100%;
-    justify-content:flex-end;
-    flex-wrap:wrap;
+    align-items:flex-start;
   }
   .admin-utility-band{
     grid-template-columns:1fr;
   }
   .search-wrap{
-    flex:1 1 96px;
-    max-width:130px;
+    min-width:0;
   }
 }
 
 @media (max-width:1450px){
   #main_table{
     grid-template-columns:220px minmax(0,1fr) minmax(400px, 440px);
-  }
-  .admin-header{
-    flex-wrap:wrap;
-  }
-  .header-right{
-    width:100%;
-    justify-content:flex-end;
-    flex-wrap:wrap;
   }
 }
 
@@ -1281,6 +1303,19 @@ div#paid_template{
 }
 
 @media (max-width:900px){
+  .header-left{
+    grid-template-columns:1fr;
+  }
+  .admin-header img#mainLogo{
+    width:72px;
+    height:72px;
+  }
+  .header-tools{
+    width:100%;
+  }
+  .stats-inline{
+    justify-content:flex-start;
+  }
   .utility-panel{
     min-height:180px;
   }
@@ -2507,23 +2542,18 @@ document.addEventListener('DOMContentLoaded', function () {
     <div class="updated" id="display_raffle_updated">Last Updated</div>
   </div>
 
-  <div class="stats-inline">
-    <div class="stat"><div class="k">Total Tickets</div><div class="v" id="display_raffle_sold">0</div></div>
-    <div class="stat"><div class="k">Participants</div><div class="v" id="display_raffle_participants">0</div></div>
-  </div>
   </div>
 
   <div class="header-right">
-    <div class="admin-flags admin-only">
-      <div class="admin-flag">
-        <div class="admin-flag-label">ADMIN</div>
-        <div class="admin-flag-bar" style="background:#c97a1f;"></div>
-      </div>
+    <div class="stats-inline">
+      <div class="stat"><div class="k">Total Tickets</div><div class="v" id="display_raffle_sold">0</div></div>
+      <div class="stat"><div class="k">Participants</div><div class="v" id="display_raffle_participants">0</div></div>
     </div>
 
+    <div class="header-tools">
     <div class="search-wrap">
       <span>🔍</span>
-      <input type="text" id="raffle_lookup" name="raffle_lookup" placeholder="Raffle #" onkeydown="if (event.key === 'Enter') { event.preventDefault(); openRaffleLookup(); }" />
+      <input type="text" id="raffle_lookup" name="raffle_lookup" placeholder="Raffle Lookup" onkeydown="if (event.key === 'Enter') { event.preventDefault(); openRaffleLookup(); }" />
     </div>
     <div class="profile-menu" id="adminProfileMenu">
       <button type="button" class="profile-menu-trigger" id="adminProfileMenuTrigger" aria-expanded="false" aria-haspopup="true">
@@ -2553,10 +2583,12 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
       </div>
     </div>
+    </div>
   </div>
 </section>
 
 <section class="button-bar">
+  <span class="button-bar-label">Admin Tools</span>
   <button type="button" class="action-btn" onclick="$('#new_raffle_button').click()">Open New Raffle</button>
   <button type="button" class="action-btn" onclick="$('#reshow_import').click()">Re-Show Imports</button>
   <button type="button" class="action-btn" onclick="$('#reshow_confirm').click()">Re-Show Confirms</button>

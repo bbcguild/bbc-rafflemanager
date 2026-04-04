@@ -40,3 +40,35 @@ Use this file for durable product and technical decisions that should survive cr
 - Whether `Prize Value` should be the next backend task or remain visual-only for now.
 - Whether `FREE` is truly obsolete enough to remove from the whole codebase.
 - Which admin layout issue remains the highest-priority UI fix right now.
+
+## Admin UI Priorities
+
+### Admin Workflow Priorities
+- Date: 2026-04-04
+- Decision: Design the admin page around the actual weekly admin workflow rather than around decorative chrome.
+- Why:
+- Admins set up the next raffle roughly once per week.
+- Admins import ticket files many times per week and watch `Total Tickets` and `Participants` as a live accuracy check.
+- Admins copy data into Google Sheets frequently.
+- On raffle night, admins record winning ticket numbers, finalize prizes, and open the next raffle.
+- Old-raffle lookup is rare and should not consume prime header space.
+
+### Header Information Priority
+- Date: 2026-04-04
+- Decision: `Last Updated`, `Total Tickets`, and `Participants` are important admin information and should remain prominent.
+- Why:
+- `Last Updated` tells both admins and end users how current the exported game data is.
+- `Total Tickets` and `Participants` are used repeatedly as accuracy checks during imports.
+
+### Header Information De-Priority
+- Date: 2026-04-04
+- Decision: `Raffle Lookup` is low-priority and can be demoted out of the main header area if needed.
+- Why: Looking up older raffles is only occasional, unlike importing tickets and monitoring current raffle state.
+
+### Admin Chrome Simplification
+- Date: 2026-04-04
+- Decision: The `ADMIN` bug can be removed, giant pill-heavy controls should be reduced, and the guild name can use a smaller font size.
+- Why:
+- The admin note area already makes the admin context clear enough.
+- The current header/action presentation is too bulky and too decorative for an admin tool.
+- The user explicitly wants fewer oversized pill controls and a calmer, more functional layout.
