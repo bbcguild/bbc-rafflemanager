@@ -65,22 +65,32 @@ html,body{
   padding:14px 20px;
   margin-bottom:14px;
 }
+.header-left{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  min-width:0;
+  flex:1 1 auto;
+}
 .admin-header img#mainLogo{
   width:72px;
   height:72px;
   object-fit:contain;
+  flex:0 0 auto;
 }
 .title-block{
   display:flex;
   flex-direction:column;
   gap:2px;
-  min-width:320px;
+  min-width:0;
+  flex:0 1 auto;
 }
 .title-block h1{
   margin:0;
   font-size:2.2rem;
   line-height:1.05;
   font-weight:700;
+  white-space:nowrap;
 }
 .title-block .sub{
   color:var(--muted);
@@ -94,14 +104,15 @@ html,body{
   display:flex;
   gap:10px;
   margin-left:6px;
+  flex:0 1 auto;
 }
 .stat{
   border-radius:14px;
-  padding:10px 14px;
+  padding:10px 12px;
   background:rgba(8,17,31,.86);
   border:1px solid var(--line);
   text-align:center;
-  min-width:120px;
+  min-width:104px;
 }
 .stat .k{
   color:var(--muted);
@@ -113,18 +124,18 @@ html,body{
   font-weight:800;
 }
 .header-right{
-  margin-left:auto;
   display:flex;
   align-items:center;
   gap:12px;
   position:relative;
+  flex:0 0 auto;
 }
 .admin-flags{
   display:flex;
   flex-direction:column;
   gap:4px;
   align-items:center;
-  margin-right:16px;
+  margin-right:8px;
   min-width:70px;
 }
 .admin-flag{
@@ -149,24 +160,29 @@ html,body{
   border:1px solid rgba(140,170,230,.12);
   border-radius:999px;
   background:#0f1622;
-  padding:6px 12px;
+  padding:6px 8px;
   height:34px;
-  min-width:240px;
+  min-width:96px;
+  max-width:106px;
+  flex:0 0 96px;
 }
 .search-wrap span{
   color:#8ea0bf;
-  margin-right:6px;
+  margin-right:2px;
 }
 .search-wrap input{
   border:none;
   outline:none;
   background:transparent;
   color:#d6deeb;
-  font-weight:700;
+  font-weight:600;
+  font-size:.74rem;
   width:100%;
+  min-width:0;
 }
 .search-wrap input::placeholder{
   color:#8ea0bf;
+  font-weight:500;
 }
 .profile-menu{
   position:relative;
@@ -175,9 +191,9 @@ html,body{
 .profile-menu-trigger{
   display:flex;
   align-items:center;
-  gap:12px;
-  min-height:72px;
-  padding:8px 18px 8px 14px;
+  gap:10px;
+  min-height:52px;
+  padding:5px 14px 5px 10px;
   border-radius:999px;
   border:1px solid rgba(80,120,210,.34);
   background:rgba(10,18,32,.9);
@@ -190,15 +206,15 @@ html,body{
   border-color:rgba(140,170,230,.45);
 }
 .profile-menu-logo{
-  width:54px;
-  height:54px;
+  width:36px;
+  height:36px;
   border-radius:50%;
   object-fit:cover;
   border:1px solid rgba(255,255,255,.1);
   flex:0 0 auto;
 }
 .profile-menu-caret{
-  font-size:1rem;
+  font-size:.85rem;
   line-height:1;
   color:#f4f7ff;
 }
@@ -271,6 +287,9 @@ html,body{
   display:none;
 }
 .profile-submenu.open .profile-submenu-panel{
+  display:block;
+}
+.profile-submenu:hover .profile-submenu-panel{
   display:block;
 }
 .profile-submenu-item{
@@ -443,18 +462,25 @@ border:1px solid rgba(140,170,230,.12);
   border-color:rgba(140,170,230,.28);
 }
 
-@media (max-width:1400px){
+@media (max-width:1200px){
   .admin-header{
     flex-wrap:wrap;
   }
+  .header-left{
+    width:100%;
+    flex-wrap:wrap;
+  }
   .header-right{
-    margin-left:0;
     width:100%;
     justify-content:flex-end;
     flex-wrap:wrap;
   }
   .button-bar{
     grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+  .search-wrap{
+    flex:1 1 96px;
+    max-width:130px;
   }
 }
 
@@ -1183,6 +1209,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 submenuTrigger.setAttribute('aria-expanded', open ? 'true' : 'false')
         }
 
+        submenu.addEventListener('mouseenter', function () {
+                if (menu.classList.contains('open')) {
+                        setSubmenuOpen(true)
+                }
+        })
+
+        submenu.addEventListener('mouseleave', function () {
+                setSubmenuOpen(false)
+        })
+
         trigger.addEventListener('click', function (event) {
                 event.preventDefault()
                 event.stopPropagation()
@@ -1216,6 +1252,7 @@ document.addEventListener('DOMContentLoaded', function () {
 <div class="page-shell">
 
 <section class="card admin-header">
+  <div class="header-left">
   <img id="mainLogo" src="https://www.bbcguild.com/wp-content/uploads/2020/04/cropped-cropped-BBC-LOGO-V2-2.gif" alt="BBC logo">
 
   <div class="title-block">
@@ -1227,6 +1264,7 @@ document.addEventListener('DOMContentLoaded', function () {
   <div class="stats-inline">
     <div class="stat"><div class="k">Total Tickets</div><div class="v" id="display_raffle_sold">0</div></div>
     <div class="stat"><div class="k">Participants</div><div class="v" id="display_raffle_participants">0</div></div>
+  </div>
   </div>
 
   <div class="header-right">
