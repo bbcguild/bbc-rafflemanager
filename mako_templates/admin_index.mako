@@ -406,7 +406,7 @@ html,body{
 }
 
 #column_guildinfo{
-  width:420px;
+  width:210px;
   vertical-align:top;
 }
 
@@ -460,6 +460,7 @@ html,body{
 
 #raffle_notes{
   width:100%;
+  max-width:220px;
   min-height:180px;
   background:#182233;
   color:#f4f7ff;
@@ -481,6 +482,12 @@ color:#d6deeb;
 border:1px solid rgba(140,170,230,.12);
   border-radius:10px;
   padding:8px 10px;
+  box-sizing:border-box;
+}
+
+#dropzone_uploader{
+  width:100%;
+  max-width:220px;
   box-sizing:border-box;
 }
 
