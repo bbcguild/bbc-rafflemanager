@@ -349,6 +349,9 @@ body{
 .rich-notes{
   white-space:normal;
 }
+.rich-notes.pending-note{
+  visibility:hidden;
+}
 .rich-notes p:first-child{
   margin-top:0;
 }
@@ -1085,9 +1088,8 @@ function refresher() {
 }
     $("#raffle_lookup").attr("placeholder", "Enter Raffle #");
     applyPublicStatus(result["raffle_status"], result["raffle_title"]);
-    $("#raffle_notes_public_1").html(result["raffle_notes"] || "Welcome to this week's raffle.");
-    $("#raffle_notes_public_1").addClass("rich-notes");
-    $(".mid-row .info-panel:last .info-body").attr("id", "raffle_notes_public_2").addClass("rich-notes").html(result["raffle_notes_public_2"] || "Use the admin notes editor to add more public raffle info.");
+    $("#raffle_notes_public_1").html(result["raffle_notes"] || "Welcome to this week's raffle.").removeClass("pending-note");
+    $(".mid-row .info-panel:last .info-body").attr("id", "raffle_notes_public_2").addClass("rich-notes").html(result["raffle_notes_public_2"] || "Use the admin notes editor to add more public raffle info.").removeClass("pending-note");
     $("#entrants_headline").text("#" + raffleNum + " Raffle Entrants");
 
     updateRaffleNav();
@@ -1173,7 +1175,7 @@ $(document).ready(function () {
   <span class="status-dice" aria-hidden="true">🎲</span>
   <strong id="raffle_titlebar"><span class="raffle-status-text">LIVE</span><span class="raffle-title-sep">-</span><span class="raffle-name-text">Raffle</span></strong>
 </div>
-      <div class="info-body rich-notes" id="raffle_notes_public_1">Welcome to this week's raffle.</div>
+      <div class="info-body rich-notes pending-note" id="raffle_notes_public_1"></div>
     </div>
 
     <div class="card info-panel">
