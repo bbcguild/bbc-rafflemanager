@@ -111,42 +111,42 @@ body.legacy-modal-open{
 .admin-header{
   display:grid;
   grid-template-columns:minmax(0,1fr) auto;
-  align-items:start;
-  gap:18px 24px;
-  padding:18px 24px;
+  align-items:center;
+  gap:14px 20px;
+  padding:14px 22px;
   margin-bottom:14px;
   min-width:0;
-  min-height:170px;
+  min-height:128px;
 }
 .header-left{
   display:grid;
-  grid-template-columns:88px minmax(0,1fr);
-  align-items:start;
-  gap:18px;
+  grid-template-columns:78px minmax(0,1fr);
+  align-items:center;
+  gap:16px;
   min-width:0;
 }
 .admin-header img#mainLogo{
-  width:84px;
-  height:84px;
+  width:72px;
+  height:72px;
   object-fit:contain;
   flex:0 0 auto;
 }
 .title-block{
   display:flex;
   flex-direction:column;
-  gap:8px;
+  gap:6px;
   min-width:0;
 }
 .title-block h1{
   margin:0;
-  font-size:clamp(1.8rem,2.2vw,2.7rem);
+  font-size:clamp(1.65rem,2vw,2.35rem);
   line-height:1;
   font-weight:700;
   letter-spacing:-.03em;
 }
 .title-block .sub{
   color:#b8c7e4;
-  font-size:clamp(.98rem,1.05vw,1.06rem);
+  font-size:clamp(.94rem,.98vw,1rem);
   font-weight:600;
 }
 .title-block .updated{
@@ -160,28 +160,28 @@ body.legacy-modal-open{
 }
 .stat{
   border-radius:18px;
-  padding:10px 16px;
+  padding:8px 14px;
   background:rgba(8,17,31,.86);
   border:1px solid var(--line);
   text-align:center;
-  min-width:126px;
+  min-width:118px;
 }
 .stat .k{
   color:var(--muted);
-  font-size:.72rem;
+  font-size:.68rem;
   font-weight:700;
   letter-spacing:.04em;
   text-transform:uppercase;
-  margin-bottom:8px;
+  margin-bottom:6px;
 }
 .stat .v{
-  font-size:1.75rem;
+  font-size:1.55rem;
   font-weight:800;
   line-height:1;
 }
 .header-right{
   display:flex;
-  align-items:flex-start;
+  align-items:center;
   justify-content:flex-start;
   position:relative;
   min-width:0;
