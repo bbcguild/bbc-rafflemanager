@@ -12,7 +12,11 @@ CREATE TABLE raffles (
     raffle_time TEXT,               -- time information for raffle
     raffle_ticket_cost TEXT,        -- cost information per raffle ticket
     raffle_closed INTEGER,          -- boolean value, closed raffles are considered archived
-    raffle_notes TEXT
+    raffle_notes TEXT,              -- public note box 1
+    raffle_title TEXT,              -- public raffle title / status headline
+    raffle_status TEXT,             -- LIVE / ROLLING / COMPLETE
+    raffle_notes_admin TEXT,        -- admin-only notes
+    raffle_notes_public_2 TEXT      -- public note box 2
 );
 
 CREATE TABLE users (

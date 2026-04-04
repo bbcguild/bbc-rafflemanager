@@ -198,6 +198,9 @@ def get_current_raffle_info (request):
     info = dict(info)
     info["raffle_title"] = (info.get("raffle_title") or "").strip()
     info["raffle_status"] = (info.get("raffle_status") or "LIVE").strip() or "LIVE"
+    info["raffle_notes"] = info.get("raffle_notes") or ""
+    info["raffle_notes_admin"] = info.get("raffle_notes_admin") or ""
+    info["raffle_notes_public_2"] = info.get("raffle_notes_public_2") or ""
     return info
 
 def parse_keys (cur, new, keys, builder):
@@ -235,10 +238,12 @@ def set_current_raffle_info (request):
     data["raffle_notes"] = request.params.get("raffle_notes", data.get("raffle_notes", ""))
     data["raffle_title"] = request.params.get("raffle_title", data.get("raffle_title", ""))
     data["raffle_status"] = request.params.get("raffle_status", data.get("raffle_status", "LIVE")) or "LIVE"
+    data["raffle_notes_admin"] = request.params.get("raffle_notes_admin", data.get("raffle_notes_admin", ""))
+    data["raffle_notes_public_2"] = request.params.get("raffle_notes_public_2", data.get("raffle_notes_public_2", ""))
 
     cur = db.cursor()
     cur.execute(
-        "UPDATE raffles SET raffle_guild=?, raffle_guild_num=?, raffle_time=?, raffle_ticket_cost=?, raffle_closed=?, raffle_notes=?, raffle_title=?, raffle_status=? WHERE raffle_id=?",
+        "UPDATE raffles SET raffle_guild=?, raffle_guild_num=?, raffle_time=?, raffle_ticket_cost=?, raffle_closed=?, raffle_notes=?, raffle_title=?, raffle_status=?, raffle_notes_admin=?, raffle_notes_public_2=? WHERE raffle_id=?",
         (
             data["raffle_guild"],
             data["raffle_guild_num"],
@@ -248,6 +253,8 @@ def set_current_raffle_info (request):
             data["raffle_notes"],
             data["raffle_title"],
             data["raffle_status"],
+            data["raffle_notes_admin"],
+            data["raffle_notes_public_2"],
             data["raffle_id"],
         )
     )

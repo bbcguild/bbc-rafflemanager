@@ -229,7 +229,16 @@ def close_raffle_by_id (cur, raffle_id):
 
 @with_cursor_boolean
 def create_new_raffle (cur, guild_id):
-    cur.execute("INSERT INTO raffles VALUES (NULL, ?, 0, 'Time here', 'Ticket cost', 0, '')", (guild_id, ))
+    cur.execute(
+        """
+        INSERT INTO raffles
+            (raffle_guild, raffle_guild_num, raffle_time, raffle_ticket_cost, raffle_closed,
+             raffle_notes, raffle_title, raffle_status, raffle_notes_admin, raffle_notes_public_2)
+        VALUES
+            (?, 0, 'Time here', 'Ticket cost', 0, '', '', 'LIVE', '', '')
+        """,
+        (guild_id, )
+    )
 
 gcri = get_cur_raffle_id
 
@@ -304,7 +313,35 @@ def set_cur_raffle_info (cur, guild_id, raffle_info):
 
     r = raffle_info
 
-    cur.execute("UPDATE raffles SET raffle_guild=?, raffle_guild_num=?, raffle_time=?, raffle_ticket_cost=?, raffle_closed=?, raffle_notes=? WHERE raffle_id=?", (r["raffle_guild"], r["raffle_guild_num"], r["raffle_time"], r["raffle_ticket_cost"], r["raffle_closed"], r["raffle_notes"], cur_id))
+    cur.execute(
+        """
+        UPDATE raffles
+           SET raffle_guild=?,
+               raffle_guild_num=?,
+               raffle_time=?,
+               raffle_ticket_cost=?,
+               raffle_closed=?,
+               raffle_notes=?,
+               raffle_title=?,
+               raffle_status=?,
+               raffle_notes_admin=?,
+               raffle_notes_public_2=?
+         WHERE raffle_id=?
+        """,
+        (
+            r["raffle_guild"],
+            r["raffle_guild_num"],
+            r["raffle_time"],
+            r["raffle_ticket_cost"],
+            r["raffle_closed"],
+            r["raffle_notes"],
+            r.get("raffle_title", ""),
+            r.get("raffle_status", "LIVE"),
+            r.get("raffle_notes_admin", ""),
+            r.get("raffle_notes_public_2", ""),
+            cur_id
+        )
+    )
 
 @with_cursor_boolean
 def close_current_raffle (cur, guild_id):
@@ -316,7 +353,16 @@ def close_current_raffle (cur, guild_id):
 
 @with_cursor_boolean
 def open_new_raffle (cur, guild_id):
-    cur.execute("INSERT INTO raffles VALUES (null, ?, 0, 'Fill this in!', '1000g', 0, '')", (guild_id, ))
+    cur.execute(
+        """
+        INSERT INTO raffles
+            (raffle_guild, raffle_guild_num, raffle_time, raffle_ticket_cost, raffle_closed,
+             raffle_notes, raffle_title, raffle_status, raffle_notes_admin, raffle_notes_public_2)
+        VALUES
+            (?, 0, 'Fill this in!', '1000g', 0, '', '', 'LIVE', '', '')
+        """,
+        (guild_id, )
+    )
 
 # users
 @with_cursor

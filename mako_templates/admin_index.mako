@@ -480,23 +480,155 @@ body.legacy-modal-open{
   min-height:0;
 }
 
-.notes-placeholder{
-  width:100%;
-  min-height:150px;
-  resize:none;
-  border:none;
-  outline:none;
-  border-radius:0;
-  background:rgba(10,18,32,.62);
-  color:#d6deeb;
-  padding:18px 20px;
-  box-sizing:border-box;
-  font-size:1rem;
-  line-height:1.45;
+.notes-panel .utility-panel-title{
+  padding:10px 14px;
+  display:block;
 }
 
-.notes-placeholder::placeholder{
+.notes-panel .utility-panel-body{
+  flex-direction:column;
+  gap:12px;
+}
+
+.notes-header-shell{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.note-tab-strip{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.note-tab{
+  min-height:30px;
+  padding:0 12px;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:999px;
+  background:rgba(7,15,28,.28);
+  color:#d8e6ff;
+  font-size:.84rem;
+  font-weight:850;
+  letter-spacing:.04em;
+  cursor:pointer;
+}
+
+.note-tab.active{
+  background:#f4f7ff;
+  color:#17376c;
+  border-color:rgba(255,255,255,.7);
+}
+
+.note-save-group{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-left:auto;
+}
+
+.note-save-status{
+  color:rgba(244,247,255,.82);
+  font-size:.8rem;
+  font-weight:700;
+  white-space:nowrap;
+}
+
+.note-save-btn{
+  min-height:32px;
+  padding:0 14px;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:999px;
+  background:rgba(10,20,38,.4);
+  color:#f4f7ff;
+  font-size:.88rem;
+  font-weight:850;
+  cursor:pointer;
+}
+
+.note-save-btn.is-dirty{
+  background:#f4f7ff;
+  color:#17376c;
+}
+
+.notes-editor-toolbar{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.note-tool{
+  min-width:38px;
+  min-height:34px;
+  padding:0 10px;
+  border:1px solid rgba(140,170,230,.18);
+  border-radius:12px;
+  background:#101927;
+  color:#f4f7ff;
+  font-size:.92rem;
+  font-weight:850;
+  cursor:pointer;
+}
+
+.note-tool[data-cmd="bold"]{
+  font-weight:900;
+}
+
+.note-tool[data-cmd="italic"]{
+  font-style:italic;
+}
+
+.note-tool[data-cmd="underline"]{
+  text-decoration:underline;
+}
+
+.note-tool.note-link{
+  padding:0 12px;
+}
+
+.note-color{
+  width:42px;
+  min-height:34px;
+  padding:4px;
+  border:1px solid rgba(140,170,230,.18);
+  border-radius:12px;
+  background:#101927;
+  cursor:pointer;
+}
+
+.notes-editor-surface{
+  flex:1;
+  min-height:160px;
+  border:1px solid rgba(140,170,230,.18);
+  border-radius:16px;
+  background:rgba(10,18,32,.62);
+  color:#d6deeb;
+  padding:16px 18px;
+  box-sizing:border-box;
+  font-size:1rem;
+  line-height:1.55;
+  overflow:auto;
+  outline:none;
+}
+
+.notes-editor-surface.is-empty::before{
+  content:attr(data-placeholder);
   color:#8194b4;
+}
+
+.notes-editor-surface a{
+  color:#7fb4ff;
+}
+
+.notes-editor-surface ul,
+.notes-editor-surface ol{
+  padding-left:1.4em;
+}
+
+.hidden-note-field{
+  display:none !important;
 }
 
 /* LEGACY LAYOUT CLEANUP */
@@ -1258,8 +1390,173 @@ function hideLegacyModal(selector) {
         syncLegacyModalState()
 }
 
+var NOTE_TAB_ORDER = [
+        { key: "raffle_notes_admin", label: "ADMIN" },
+        { key: "raffle_notes", label: "PUBLIC 1" },
+        { key: "raffle_notes_public_2", label: "PUBLIC 2" }
+]
+
+var NOTE_EDITOR_STATE = {
+        activeKey: "raffle_notes_admin",
+        drafts: {
+                raffle_notes_admin: "",
+                raffle_notes: "",
+                raffle_notes_public_2: ""
+        },
+        dirty: false
+}
+
+function getNotesEditorSurface() {
+        return document.getElementById("notesEditorSurface")
+}
+
+function syncNotesEditorPlaceholder() {
+        var surface = getNotesEditorSurface()
+        if (!surface) {
+                return
+        }
+
+        var plainText = (surface.textContent || "").replace(/\u00a0/g, " ").trim()
+        surface.classList.toggle("is-empty", !plainText && !surface.querySelector("img, ul, ol, li, a, span, div, p, br"))
+}
+
+function setNoteSaveState(isDirty, message) {
+        NOTE_EDITOR_STATE.dirty = !!isDirty
+
+        var saveBtn = document.getElementById("notesSaveBtn")
+        var status = document.getElementById("notesSaveStatus")
+
+        if (saveBtn) {
+                saveBtn.classList.toggle("is-dirty", !!isDirty)
+                saveBtn.textContent = isDirty ? "Save Notes" : "Saved"
+        }
+        if (status) {
+                status.textContent = message || (isDirty ? "Unsaved changes" : "Saved")
+        }
+}
+
+function persistActiveNoteDraft() {
+        var surface = getNotesEditorSurface()
+        if (!surface || !NOTE_EDITOR_STATE.activeKey) {
+                return
+        }
+
+        NOTE_EDITOR_STATE.drafts[NOTE_EDITOR_STATE.activeKey] = surface.innerHTML
+        $("#" + NOTE_EDITOR_STATE.activeKey).val(surface.innerHTML)
+        syncNotesEditorPlaceholder()
+}
+
+function renderActiveNoteTab() {
+        $(".note-tab").removeClass("active")
+        $('.note-tab[data-note-key="' + NOTE_EDITOR_STATE.activeKey + '"]').addClass("active")
+}
+
+function loadNoteTab(noteKey) {
+        persistActiveNoteDraft()
+        NOTE_EDITOR_STATE.activeKey = noteKey
+
+        var surface = getNotesEditorSurface()
+        if (!surface) {
+                return
+        }
+
+        surface.innerHTML = NOTE_EDITOR_STATE.drafts[noteKey] || ""
+        renderActiveNoteTab()
+        syncNotesEditorPlaceholder()
+}
+
+function loadNoteDraftsFromRaffle(result) {
+        NOTE_EDITOR_STATE.drafts.raffle_notes_admin = result["raffle_notes_admin"] || ""
+        NOTE_EDITOR_STATE.drafts.raffle_notes = result["raffle_notes"] || ""
+        NOTE_EDITOR_STATE.drafts.raffle_notes_public_2 = result["raffle_notes_public_2"] || ""
+
+        $("#raffle_notes_admin").val(NOTE_EDITOR_STATE.drafts.raffle_notes_admin)
+        $("#raffle_notes").val(NOTE_EDITOR_STATE.drafts.raffle_notes)
+        $("#raffle_notes_public_2").val(NOTE_EDITOR_STATE.drafts.raffle_notes_public_2)
+
+        loadNoteTab(NOTE_EDITOR_STATE.activeKey || "raffle_notes_admin")
+        setNoteSaveState(false, "Saved")
+}
+
+function execNoteCommand(command, value) {
+        var surface = getNotesEditorSurface()
+        if (!surface) {
+                return
+        }
+
+        surface.focus()
+        document.execCommand(command, false, value || null)
+        persistActiveNoteDraft()
+        setNoteSaveState(true, "Unsaved changes")
+}
+
+function saveNotes() {
+        persistActiveNoteDraft()
+        var saveBtn = document.getElementById("notesSaveBtn")
+        if (saveBtn) {
+                saveBtn.disabled = true
+                saveBtn.textContent = "Saving..."
+        }
+
+        $.ajax({
+                type: "POST",
+                url: "json/set/raffle",
+                data: $("#ginfo_form").serialize(),
+                success: function () {
+                        setNoteSaveState(false, "Saved")
+                },
+                error: function () {
+                        setNoteSaveState(true, "Save failed")
+                },
+                complete: function () {
+                        if (saveBtn) {
+                                saveBtn.disabled = false
+                                saveBtn.textContent = NOTE_EDITOR_STATE.dirty ? "Save Notes" : "Saved"
+                        }
+                },
+                xhrFields: {
+                        withCredentials: true
+                }
+        })
+}
+
 $(document).on("input blur", ".prize_value", function () {
         formatPrizeValueField(this)
+})
+
+$(document).on("click", ".note-tab", function () {
+        loadNoteTab($(this).data("noteKey"))
+})
+
+$(document).on("click", ".note-tool", function () {
+        var cmd = $(this).data("cmd")
+        if (!cmd) {
+                return
+        }
+
+        if (cmd === "createLink") {
+                var url = window.prompt("Enter a link URL")
+                if (!url) {
+                        return
+                }
+                execNoteCommand(cmd, url)
+                return
+        }
+
+        execNoteCommand(cmd)
+})
+
+$(document).on("input", "#notesEditorSurface", function () {
+        persistActiveNoteDraft()
+        setNoteSaveState(true, "Unsaved changes")
+})
+
+$(document).on("change input", "#notesTextColor", function () {
+        execNoteCommand("foreColor", this.value)
+})
+
+$(document).on("click", "#notesSaveBtn", function () {
+        saveNotes()
 })
 
 $(document).on("click", "#legacy_modal_backdrop", function () {
@@ -1267,6 +1564,15 @@ $(document).on("click", "#legacy_modal_backdrop", function () {
         hideLegacyModal("#confirm_template")
         hideLegacyModal("#barter_template")
         hideLegacyModal("#paid_template")
+})
+
+window.addEventListener("beforeunload", function (event) {
+        if (!NOTE_EDITOR_STATE.dirty) {
+                return
+        }
+
+        event.preventDefault()
+        event.returnValue = ""
 })
 
 
@@ -1320,7 +1626,7 @@ $("#raffle_time").val(result["raffle_time"])
 $("#raffle_cost").val(result["raffle_ticket_cost"])
 $("#raffle_title").val(result["raffle_title"] || "")
 $("#raffle_status").val(normalizeRaffleStatus(result["raffle_status"]))
-$("#raffle_notes").val(result["raffle_notes"])
+                loadNoteDraftsFromRaffle(result)
                 applyAdminStatus(result["raffle_status"])
 
                 CURRENT_RAFFLE_INFO.raffle_subheader = normalizeFieldValue(result["raffle_guild_num"])
@@ -2071,9 +2377,35 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <section class="admin-utility-band">
   <div class="utility-panel notes-panel">
-    <div class="utility-panel-title">Admin Notes</div>
+    <div class="utility-panel-title">
+      <div class="notes-header-shell">
+        <div class="note-tab-strip">
+          <button type="button" class="note-tab active" data-note-key="raffle_notes_admin">ADMIN</button>
+          <button type="button" class="note-tab" data-note-key="raffle_notes">PUBLIC 1</button>
+          <button type="button" class="note-tab" data-note-key="raffle_notes_public_2">PUBLIC 2</button>
+        </div>
+        <div class="note-save-group">
+          <span class="note-save-status" id="notesSaveStatus">Saved</span>
+          <button type="button" class="note-save-btn" id="notesSaveBtn">Saved</button>
+        </div>
+      </div>
+    </div>
     <div class="utility-panel-body">
-      <textarea id="raffle_notes" class="notes-placeholder" placeholder="Notes area reserved for the upcoming editor." readonly></textarea>
+      <div class="notes-editor-toolbar">
+        <button type="button" class="note-tool" data-cmd="bold" title="Bold">B</button>
+        <button type="button" class="note-tool" data-cmd="italic" title="Italic">I</button>
+        <button type="button" class="note-tool" data-cmd="underline" title="Underline">U</button>
+        <button type="button" class="note-tool" data-cmd="insertUnorderedList" title="Bulleted list">• List</button>
+        <button type="button" class="note-tool" data-cmd="insertOrderedList" title="Numbered list">1. List</button>
+        <button type="button" class="note-tool note-link" data-cmd="createLink" title="Insert link">Link</button>
+        <input type="color" id="notesTextColor" class="note-color" value="#f4f7ff" title="Text color" />
+      </div>
+      <div
+        id="notesEditorSurface"
+        class="notes-editor-surface is-empty"
+        contenteditable="true"
+        data-placeholder="Write notes here, then click Save Notes."
+      ></div>
     </div>
   </div>
 
@@ -2117,6 +2449,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
             <label class="settings-block-label" for="raffle_title">Raffle Title</label>
 <input type="text" id="raffle_title" class="ginfo_change_save" name="raffle_title"/>
+            <textarea id="raffle_notes" name="raffle_notes" class="hidden-note-field"></textarea>
+            <textarea id="raffle_notes_admin" name="raffle_notes_admin" class="hidden-note-field"></textarea>
+            <textarea id="raffle_notes_public_2" name="raffle_notes_public_2" class="hidden-note-field"></textarea>
 
             <span id="raffle_sold" class="legacy-summary-hide"></span>
             <span id="raffle_participants" class="legacy-summary-hide"></span>

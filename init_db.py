@@ -8,6 +8,26 @@ import os
 import sqlite3
 import shutil
 
+def ensure_raffle_columns(conn):
+    """Backfill newer raffle columns on older databases."""
+    expected_columns = {
+        "raffle_title": "ALTER TABLE raffles ADD COLUMN raffle_title TEXT DEFAULT ''",
+        "raffle_status": "ALTER TABLE raffles ADD COLUMN raffle_status TEXT DEFAULT 'LIVE'",
+        "raffle_notes_admin": "ALTER TABLE raffles ADD COLUMN raffle_notes_admin TEXT DEFAULT ''",
+        "raffle_notes_public_2": "ALTER TABLE raffles ADD COLUMN raffle_notes_public_2 TEXT DEFAULT ''",
+    }
+
+    cursor = conn.cursor()
+    cursor.execute("PRAGMA table_info(raffles)")
+    existing_columns = {row[1] for row in cursor.fetchall()}
+
+    for column_name, statement in expected_columns.items():
+        if column_name not in existing_columns:
+            print(f"Applying raffle schema migration: add column {column_name}")
+            cursor.execute(statement)
+
+    conn.commit()
+
 def init_database():
     """Initialize the database if it doesn't exist.
     
@@ -120,6 +140,7 @@ def init_database():
             result = cursor.fetchone()
             if result:
                 print("Database schema is valid, skipping initialization")
+                ensure_raffle_columns(conn)
                 conn.close()
                 return db_path
             else:
@@ -180,6 +201,7 @@ def init_database():
                     cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
                     tables = cursor.fetchall()
                     print(f"Copied database tables: {[t[0] for t in tables]}")
+                    ensure_raffle_columns(conn)
                     conn.close()
                     return db_path
                 else:
@@ -207,6 +229,7 @@ def init_database():
             print("Executing schema...")
             conn.executescript(schema_sql)
             print("Schema applied successfully")
+            ensure_raffle_columns(conn)
             
             # Verify schema was applied
             cursor = conn.cursor()
