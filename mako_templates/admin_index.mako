@@ -799,10 +799,11 @@ body.legacy-modal-open{
 }
 
 .ticket-totals-footer .cell{
-  padding:0 8px;
+  padding:0 4px;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
+  font-size:.92rem;
 }
 
 .ticket-totals-footer .label-cell{
@@ -812,11 +813,12 @@ body.legacy-modal-open{
 
 .ticket-totals-footer .value-cell{
   text-align:right;
+  font-weight:400;
 }
 
 .ticket-totals-footer .value-cell.total-value{
   color:#e6d77a;
-  font-weight:700;
+  font-weight:600;
 }
 
 .ticket-tools{
