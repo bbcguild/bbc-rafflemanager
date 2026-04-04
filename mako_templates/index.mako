@@ -757,7 +757,7 @@ const guildSlug = "${request.matchdict['guild']}";
 const initialRequestedRaffleNum = "${initial_lookup_raffle}";
 const liveRaffleEndpoint = "/" + guildSlug + "/json/get/raffle";
 const MAX_HISTORY_DEPTH = 5;
-const publicExtendedTicketsEnabled = ${'true' if request.extended_tickets else 'false'};
+const publicExtendedTicketsEnabled = ${'true' if getattr(request, 'extended_tickets', False) else 'false'};
 const urlParams = new URLSearchParams(window.location.search);
 const requestedDepthRaw = urlParams.get('depth');
 let currentDepth = requestedDepthRaw === null ? null : parseInt(requestedDepthRaw, 10);
