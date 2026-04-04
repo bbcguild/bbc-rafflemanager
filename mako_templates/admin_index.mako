@@ -628,6 +628,34 @@ border:1px solid rgba(140,170,230,.12);
   box-sizing:border-box;
 }
 
+#raffle_status.status-live{
+  color:#8ff0ba;
+}
+
+#raffle_status.status-rolling{
+  color:#f2b36b;
+}
+
+#raffle_status.status-complete{
+  color:#ff9d9d;
+}
+
+#raffle_status option{
+  background:#0f1622;
+}
+
+#raffle_status option[value="LIVE"]{
+  color:#8ff0ba;
+}
+
+#raffle_status option[value="ROLLING"]{
+  color:#f2b36b;
+}
+
+#raffle_status option[value="COMPLETE"]{
+  color:#ff9d9d;
+}
+
 #dropzone_uploader{
   width:100%;
   max-width:220px;
@@ -895,10 +923,13 @@ function applyAdminStatus(status) {
         var normalizedStatus = normalizeRaffleStatus(status)
         var statusFlag = $("#adminStatusFlag")
         var statusLabel = $("#adminStatusLabel")
+        var statusSelect = $("#raffle_status")
 
         statusFlag.removeClass("status-live status-rolling status-complete")
         statusFlag.addClass("status-" + normalizedStatus.toLowerCase())
         statusLabel.text(normalizedStatus)
+        statusSelect.removeClass("status-live status-rolling status-complete")
+        statusSelect.addClass("status-" + normalizedStatus.toLowerCase())
 }
 
 function copyNamesAndTotals() {
@@ -1802,7 +1833,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <select id="raffle_status" class="ginfo_change_save" name="raffle_status">
                 <option value="LIVE">LIVE</option>
                 <option value="ROLLING">ROLLING</option>
-                <option value="COMPLETE">COMPLETE</option>
+                <option value="COMPLETE">CLOSED</option>
             </select>
 
             <label class="settings-block-label" for="raffle_subheader">Raffle Number</label>
