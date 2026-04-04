@@ -1523,7 +1523,7 @@ function saveNotes() {
 function addPrizeCard() {
         $.getJSON("json/set/prize_add", function (result) {
                 if (result) {
-                        get_prize_info()
+                        get_prize_info({ scrollToLast: true })
                 }
         })
         return false
@@ -1646,37 +1646,38 @@ $("#raffle_status").val(normalizeRaffleStatus(result["raffle_status"]))
                 $("#display_raffle_time").text("Drawing: " + result["raffle_time"])
             })
 }
-var get_prize_info = function () {
+var get_prize_info = function (options) {
+        options = options || {}
         // deal with prizes
         $.getJSON("json/get/prizes", function (result) {
                 $("#prize_info").empty()
+                var lastPrizeCard = null
                 $.each(result, function (index, value) {
                     var template = $("#prize_template").clone()
-                    var new_id = "prize_" + value["prize_text2"] + "_"
-                    var id_id = "prize_" + value["prize_id"] + "_"
-                    template.attr({"id": new_id + "block"})
+                    var dom_id = "prize_" + value["prize_id"] + "_"
+                    template.attr({"id": dom_id + "block"})
                     // fix the prize number
-                    $("#prize_number", template).attr({"id": new_id + "number"}).val(value["prize_text2"])
+                    $("#prize_number", template).attr({"id": dom_id + "number"}).val(value["prize_text2"])
                     var pwinner = value["prize_winner"]
                     var pname = value["prize_winner_name"]
-                    $("#prize_winner", template).attr({"id": new_id + "winner"}).val(pwinner)
+                    $("#prize_winner", template).attr({"id": dom_id + "winner"}).val(pwinner)
                     if (value["prize_finalised"] != 0) {
                         $("#prize_winner_name", template).addClass("finalised")
                     }
-                    $("#prize_winner_name", template).attr({"id": new_id + "winner_name"}).text(pname)
+                    $("#prize_winner_name", template).attr({"id": dom_id + "winner_name"}).text(pname)
 
                     // at least the prize details are here
-                    $("#prize_item", template).attr({"id": new_id + "item"}).val(value["prize_text"])
-                    $("#prize_value", template).attr({"id": new_id + "value"})
-                    formatPrizeValueField($("#" + new_id + "value", template)[0])
+                    $("#prize_item", template).attr({"id": dom_id + "item"}).val(value["prize_text"])
+                    var prizeValueField = $("#prize_value", template).attr({"id": dom_id + "value"})[0]
+                    formatPrizeValueField(prizeValueField)
                     if (value["prize_finalised"] != 0) {
                         $("#prize_finalise", template).remove()
                         $("#prize_delete", template).remove()
                         $("#prize_roll", template).remove()
                     } else {
-                        $("#prize_finalise", template).attr({"id": id_id + "finalise"})
-                        $("#prize_delete", template).attr({"id": id_id + "delete"})
-                        $("#prize_roll", template).attr({"id": id_id + "roll"})
+                        $("#prize_finalise", template).attr({"id": dom_id + "finalise"})
+                        $("#prize_delete", template).attr({"id": dom_id + "delete"})
+                        $("#prize_roll", template).attr({"id": dom_id + "roll"})
                     }
                     $("#prize_template_form", template).attr({"id": "prize_" + value["prize_id"] + "_form"})
                     $(".prize_id", template).val(value["prize_id"])
@@ -1710,7 +1711,7 @@ var get_prize_info = function () {
                             $.ajax({
                                 type: "POST",
                                 url: "json/set/prize",
-                                data: $("#" + id_id + "form").serialize(),
+                                data: $("#" + dom_id + "form").serialize(),
                                 success: function (result) {
                                     get_prize_info()
                                 },
@@ -1722,7 +1723,12 @@ var get_prize_info = function () {
                             })
 
                     $("#prize_info").append(template)
+                    lastPrizeCard = $("#" + dom_id + "block")
                 })
+
+                if (options.scrollToLast && lastPrizeCard && lastPrizeCard.length) {
+                    lastPrizeCard[0].scrollIntoView({ behavior: "smooth", block: "nearest" })
+                }
             })
 }
 
