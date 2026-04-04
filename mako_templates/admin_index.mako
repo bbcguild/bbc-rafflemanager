@@ -1714,6 +1714,9 @@ var get_prize_info = function (options) {
                     // fix the prize number
                     $("#prize_number", template).attr({"id": dom_id + "number"}).val(value["prize_text2"])
                     var pwinner = value["prize_winner"]
+                    if (String(pwinner) === "0") {
+                        pwinner = ""
+                    }
                     var pname = value["prize_winner_name"]
                     $("#prize_winner", template).attr({"id": dom_id + "winner"}).val(pwinner)
                     if (value["prize_finalised"] != 0) {
