@@ -313,34 +313,32 @@ body.legacy-modal-open{
   flex:0 0 auto;
 }
 .profile-menu-trigger{
-  --profile-trigger-bg:linear-gradient(180deg,rgba(17,28,48,.98),rgba(8,17,31,.98));
-  --profile-trigger-border:rgba(95,132,212,.34);
   display:flex;
   align-items:center;
-  gap:0;
-  min-height:42px;
+  gap:6px;
+  min-height:40px;
   padding:0;
-  border-radius:12px;
-  border:1px solid var(--profile-trigger-border);
-  background:var(--profile-trigger-bg);
+  border:none;
+  background:transparent;
   color:var(--text);
-  box-shadow:var(--shadow);
+  box-shadow:none;
   cursor:pointer;
-  overflow:hidden;
+  overflow:visible;
 }
 .profile-menu-trigger:focus{
   outline:none;
-  border-color:rgba(140,170,230,.5);
 }
 .profile-trigger-logo-shell{
-  min-width:48px;
-  min-height:42px;
+  min-width:46px;
+  min-height:40px;
   display:flex;
   align-items:center;
   justify-content:center;
   padding:5px 7px;
   background:linear-gradient(180deg,rgba(26,41,71,.95),rgba(14,24,42,.95));
-  border-right:1px solid rgba(95,132,212,.26);
+  border:1px solid rgba(95,132,212,.34);
+  border-radius:12px;
+  box-shadow:var(--shadow);
 }
 .profile-menu-logo{
   width:30px;
@@ -351,27 +349,28 @@ body.legacy-modal-open{
   flex:0 0 auto;
 }
 .profile-menu-caret{
-  min-width:28px;
-  min-height:42px;
+  min-width:24px;
+  min-height:34px;
   display:flex;
   align-items:center;
   justify-content:center;
-  border-left:1px solid rgba(95,132,212,.22);
+  border:1px solid rgba(95,132,212,.28);
+  border-radius:999px;
   background:linear-gradient(180deg,rgba(20,34,58,.94),rgba(9,17,31,.94));
-  font-size:.72rem;
+  font-size:.68rem;
   line-height:1;
   color:#f4f7ff;
+  box-shadow:var(--shadow);
 }
 .profile-menu-panel{
   position:absolute;
-  top:calc(100% - 2px);
+  top:calc(100% + 8px);
   right:0;
-  width:320px;
+  width:336px;
   padding:0;
-  border-radius:0 0 16px 16px;
+  border-radius:16px;
   border:1px solid rgba(95,132,212,.34);
-  border-top:none;
-  background:linear-gradient(180deg,rgba(20,31,54,.99),rgba(9,17,31,.99));
+  background:linear-gradient(180deg,rgba(22,34,58,.99),rgba(9,17,31,.99));
   box-shadow:var(--shadow);
   display:none;
   z-index:60;
@@ -380,10 +379,25 @@ body.legacy-modal-open{
 .profile-menu.open .profile-menu-panel{
   display:block;
 }
+.profile-menu-panel::before{
+  content:"";
+  position:absolute;
+  top:-8px;
+  right:20px;
+  width:14px;
+  height:14px;
+  background:linear-gradient(180deg,rgba(22,34,58,.99),rgba(17,28,48,.99));
+  border-top:1px solid rgba(95,132,212,.34);
+  border-left:1px solid rgba(95,132,212,.34);
+  transform:rotate(45deg);
+}
 .profile-menu-lookup{
   padding:10px;
   background:linear-gradient(180deg,rgba(29,44,73,.95),rgba(18,28,47,.95));
   border-bottom:1px solid rgba(95,132,212,.2);
+}
+.profile-menu-section{
+  border-top:1px solid rgba(95,132,212,.12);
 }
 .profile-menu-list,
 .profile-submenu-list{
@@ -417,14 +431,26 @@ body.legacy-modal-open{
   outline:none;
 }
 .profile-menu-icon{
-  width:16px;
+  width:18px;
   text-align:center;
   color:#b8c7e4;
-  flex:0 0 16px;
+  flex:0 0 18px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
 }
 .profile-menu-text{
   flex:1 1 auto;
   padding-left:10px;
+}
+.profile-menu-icon svg{
+  width:17px;
+  height:17px;
+  stroke:currentColor;
+  fill:none;
+  stroke-width:1.8;
+  stroke-linecap:round;
+  stroke-linejoin:round;
 }
 .profile-submenu{
   position:relative;
@@ -433,16 +459,16 @@ body.legacy-modal-open{
   gap:12px;
 }
 .profile-submenu-arrow{
-  font-size:.95rem;
+  font-size:.82rem;
   line-height:1;
 }
 .profile-submenu-panel{
   position:absolute;
   top:-1px;
-  right:100%;
-  width:260px;
+  right:calc(100% + 8px);
+  width:248px;
   padding:0;
-  border-radius:18px 0 18px 18px;
+  border-radius:16px;
   border:1px solid rgba(95,132,212,.34);
   background:linear-gradient(180deg,rgba(18,29,50,.99),rgba(9,17,31,.99));
   box-shadow:var(--shadow);
@@ -452,10 +478,14 @@ body.legacy-modal-open{
 .profile-submenu-panel::before{
   content:"";
   position:absolute;
-  top:0;
-  right:-12px;
-  width:12px;
-  height:100%;
+  top:18px;
+  right:-8px;
+  width:14px;
+  height:14px;
+  background:linear-gradient(180deg,rgba(18,29,50,.99),rgba(12,21,37,.99));
+  border-top:1px solid rgba(95,132,212,.34);
+  border-right:1px solid rgba(95,132,212,.34);
+  transform:rotate(45deg);
 }
 .profile-submenu.open .profile-submenu-panel{
   display:block;
@@ -481,6 +511,9 @@ body.legacy-modal-open{
 .profile-submenu-item:focus{
   background:rgba(80,120,210,.11);
   outline:none;
+}
+.profile-menu-item.is-placeholder{
+  opacity:.7;
 }
 
 /* NEW BUTTON BAR */
@@ -2596,32 +2629,95 @@ document.addEventListener('DOMContentLoaded', function () {
       <div class="profile-menu-panel" id="adminProfileMenuPanel">
         <div class="profile-menu-lookup">
           <div class="search-wrap">
-            <span>Search</span>
+            <span>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="11" cy="11" r="6.5"></circle>
+                <path d="M16 16l5 5"></path>
+              </svg>
+            </span>
             <input type="text" id="raffle_lookup" name="raffle_lookup" placeholder="Raffle Lookup" onkeydown="if (event.key === 'Enter') { event.preventDefault(); openRaffleLookup(); }" />
           </div>
         </div>
         <div class="profile-menu-list">
           <div class="profile-submenu" id="adminTemplateSubmenu">
             <button type="button" class="profile-submenu-trigger" id="adminTemplateSubmenuTrigger" aria-expanded="false">
-              <span class="profile-menu-icon">T</span>
-              <span class="profile-menu-text">Theme</span>
+              <span class="profile-menu-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 3v18"></path>
+                  <path d="M3 12h18"></path>
+                  <path d="M5.5 5.5l13 13"></path>
+                  <path d="M18.5 5.5l-13 13"></path>
+                </svg>
+              </span>
+              <span class="profile-menu-text">Templates</span>
               <span class="profile-submenu-arrow">&lt;</span>
             </button>
 
             <div class="profile-submenu-panel" id="adminTemplateSubmenuPanel">
               <div class="profile-submenu-list">
-                <button type="button" class="profile-submenu-item">Holiday</button>
+                <button type="button" class="profile-submenu-item">Christmas</button>
                 <button type="button" class="profile-submenu-item">Halloween</button>
                 <button type="button" class="profile-submenu-item">Birthday</button>
                 <button type="button" class="profile-submenu-item">Default</button>
+                <a class="profile-menu-item is-placeholder" href="#" onclick="return false;">
+                  <span class="profile-menu-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M4 12h16"></path>
+                      <path d="M12 4l8 8-8 8"></path>
+                    </svg>
+                  </span>
+                  <span class="profile-menu-text">Manage Templates</span>
+                </a>
               </div>
             </div>
           </div>
 
+          <div class="profile-menu-section">
+            <a class="profile-menu-item" href="/bbc1/">
+              <span class="profile-menu-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M3 12h18"></path>
+                  <path d="M15 5l6 7-6 7"></path>
+                </svg>
+              </span>
+              <span class="profile-menu-text">BBC1</span>
+            </a>
+            <a class="profile-menu-item" href="/bbc2/">
+              <span class="profile-menu-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M3 12h18"></path>
+                  <path d="M15 5l6 7-6 7"></path>
+                </svg>
+              </span>
+              <span class="profile-menu-text">BBC2</span>
+            </a>
+          </div>
+
+          <div class="profile-menu-section">
+            <a class="profile-menu-item is-placeholder" href="#" onclick="return false;">
+              <span class="profile-menu-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9"></circle>
+                  <path d="M12 8v5"></path>
+                  <path d="M12 16h.01"></path>
+                </svg>
+              </span>
+              <span class="profile-menu-text">Help</span>
+            </a>
+          </div>
+
+          <div class="profile-menu-section">
           <a class="profile-menu-item" href="/${request.matchdict.get('guild')}/auth/logout">
-            <span class="profile-menu-icon">X</span>
+            <span class="profile-menu-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M10 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h5"></path>
+                <path d="M14 8l6 4-6 4"></path>
+                <path d="M20 12H9"></path>
+              </svg>
+            </span>
             <span class="profile-menu-text">Logout</span>
           </a>
+          </div>
         </div>
       </div>
     </div>
