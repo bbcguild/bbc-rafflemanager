@@ -267,7 +267,8 @@ def close_current_raffle (request):
 @view_config(route_name="open_new_raffle", renderer="json", permission="akaviri")
 def open_new_raffle (request):
     cur_id = db.get_cur_raffle_id()
-    current_info = db.get_cur_raffle_info() or {}
+    current_info = db.get_cur_raffle_info()
+    current_info = dict(current_info) if current_info else {}
     requested_number = (request.params.get("raffle_guild_num") or "").strip()
 
     new_raffle_info = {
