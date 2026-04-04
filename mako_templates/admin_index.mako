@@ -86,23 +86,24 @@ body.legacy-modal-open{
 
 .admin-topbar{
   display:flex;
-  align-items:center;
+  align-items:flex-start;
   justify-content:space-between;
-  gap:16px;
-  margin-bottom:10px;
+  gap:12px;
+  margin-bottom:8px;
 }
 .admin-topbar-updated{
   color:#e6d77a;
-  font-size:clamp(.96rem,1vw,1.08rem);
+  font-size:clamp(.88rem,.92vw,1rem);
   font-weight:700;
   letter-spacing:.01em;
   min-width:0;
+  padding-top:6px;
 }
 .admin-topbar-controls{
   display:flex;
   align-items:flex-start;
   justify-content:flex-end;
-  gap:12px;
+  gap:8px;
   margin-left:auto;
 }
 
@@ -112,10 +113,10 @@ body.legacy-modal-open{
   grid-template-columns:minmax(0,1fr) auto;
   align-items:start;
   gap:18px 24px;
-  padding:24px 26px;
+  padding:18px 24px;
   margin-bottom:14px;
   min-width:0;
-  min-height:230px;
+  min-height:170px;
 }
 .header-left{
   display:grid;
@@ -125,8 +126,8 @@ body.legacy-modal-open{
   min-width:0;
 }
 .admin-header img#mainLogo{
-  width:88px;
-  height:88px;
+  width:84px;
+  height:84px;
   object-fit:contain;
   flex:0 0 auto;
 }
@@ -138,14 +139,14 @@ body.legacy-modal-open{
 }
 .title-block h1{
   margin:0;
-  font-size:clamp(1.9rem,2.45vw,3rem);
+  font-size:clamp(1.8rem,2.2vw,2.7rem);
   line-height:1;
   font-weight:700;
   letter-spacing:-.03em;
 }
 .title-block .sub{
   color:#b8c7e4;
-  font-size:clamp(1rem,1.15vw,1.1rem);
+  font-size:clamp(.98rem,1.05vw,1.06rem);
   font-weight:600;
 }
 .title-block .updated{
@@ -159,11 +160,11 @@ body.legacy-modal-open{
 }
 .stat{
   border-radius:18px;
-  padding:12px 18px;
+  padding:10px 16px;
   background:rgba(8,17,31,.86);
   border:1px solid var(--line);
   text-align:center;
-  min-width:138px;
+  min-width:126px;
 }
 .stat .k{
   color:var(--muted);
@@ -174,7 +175,7 @@ body.legacy-modal-open{
   margin-bottom:8px;
 }
 .stat .v{
-  font-size:2rem;
+  font-size:1.75rem;
   font-weight:800;
   line-height:1;
 }
@@ -316,9 +317,9 @@ body.legacy-modal-open{
   display:flex;
   align-items:center;
   gap:0;
-  min-height:56px;
+  min-height:48px;
   padding:0;
-  border-radius:18px;
+  border-radius:14px;
   border:1px solid var(--profile-trigger-border);
   background:var(--profile-trigger-bg);
   color:var(--text);
@@ -331,44 +332,32 @@ body.legacy-modal-open{
   border-color:rgba(140,170,230,.5);
 }
 .profile-trigger-logo-shell{
-  min-width:64px;
-  min-height:56px;
+  min-width:54px;
+  min-height:48px;
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:8px 10px;
+  padding:6px 8px;
   background:linear-gradient(180deg,rgba(26,41,71,.95),rgba(14,24,42,.95));
   border-right:1px solid rgba(95,132,212,.26);
 }
 .profile-menu-logo{
-  width:38px;
-  height:38px;
-  border-radius:12px;
+  width:34px;
+  height:34px;
+  border-radius:10px;
   object-fit:cover;
   border:1px solid rgba(255,255,255,.14);
   flex:0 0 auto;
 }
-.profile-trigger-label{
-  min-height:56px;
-  display:flex;
-  align-items:center;
-  padding:0 14px 0 16px;
-  color:#dce8ff;
-  font-size:.86rem;
-  font-weight:800;
-  letter-spacing:.08em;
-  text-transform:uppercase;
-  white-space:nowrap;
-}
 .profile-menu-caret{
-  min-width:40px;
-  min-height:56px;
+  min-width:34px;
+  min-height:48px;
   display:flex;
   align-items:center;
   justify-content:center;
   border-left:1px solid rgba(95,132,212,.22);
   background:linear-gradient(180deg,rgba(20,34,58,.94),rgba(9,17,31,.94));
-  font-size:.9rem;
+  font-size:.8rem;
   line-height:1;
   color:#f4f7ff;
 }
@@ -391,7 +380,7 @@ body.legacy-modal-open{
   display:block;
 }
 .profile-menu-lookup{
-  padding:16px 16px 14px;
+  padding:12px;
   background:linear-gradient(180deg,rgba(29,44,73,.95),rgba(18,28,47,.95));
   border-bottom:1px solid rgba(95,132,212,.2);
 }
@@ -500,7 +489,7 @@ body.legacy-modal-open{
   gap:12px;
   margin-bottom:14px;
   width:100%;
-  padding:12px 14px;
+  padding:10px 14px;
   align-items:center;
   background:linear-gradient(180deg,var(--panel),var(--panel2));
   border:1px solid var(--line);
@@ -517,14 +506,14 @@ body.legacy-modal-open{
   margin-right:2px;
 }
 .action-btn{
-  min-height:36px;
+  min-height:34px;
   min-width:0;
-  padding:0 14px;
+  padding:0 13px;
   border-radius:12px;
   border:1px solid var(--line2);
   background:rgba(13,24,44,.92);
   color:#f4f7ff;
-  font-size:.9rem;
+  font-size:.88rem;
   font-weight:750;
   white-space:nowrap;
   overflow:hidden;
@@ -2600,7 +2589,6 @@ document.addEventListener('DOMContentLoaded', function () {
         <span class="profile-trigger-logo-shell">
           <img class="profile-menu-logo" src="https://www.bbcguild.com/wp-content/uploads/2020/04/cropped-cropped-BBC-LOGO-V2-2.gif" alt="Guild logo">
         </span>
-        <span class="profile-trigger-label">Control Panel</span>
         <span class="profile-menu-caret">v</span>
       </button>
 
@@ -2664,7 +2652,6 @@ document.addEventListener('DOMContentLoaded', function () {
   <button type="button" class="action-btn" onclick="$('#reshow_confirm').click()">Re-Show Confirms</button>
   <button type="button" class="action-btn" onclick="$('#import_paid').click()">Import Paid</button>
   <button type="button" class="action-btn" onclick="$('#import_barter').click()">Import Barter</button>
-  <button type="button" class="action-btn" onclick="$('#manual_refresh').click()">Manual Refresh</button>
 </section>
 
 <section class="admin-utility-band">
