@@ -29,6 +29,7 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - Admin shell redesign follow-up on 2026-04-04: after user feedback that the first topbar pass was still too tall/prominent, the utility strip and menu trigger were tightened further. The visible `Control Panel` label was removed so the BBC logo plus caret can stand on its own, the header height was reduced, stat cards were compacted, and the visible `Manual Refresh` button was removed from the admin tools row.
 - Cleanup follow-up on 2026-04-04: repaired the text-encoding regressions introduced during the recent admin template restructuring. The broken status dropdown labels and other mojibake text were normalized back to clean readable labels so the page can be evaluated on layout/design again instead of being distracted by corrupted glyphs.
 - Admin shell redesign follow-up on 2026-04-04: default admin mode now uses a shorter everyday header so the page does not waste vertical space when no special theme art is active. The longer/taller hero treatment is still a good idea for future seasonal templates, but the base experience should optimize for routine use first.
+- Admin shell redesign follow-up on 2026-04-04: continued trimming the everyday top chrome. The utility strip, profile trigger, dropdown panel, stat cards, and base header proportions were all tightened again so the non-themed default view wastes less vertical space while preserving the cleaner “header is for identity + stats, menu lives above” structure.
 
 ## Known Facts
 - `SESSION.md` was introduced after an earlier crash because conversation state had been lost.
@@ -68,11 +69,11 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - `DECISIONS.md`
 
 ## Exact Next Step
-- Re-anchor on the current code by auditing `mako_templates/admin_index.mako` against the open layout issues captured in this file and `DECISIONS.md`.
-- Then decide one concrete next task before making more changes:
-- finish admin layout/gutter polish
-- remove `FREE` end-to-end
-- wire `Prize Value` end-to-end
+- Verify the newest compact-header/topbar pass in-browser on the admin page.
+- If the overall direction is approved, keep refining the top shell:
+- replace the temporary text placeholder icons in the profile menu with a more intentional icon treatment
+- decide whether the logo/caret trigger should split into two smaller connected pieces
+- then continue into broader admin layout/gutter polish below the header
 
 ## If Chat Dies, Resume By Doing This
 1. Read `SESSION.md`.
