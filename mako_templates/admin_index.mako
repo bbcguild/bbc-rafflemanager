@@ -630,18 +630,22 @@ border:1px solid rgba(140,170,230,.12);
 
 #raffle_status.status-live{
   color:#8ff0ba;
+  font-weight:800;
 }
 
 #raffle_status.status-rolling{
   color:#f2b36b;
+  font-weight:800;
 }
 
 #raffle_status.status-complete{
   color:#ff9d9d;
+  font-weight:800;
 }
 
 #raffle_status option{
   background:#0f1622;
+  font-weight:800;
 }
 
 #raffle_status option[value="LIVE"]{
@@ -1831,9 +1835,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
             <label class="settings-block-label" for="raffle_status">Status</label>
             <select id="raffle_status" class="ginfo_change_save" name="raffle_status">
-                <option value="LIVE">LIVE</option>
-                <option value="ROLLING">ROLLING</option>
-                <option value="COMPLETE">CLOSED</option>
+                <option value="LIVE">● LIVE</option>
+                <option value="ROLLING">🎲 ROLLING</option>
+                <option value="COMPLETE">● CLOSED</option>
             </select>
 
             <label class="settings-block-label" for="raffle_subheader">Raffle Number</label>
