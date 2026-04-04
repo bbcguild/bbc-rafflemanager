@@ -38,6 +38,7 @@ Use this file as the durable memory for active work so we do not rely on chat hi
 - Long-term cleanup idea: fully remove `FREE` from the codebase if it is confirmed obsolete.
 - Follow-up layout feedback on 2026-04-04: the right-side ticket table still showed a black empty strip on the right, and the scrollbar returned because range values started wrapping around row 44 and increased row height.
 - Corrected follow-up fix in `admin_index.mako`: the ticket table should not stretch to consume extra width; instead, the right column should size to the table's needed width while the center winner-card area receives the leftover space, with the range column kept on one line.
+- Additional follow-up on 2026-04-04: after deploying the width fix, the black strip was nearly gone and row wrapping was resolved, but a small internal table scrollbar still remained; next adjustment changed the ticket table to `height: "auto"` so Handsontable can grow to full content height instead of using a guessed pixel height.
 
 ## Reconstructed Context
 - Recent committed work before the interruption was focused on the admin page in `mako_templates/admin_index.mako`.
@@ -66,6 +67,7 @@ Use this file as the durable memory for active work so we do not rely on chat hi
 - Confirm whether `FREE` is truly obsolete so we can remove it from the codebase instead of continuing to hide it in the UI.
 - Confirm that the new Handsontable stretch/no-wrap fix removes the black strip and prevents range wrapping for longer ticket ranges.
 - Confirm that the corrected content-width right column removes the black strip while giving extra width back to the center winner cards.
+- Confirm that using `height: "auto"` removes the last remaining internal scrollbar without creating a new layout problem.
 
 ## Next Step
 - Review `mako_templates/admin_index.mako` in the browser and verify the updated admin layout behaves correctly on the target screen size.

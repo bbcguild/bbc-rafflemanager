@@ -1162,11 +1162,10 @@ var get_ticket_table = function () {
 % if request.extended_tickets:
         $.getJSON(window.location.pathname + "json/get/tickets_extended", function (result) {
                 result = addTicketRanges(result, true)
-                var ticketTableHeight = Math.max(220, ((result.length || 0) + 2) * 24 + 36)
                 $("#ticket_info").handsontable("destroy")
                 $("#ticket_info").handsontable({
                         data: result,
-                        height: ticketTableHeight,
+                        height: "auto",
                         rowHeaders: false,
                         colHeaders: ["#", "Name", "Total", "Paid", "Bar", "Range"],
                         colWidths: [38, 150, 52, 52, 52, 112],
@@ -1230,11 +1229,10 @@ var get_ticket_table = function () {
 % else:
         $.getJSON(window.location.pathname + "json/get/tickets", function (result) {
                 result = addTicketRanges(result, false)
-                var ticketTableHeight = Math.max(220, ((result.length || 0) + 2) * 24 + 36)
                 $("#ticket_info").handsontable("destroy")
                 $("#ticket_info").handsontable({
                         data: result,
-                        height: ticketTableHeight,
+                        height: "auto",
                         rowHeaders: false,
                         colHeaders: ["#", "Name", "Total", "Range"],
                         colWidths: [62, 180, 56, 112],
