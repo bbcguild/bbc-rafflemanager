@@ -1520,6 +1520,15 @@ function saveNotes() {
         })
 }
 
+function addPrizeCard() {
+        $.getJSON("json/set/prize_add", function (result) {
+                if (result) {
+                        get_prize_info()
+                }
+        })
+        return false
+}
+
 $(document).on("input blur", ".prize_value", function () {
         formatPrizeValueField(this)
 })
@@ -2069,10 +2078,9 @@ $(document).ready(function () {
                     }
                 })
             })
-            $("#add_prize_button").click(function () {
-                $.getJSON("json/set/prize_add", function (result) {
-                        if (result) { get_prize_info() }
-                    })
+            $("#add_prize_button").click(function (event) {
+                event.preventDefault()
+                addPrizeCard()
             })
             $("#manual_refresh").click(function () {
                 get_ticket_table()
@@ -2493,7 +2501,7 @@ document.addEventListener('DOMContentLoaded', function () {
         <div id="prize_info">
         </div>
         <div id="add_prize_block">
-            <input type="submit" value="Add prize" id="add_prize_button" />
+            <input type="button" value="Add prize" id="add_prize_button" onclick="return addPrizeCard()" />
         </div>
     </div>
         </td>
