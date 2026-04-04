@@ -1,0 +1,61 @@
+# Docker ignore file to keep the image lean
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Logs
+*.log
+errors.log
+recent_errors.log
+access.log
+error.log
+
+# Backup files
+*.backup
+*.backup*
+*~
+
+# Development files
+.env
+.env.local
+
+# Docker files
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Documentation
+*.md
+!README.md
+
+# Development scripts
+dev-*.sh
+deploy.sh
+test_*.py
+test_*.lua
+
+# Local database (production uses persistent volume)
+raffle.db.bak
+raffle.db.backup
