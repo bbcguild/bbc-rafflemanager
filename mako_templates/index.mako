@@ -581,6 +581,17 @@ body{
   font-variant-numeric:tabular-nums;
   justify-self:end;
 }
+.thead .idx,
+.thead .total,
+.thead .paid,
+.thead .bar,
+.thead .range{
+  text-align:center;
+  justify-self:center;
+}
+.row .total{
+  color:#e6d77a;
+}
 .range{
   white-space:nowrap;
 }
