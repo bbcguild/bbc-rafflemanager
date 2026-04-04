@@ -403,20 +403,38 @@ html,body{
 
 #main_table{
   width:100%;
+  display:grid;
+  grid-template-columns:260px minmax(560px,1.08fr) minmax(500px,.92fr);
+  gap:12px;
+  align-items:start;
+  border-collapse:separate;
+}
+
+#main_table > tbody,
+#main_table > tbody > tr{
+  display:contents;
 }
 
 #column_guildinfo{
-  width:210px;
+  display:block;
   vertical-align:top;
+  min-width:0;
+  width:auto;
 }
 
 #column_prizeinfo{
+  display:block;
   vertical-align:top;
+  min-width:0;
+  width:auto;
+  overflow:hidden;
 }
 
 #column_ticketinfo{
-  width:260px;
+  display:block;
   vertical-align:top;
+  min-width:0;
+  width:auto;
 }
 
 #column_ticketlist{
@@ -431,7 +449,41 @@ html,body{
   border-radius:22px;
   box-shadow:var(--shadow);
   padding:14px;
-  margin:0 6px;
+  margin:0;
+}
+
+#center{
+  background:transparent;
+  border:none;
+  box-shadow:none;
+  padding:0;
+}
+
+#right{
+  overflow:hidden;
+}
+
+#ticket_info{
+  width:100%;
+  overflow:hidden;
+}
+
+.ticket-tools{
+  display:flex;
+  justify-content:flex-end;
+  margin-bottom:10px;
+}
+
+.ticket-copy-btn{
+  min-height:38px;
+  padding:0 14px;
+  border-radius:14px;
+  border:1px solid var(--line2);
+  background:linear-gradient(180deg,#0b1a34,#09142a);
+  color:#f4f7ff;
+  font-size:.92rem;
+  font-weight:850;
+  cursor:pointer;
 }
 
 #ticket_list{
@@ -519,18 +571,143 @@ border:1px solid rgba(140,170,230,.12);
 /* keep legacy prize/table styling functional */
 .prize{
   width:100%;
+  border-collapse:separate;
+  border-spacing:0 12px;
 }
 
 .prize input[type="text"]{
   background:#0f1622;
   color:#d6deeb;
   border:1px solid rgba(140,170,230,.12);
-  border-radius:8px;
+  border-radius:14px;
+  font-size:1.25em;
+  line-height:1.2;
+  padding:10px 14px;
 }
 
 .prize input[type="text"]:focus{
   outline:none;
   border-color:rgba(140,170,230,.28);
+}
+
+.prize_number{
+  width:100%;
+  min-height:112px;
+  text-align:center;
+  font-size:2.2rem !important;
+  font-weight:900;
+}
+
+.prize_winner,
+.prize_item,
+.prize_value{
+  min-height:42px;
+}
+
+.prize-shell{
+  display:grid;
+  grid-template-columns:94px minmax(0,1fr) 68px;
+  gap:14px;
+  align-items:stretch;
+  width:100%;
+  box-sizing:border-box;
+  padding:10px;
+  border:1px solid rgba(80,120,210,.18);
+  border-radius:18px;
+  background:linear-gradient(180deg,rgba(9,18,35,.96),rgba(8,15,28,.98));
+}
+
+.prize-main{
+  display:grid;
+  grid-template-rows:auto auto;
+  gap:14px;
+  min-width:0;
+}
+
+.prize-top-row,
+.prize-bottom-row{
+  display:grid;
+  gap:14px;
+  min-width:0;
+}
+
+.prize-top-row{
+  grid-template-columns:minmax(0,1fr);
+}
+
+.prize-bottom-row{
+  grid-template-columns:110px 150px minmax(0,1fr);
+  align-items:center;
+}
+
+.prize-field{
+  min-width:0;
+}
+
+.prize-field input[type="text"]{
+  width:100%;
+  box-sizing:border-box;
+}
+
+.prize-winner-display{
+  min-height:42px;
+  box-sizing:border-box;
+  padding:10px 14px;
+  border:1px solid rgba(140,170,230,.12);
+  border-radius:14px;
+  background:#0f1622;
+  color:#f4f7ff;
+  font-size:1.25em;
+  line-height:1.2;
+  display:flex;
+  align-items:center;
+  overflow:hidden;
+  align-self:center;
+}
+
+.prize_winner_name{
+  display:block;
+  width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-weight:800;
+}
+
+.prize_winner_name:empty::before{
+  content:attr(data-placeholder);
+  color:#8395b9;
+  font-weight:700;
+}
+
+.prize_winner_name.finalised{
+  color:#ffe7ae;
+}
+
+.prize-actions{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.prize-action{
+  min-height:54px;
+  border:1px solid rgba(80,120,210,.24);
+  border-radius:18px;
+  background:rgba(11,20,40,.92);
+  color:#7f2ed3;
+  font-size:1.4rem;
+  font-weight:900;
+  text-decoration:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.prize-action:hover,
+.prize-action:focus{
+  color:#b15dff;
+  outline:none;
 }
 
 @media (max-width:1200px){
@@ -626,6 +803,65 @@ function applyAdminStatus(status) {
         statusLabel.text(normalizedStatus)
 }
 
+function copyNamesAndTotals() {
+        var hot = $("#ticket_info").handsontable("getInstance")
+        if (!hot) {
+                return
+        }
+
+        var rows = hot.getData() || []
+        var output = []
+
+        for (var i = 0; i < rows.length; i++) {
+                var row = rows[i] || []
+                var name = row[1] == null ? "" : $.trim(String(row[1]))
+                var total = row[2]
+
+                if (!name) {
+                        continue
+                }
+
+                if (total == null || total === "") {
+                        total = 0
+                }
+
+                output.push(name + "\t" + total)
+        }
+
+        var text = output.join("\n")
+        if (!text) {
+                return
+        }
+
+        function showCopiedState() {
+                var btn = document.getElementById("copyNamesTotalsBtn")
+                if (!btn) {
+                        return
+                }
+                var original = btn.textContent
+                btn.textContent = "Copied"
+                setTimeout(function () {
+                        btn.textContent = original
+                }, 1200)
+        }
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(showCopiedState)
+                return
+        }
+
+        var helper = document.createElement("textarea")
+        helper.value = text
+        helper.setAttribute("readonly", "")
+        helper.style.position = "absolute"
+        helper.style.left = "-9999px"
+        document.body.appendChild(helper)
+        helper.select()
+        document.execCommand("copy")
+        document.body.removeChild(helper)
+        showCopiedState()
+}
+
 
 // Some of my best friends use JSON!
 var GLOBAL_PRIZE_ALERTED = false
@@ -709,6 +945,7 @@ var get_prize_info = function () {
 
                     // at least the prize details are here
                     $("#prize_item", template).attr({"id": new_id + "item"}).val(value["prize_text"])
+                    $("#prize_value", template).attr({"id": new_id + "value"})
                     if (value["prize_finalised"] != 0) {
                         $("#prize_finalise", template).remove()
                         $("#prize_delete", template).remove()
@@ -746,7 +983,7 @@ var get_prize_info = function () {
                                 })
                             })
 
-                    $("input[type='text']", template).change(function () {
+                    $("input[type='text'][name]", template).change(function () {
                             $.ajax({
                                 type: "POST",
                                 url: "json/set/prize",
@@ -913,12 +1150,14 @@ var get_ticket_table = function () {
 % if request.extended_tickets:
         $.getJSON(window.location.pathname + "json/get/tickets_extended", function (result) {
                 result = addTicketRanges(result, true)
+                var ticketTableHeight = Math.max(220, ((result.length || 0) + 2) * 24 + 36)
                 $("#ticket_info").handsontable("destroy")
                 $("#ticket_info").handsontable({
                         data: result,
+                        height: ticketTableHeight,
                         rowHeaders: false,
                         colHeaders: ["#", "Name", "Total", "Paid", "Bar", "Range"],
-                        colWidths: [42, 180, 55, 55, 55, 110],
+                        colWidths: [38, 150, 52, 52, 52, 96],
                         contextMenu: false,
                         enterMoves: {row: 0, col: 1},
                         columnSorting: true,
@@ -978,12 +1217,14 @@ var get_ticket_table = function () {
 % else:
         $.getJSON(window.location.pathname + "json/get/tickets", function (result) {
                 result = addTicketRanges(result, false)
+                var ticketTableHeight = Math.max(220, ((result.length || 0) + 2) * 24 + 36)
                 $("#ticket_info").handsontable("destroy")
                 $("#ticket_info").handsontable({
                         data: result,
+                        height: ticketTableHeight,
                         rowHeaders: false,
                         colHeaders: ["#", "Name", "Total", "Range"],
-                        colWidths: [100, 220, 55, 110],
+                        colWidths: [62, 180, 56, 98],
                         contextMenu: false,
                         enterMoves: {row: 0, col: 1},
                         columnSorting: true,
@@ -1507,6 +1748,9 @@ document.addEventListener('DOMContentLoaded', function () {
         </td>
         <td id="column_ticketinfo">
     <div id="right" class="column">
+        <div class="ticket-tools">
+            <button type="button" class="ticket-copy-btn" id="copyNamesTotalsBtn" onclick="copyNamesAndTotals()">Copy Names + Totals</button>
+        </div>
         <div id="ticket_info">
         </div>
     </div>
@@ -1518,24 +1762,34 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <div id="prize_template">
 <form id="prize_template_form">
-<table class="prize">
-    <tr>
-        <th rowspan="3" class="prize_number_column"><input type="text" class="prize_number" id="prize_number" name="prize_text2" /></td>
-        <td class="winning_number">Winning Number:</td>
-        <td class="number_column"><input type="text" id="prize_winner" class="prize_winner" name="prize_winner"/></td>
-        <td class="delete_button"><a href="#" id="prize_delete" class="prize_delete">x</a></td>
-    </tr>
-    <tr>
-        <td class="winner">Winner:</td>
-        <td class="winner_column"><span id="prize_winner_name" class="prize_winner_name"></span></td>
-        <td class="roll_button"><a href="#" id="prize_roll" class="prize_roll">R</a></td>
-    </tr>
-    <tr>
-        <td class="winning_prize">Prize:</td>
-        <td class="prize_column"><input type="text" id="prize_item" class="prize_item" name="prize_text" /></td>
-        <td class="finalise_button"><a href="#" id="prize_finalise" class="prize_finalise">f</a></td>
-    </tr>
-</table>
+<div class="prize prize-shell">
+    <div class="prize-field prize-number-panel">
+        <input type="text" class="prize_number" id="prize_number" name="prize_text2" placeholder="#" />
+    </div>
+    <div class="prize-main">
+        <div class="prize-top-row">
+            <div class="prize-field">
+                <input type="text" id="prize_item" class="prize_item" name="prize_text" placeholder="Prize" />
+            </div>
+        </div>
+        <div class="prize-bottom-row">
+            <div class="prize-field">
+                <input type="text" id="prize_winner" class="prize_winner" name="prize_winner" placeholder="Winning Number" />
+            </div>
+            <div class="prize-field">
+                <input type="text" id="prize_value" class="prize_value" placeholder="Prize Value" />
+            </div>
+            <div class="prize-winner-display">
+                <span id="prize_winner_name" class="prize_winner_name" data-placeholder="Winner"></span>
+            </div>
+        </div>
+    </div>
+    <div class="prize-actions">
+        <a href="#" id="prize_finalise" class="prize_finalise prize-action" title="Finalize winner">f</a>
+        <a href="#" id="prize_roll" class="prize_roll prize-action" title="Roll winner">R</a>
+        <a href="#" id="prize_delete" class="prize_delete prize-action" title="Delete prize">x</a>
+    </div>
+</div>
 <input type="hidden" name="prize_id" value="" class="prize_id" />
 </form>
 </div>
