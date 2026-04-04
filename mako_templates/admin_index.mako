@@ -350,18 +350,20 @@ body.legacy-modal-open{
   box-shadow:var(--shadow);
 }
 .profile-menu-caret{
-  min-width:24px;
-  min-height:34px;
+  width:22px;
+  height:22px;
   display:flex;
   align-items:center;
   justify-content:center;
-  border:1px solid rgba(95,132,212,.28);
-  border-radius:999px;
-  background:linear-gradient(180deg,rgba(20,34,58,.94),rgba(9,17,31,.94));
-  font-size:.68rem;
+  border:1px solid rgba(140,170,230,.18);
+  border-radius:50%;
+  background:rgba(6,10,18,.88);
+  font-size:.62rem;
   line-height:1;
   color:#f4f7ff;
-  box-shadow:var(--shadow);
+  box-shadow:0 8px 18px rgba(0,0,0,.2);
+  backdrop-filter:blur(2px);
+  -webkit-backdrop-filter:blur(2px);
 }
 .profile-menu-panel{
   position:absolute;
