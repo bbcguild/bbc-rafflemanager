@@ -70,9 +70,16 @@ body{
 .header{
   display:flex;
   align-items:center;
-  gap:18px;
+  gap:14px;
   padding:14px 20px;
   min-width:0;
+}
+.header-left{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  min-width:0;
+  flex:1 1 auto;
 }
 .header img#mainLogo{
   width:72px;
@@ -85,20 +92,30 @@ body{
   flex-direction:column;
   gap:2px;
   min-width:0;
+  flex:1 1 240px;
 }
 .title-block h1{
   margin:0;
-  font-size:2.2rem;
-  line-height:1.05;
+  font-size:1.95rem;
+  line-height:1.04;
   font-weight:700;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 .title-block .sub{
   color:var(--muted);
-  font-size:1rem;
+  font-size:.88rem;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 .title-block .updated{
   color:#e6d77a;
-  font-size:.9rem;
+  font-size:.82rem;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 .title-block .updated.closed{
   color:var(--danger);
@@ -106,16 +123,18 @@ body{
 }
 .stats-inline{
   display:flex;
-  gap:10px;
-  margin-left:6px;
+  gap:8px;
+  margin-left:2px;
+  flex:0 1 auto;
+  min-width:0;
 }
 .stat{
   border-radius:14px;
-  padding:10px 14px;
+  padding:10px 10px;
   background:rgba(8,17,31,.86);
   border:1px solid #ffffff !important;
   text-align:center;
-  min-width:120px;
+  min-width:92px;
 }
 .stat .k{
   color:var(--muted);
@@ -136,9 +155,11 @@ body{
   display:grid;
   grid-template-columns:auto;
   align-items:start;
-  justify-items:center;
-  gap:8px;
+  justify-items:stretch;
+  gap:6px;
   min-width:0;
+  flex:0 0 290px;
+  width:290px;
 }
 
 .mobile-search-toggle-inline{
@@ -153,7 +174,8 @@ body{
   background:#f3f4f6;
   padding:6px 12px;
   height:34px;
-  min-width:220px;
+  min-width:0;
+  width:100%;
 }
 .search-wrap span{
   color:#6b7280;
@@ -171,9 +193,9 @@ body{
 
 .raffle-nav{
   display:flex;
-  gap:8px;
+  gap:6px;
   flex-wrap:wrap;
-  justify-content:center;
+  justify-content:flex-start;
   width:100%;
 }
 
@@ -183,9 +205,9 @@ body{
   align-items:center;
   justify-content:center;
   min-height:24px;
-  padding:3px 12px;
+  padding:3px 10px;
   border-radius:0;
-  font-size:.82rem;
+  font-size:.78rem;
   font-weight:800;
   line-height:1;
   text-decoration:none;
@@ -243,23 +265,29 @@ body{
 }
 .raffle-live-header.status-live #raffle_titlebar{
   color:#eafff3;
+}
+.raffle-live-header.status-live .raffle-status-text{
   text-shadow:0 0 6px rgba(54,255,142,.45), 0 0 14px rgba(54,255,142,.28);
 }
 .raffle-live-header.status-closed .live-dot{
-  background:#ffb347;
-  box-shadow:0 0 8px rgba(255,179,71,.82);
+  background:#c97a1f;
+  box-shadow:0 0 8px rgba(201,122,31,.85);
 }
 .raffle-live-header.status-closed #raffle_titlebar{
-  color:#ffe7bf;
-  text-shadow:0 0 6px rgba(255,179,71,.45), 0 0 14px rgba(255,179,71,.28);
+  color:#ffe2b3;
+}
+.raffle-live-header.status-closed .raffle-status-text{
+  text-shadow:0 0 6px rgba(201,122,31,.48), 0 0 14px rgba(201,122,31,.3);
 }
 .raffle-live-header.status-complete .live-dot{
-  background:#ff5b5b;
-  box-shadow:0 0 8px rgba(255,91,91,.82);
+  background:#ff0000;
+  box-shadow:0 0 8px rgba(255,0,0,.82);
 }
 .raffle-live-header.status-complete #raffle_titlebar{
   color:#ffd6d6;
-  text-shadow:0 0 6px rgba(255,91,91,.42), 0 0 14px rgba(255,91,91,.24);
+}
+.raffle-live-header.status-complete .raffle-status-text{
+  text-shadow:0 0 6px rgba(255,0,0,.45), 0 0 14px rgba(255,0,0,.26);
 }
 .live-dot{
   width:10px;
@@ -285,6 +313,13 @@ body{
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
+}
+.raffle-status-text{
+  font-weight:900;
+}
+.raffle-title-sep{
+  opacity:.78;
+  margin:0 .22em;
 }
 .info-body{
   min-height:106px;
@@ -490,6 +525,16 @@ body{
   .mid-row,.bottom-row{grid-template-columns:1fr}
   .entrants-scroll{overflow:visible;max-height:none}
   .thead{margin:0 56px 0 8px}
+  .title-block{
+    min-width:260px;
+  }
+}
+
+@media (max-width:980px){
+  .header-left{
+    width:100%;
+    flex-wrap:wrap;
+  }
 }
 
 @media (max-width:700px){
@@ -804,13 +849,21 @@ function normalizeRaffleStatus(status) {
   return value;
 }
 
+function escapeHtml(value) {
+  return $("<div>").text(value == null ? "" : String(value)).html();
+}
+
 function applyPublicStatus(status, title) {
   var normalizedStatus = normalizeRaffleStatus(status);
   var $header = $(".raffle-live-header");
 
   $header.removeClass("status-live status-closed status-complete");
   $header.addClass("status-" + normalizedStatus.toLowerCase());
-  $("#raffle_titlebar").text(normalizedStatus + " - " + (title || "Raffle"));
+  $("#raffle_titlebar").html(
+    '<span class="raffle-status-text">' + escapeHtml(normalizedStatus) + '</span>' +
+    '<span class="raffle-title-sep">-</span>' +
+    '<span class="raffle-name-text">' + escapeHtml(title || "Raffle") + '</span>'
+  );
 }
 
 function updateRaffleNav() {
@@ -1036,6 +1089,7 @@ $(document).ready(function () {
 <div class="page">
 
   <section class="card header">
+    <div class="header-left">
     <img id="mainLogo" src="https://www.bbcguild.com/wp-content/uploads/2020/04/cropped-cropped-BBC-LOGO-V2-2.gif" alt="BBC logo">
 
     <div class="title-block">
@@ -1058,6 +1112,7 @@ $(document).ready(function () {
       <div class="stat"><div class="k">Total Tickets</div><div class="v" id="raffle_sold">0</div></div>
       <div class="stat"><div class="k">Participants</div><div class="v" id="raffle_participants">0</div></div>
     </div>
+    </div>
 
     <div class="header-right" id="header_right">
       <form id="raffle_lookup_form" action="/${request.matchdict['guild']}/lookup" method="get" class="search-wrap" style="margin:0;" autocomplete="off">
@@ -1076,7 +1131,7 @@ $(document).ready(function () {
   <section class="mid-row">
     <div class="info-bar raffle-live-header">
   <span class="live-dot"></span>
-  <strong id="raffle_titlebar">LIVE - Raffle</strong>
+  <strong id="raffle_titlebar"><span class="raffle-status-text">LIVE</span><span class="raffle-title-sep">-</span><span class="raffle-name-text">Raffle</span></strong>
 </div>
       <div class="info-body" id="raffle_notes">Welcome to this week's raffle.</div>
     </div>

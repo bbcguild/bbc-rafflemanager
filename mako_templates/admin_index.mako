@@ -178,26 +178,26 @@ html,body{
   background:#1fe38f;
 }
 .admin-flag.status-complete .admin-status-label{
-  color:#ffe3c2;
-  text-shadow:0 0 6px rgba(255,179,71,.42), 0 0 14px rgba(255,179,71,.24);
+  color:#ffd6d6;
+  text-shadow:0 0 6px rgba(255,0,0,.45), 0 0 14px rgba(255,0,0,.28);
 }
 .admin-flag.status-complete .admin-status-dot{
-  background:#ffb347;
-  box-shadow:0 0 8px rgba(255,179,71,.78);
+  background:#ff0000;
+  box-shadow:0 0 8px rgba(255,0,0,.82);
 }
 .admin-flag.status-complete .admin-flag-bar{
-  background:#ffb347;
+  background:#ff0000;
 }
 .admin-flag.status-closed .admin-status-label{
-  color:#ffd6d6;
-  text-shadow:0 0 6px rgba(255,91,91,.42), 0 0 14px rgba(255,91,91,.24);
+  color:#ffe3c2;
+  text-shadow:0 0 6px rgba(201,122,31,.45), 0 0 14px rgba(201,122,31,.26);
 }
 .admin-flag.status-closed .admin-status-dot{
-  background:#ff5b5b;
-  box-shadow:0 0 8px rgba(255,91,91,.78);
+  background:#c97a1f;
+  box-shadow:0 0 8px rgba(201,122,31,.82);
 }
 .admin-flag.status-closed .admin-flag-bar{
-  background:#ff5b5b;
+  background:#c97a1f;
 }
 .admin-flag-bar{
   height:6px;
