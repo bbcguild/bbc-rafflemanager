@@ -124,7 +124,8 @@ body{
 .stats-inline{
   display:flex;
   gap:8px;
-  margin-left:2px;
+  margin-left:auto;
+  justify-content:flex-end;
   flex:0 1 auto;
   min-width:0;
 }
@@ -152,18 +153,17 @@ body{
 
 .header-right{
   margin-left:auto;
-  display:grid;
-  grid-template-columns:auto;
-  align-items:start;
-  justify-items:stretch;
-  gap:6px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
   min-width:0;
-  flex:0 0 290px;
-  width:290px;
+  flex:0 0 auto;
+  width:auto;
 }
 
-.mobile-search-toggle-inline{
-  display:none;
+.mobile-search-toggle-inline,
+.header-right .search-wrap{
+  display:none !important;
 }
 
 .search-wrap{
@@ -197,41 +197,59 @@ body{
 
 .raffle-nav{
   display:flex;
-  gap:6px;
-  flex-wrap:wrap;
-  justify-content:flex-start;
-  width:100%;
+  gap:10px;
+  flex-wrap:nowrap;
+  justify-content:flex-end;
+  align-items:center;
+  width:auto;
 }
 
-.raffle-nav-link,
-.raffle-nav-disabled{
+.archive-nav-link,
+.archive-nav-disabled{
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  min-height:24px;
-  padding:3px 10px;
+  min-height:42px;
+  min-width:42px;
+  padding:0 10px;
   border-radius:0;
-  font-size:.78rem;
+  font-size:1.18rem;
   font-weight:800;
   line-height:1;
   text-decoration:none;
 }
 
-.raffle-nav-link{
+.archive-nav-link{
   color:var(--text);
   background:rgba(255,255,255,.04);
   border:1px solid var(--line2);
 }
 
-.raffle-nav-link:hover{
+.archive-nav-link:hover{
   background:rgba(255,255,255,.08);
 }
 
-.raffle-nav-disabled{
+.archive-nav-disabled{
   color:rgba(244,247,255,.45);
   background:rgba(255,255,255,.02);
   border:1px solid rgba(255,255,255,.08);
   cursor:default;
+}
+
+.archive-nav-label{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:42px;
+  padding:0 16px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.03);
+  color:var(--text);
+  font-size:.88rem;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  white-space:nowrap;
 }
 
 /* Mid row */
@@ -561,18 +579,18 @@ body{
 /* Mobile */
 @media (max-width:1180px){
   .header-right{
-    width:100%;
-    margin-left:0 !important;
+    width:auto;
+    margin-left:auto !important;
     display:flex !important;
-    flex-direction:column !important;
-    justify-content:flex-start !important;
+    flex-direction:row !important;
+    justify-content:flex-end !important;
     align-items:center !important;
-    gap:10px !important;
-    flex-wrap:wrap;
+    gap:0 !important;
+    flex-wrap:nowrap;
   }
 
   .raffle-nav{
-    justify-content:center;
+    justify-content:flex-end;
   }
 }
 
@@ -654,30 +672,6 @@ body{
     min-width:0;
   }
 
-  .mobile-search-toggle-inline{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    position:absolute;
-    right:18px;
-    bottom:22px;
-    border:none;
-    background:transparent;
-    color:var(--muted);
-    font:inherit;
-    font-size:2rem;
-    line-height:1;
-    cursor:pointer;
-    padding:0;
-    margin:0;
-    opacity:.95;
-    z-index:3;
-  }
-
-  .mobile-search-toggle-inline:hover{
-    background:transparent;
-  }
-
   .stats-inline{
     display:none !important;
   }
@@ -701,27 +695,10 @@ body{
   .header-right{
     grid-area:search !important;
     width:100%;
-    display:grid !important;
-    grid-template-columns:1fr;
-    gap:10px !important;
-    align-items:stretch !important;
-    justify-items:stretch !important;
-  }
-
-  .search-wrap{
-    min-width:0;
-    width:100%;
-    height:54px;
-    padding:0 14px;
-    border-radius:10px;
-  }
-
-  .search-wrap span{
-    font-size:1rem;
-  }
-
-  .search-wrap input{
-    font-size:.98rem;
+    display:flex !important;
+    justify-content:center !important;
+    align-items:center !important;
+    gap:0 !important;
   }
 
   .raffle-nav{
@@ -729,24 +706,17 @@ body{
     gap:6px;
   }
 
-  .raffle-nav-link,
-  .raffle-nav-disabled{
-    min-height:26px;
-    padding:4px 10px;
+  .archive-nav-link,
+  .archive-nav-disabled{
+    min-height:38px;
+    min-width:38px;
+    font-size:1.08rem;
+  }
+
+  .archive-nav-label{
+    min-height:38px;
+    padding:0 12px;
     font-size:.8rem;
-  }
-
-  .header-right .search-wrap,
-  .header-right .raffle-nav{
-    display:none;
-  }
-
-  .header-right.mobile-search-open .search-wrap{
-    display:flex;
-  }
-
-  .header-right.mobile-search-open .raffle-nav{
-    display:flex;
   }
 
   .info-bar{height:36px;font-size:.92rem}
@@ -790,25 +760,6 @@ $(document).ready(function() {
     applyEntrantFilter();
   });
 
-  $(document).on('submit', '#raffle_lookup_form', function(e) {
-    var rawValue = $('#raffle_lookup').val() || '';
-    var cleanedValue = rawValue.trim().replace(/^#/, '');
-
-    if (!cleanedValue) {
-      e.preventDefault();
-      return;
-    }
-
-    $('#raffle_lookup').val(cleanedValue);
-  });
-
-  $(document).on('click', '#mobile_search_toggle_inline', function() {
-    var $headerRight = $('#header_right');
-    var isOpen = $headerRight.hasClass('mobile-search-open');
-
-    $headerRight.toggleClass('mobile-search-open', !isOpen);
-    $(this).attr('aria-expanded', !isOpen ? 'true' : 'false');
-  });
 });
 
 function escapeHtml(str) {
@@ -948,22 +899,24 @@ function updateRaffleNav() {
 
   if (prevNum && effectiveDepth !== null && effectiveDepth < MAX_HISTORY_DEPTH) {
     $nav.append(
-      '<a class="raffle-nav-link" href="' +
+      '<a class="archive-nav-link" href="' +
       raffleLookupHref(prevNum, effectiveDepth + 1) +
-      '">&lt; Prev Raffle</a>'
+      '" aria-label="Previous archive">⏪</a>'
     );
   } else {
-    $nav.append('<span class="raffle-nav-disabled">&lt; Prev Raffle</span>');
+    $nav.append('<span class="archive-nav-disabled" aria-hidden="true">⏪</span>');
   }
+
+  $nav.append('<span class="archive-nav-label">Archives</span>');
 
   if (nextNum && effectiveDepth !== null && effectiveDepth > 0) {
     $nav.append(
-      '<a class="raffle-nav-link" href="' +
+      '<a class="archive-nav-link" href="' +
       raffleLookupHref(nextNum, effectiveDepth - 1) +
-      '">Next Raffle &gt;</a>'
+      '" aria-label="Next archive">⏩</a>'
     );
   } else {
-    $nav.append('<span class="raffle-nav-disabled">Next Raffle &gt;</span>');
+    $nav.append('<span class="archive-nav-disabled" aria-hidden="true">⏩</span>');
   }
 }
 
@@ -1163,7 +1116,6 @@ function refresher() {
 } else {
   $("#raffle_subheader").text("#" + raffleNum + " Raffle • Drawing: " + result["raffle_time"]);
 }
-    $("#raffle_lookup").attr("placeholder", "Enter Raffle #");
     applyPublicStatus(result["raffle_status"], result["raffle_title"]);
     $("#raffle_notes_public_1").html(result["raffle_notes"] || "").removeClass("pending-note");
     $(".mid-row .info-panel:last .info-body").attr("id", "raffle_notes_public_2").addClass("rich-notes").html(result["raffle_notes_public_2"] || "").removeClass("pending-note");
