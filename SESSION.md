@@ -45,6 +45,7 @@ Use this file as the durable memory for active work so we do not rely on chat hi
 - Left settings panel follow-up on 2026-04-04: move the `Status` dropdown to the top of the left column.
 - Left settings panel follow-up on 2026-04-04: color the `Status` dropdown to match the header/public status palette and rename the visible `COMPLETE` option label to `CLOSED` while keeping the backend value unchanged.
 - Left settings panel follow-up on 2026-04-04: make the `Status` dropdown text bold and add inline status markers to the visible labels (`● LIVE`, `🎲 ROLLING`, `● CLOSED`).
+- Left settings panel follow-up on 2026-04-04: switch the dropdown markers to emoji so they match the dice better (`🟢 LIVE`, `🎲 ROLLING`, `🔴 CLOSED`).
 - Follow-up layout feedback on 2026-04-04: the right-side ticket table still showed a black empty strip on the right, and the scrollbar returned because range values started wrapping around row 44 and increased row height.
 - Corrected follow-up fix in `admin_index.mako`: the ticket table should not stretch to consume extra width; instead, the right column should size to the table's needed width while the center winner-card area receives the leftover space, with the range column kept on one line.
 - Additional follow-up on 2026-04-04: after deploying the width fix, the black strip was nearly gone and row wrapping was resolved, but a small internal table scrollbar still remained; next adjustment changed the ticket table to `height: "auto"` so Handsontable can grow to full content height instead of using a guessed pixel height.

@@ -1835,9 +1835,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
             <label class="settings-block-label" for="raffle_status">Status</label>
             <select id="raffle_status" class="ginfo_change_save" name="raffle_status">
-                <option value="LIVE">● LIVE</option>
+                <option value="LIVE">🟢 LIVE</option>
                 <option value="ROLLING">🎲 ROLLING</option>
-                <option value="COMPLETE">● CLOSED</option>
+                <option value="COMPLETE">🔴 CLOSED</option>
             </select>
 
             <label class="settings-block-label" for="raffle_subheader">Raffle Number</label>
