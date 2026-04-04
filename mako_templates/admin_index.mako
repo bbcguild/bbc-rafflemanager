@@ -399,6 +399,8 @@ html,body{
   max-width:none;
   margin:0;
   padding:0;
+  height:auto !important;
+  min-height:0 !important;
 }
 
 #main_table{
@@ -408,6 +410,7 @@ html,body{
   gap:12px;
   align-items:start;
   border-collapse:separate;
+  height:auto !important;
 }
 
 #main_table > tbody,
@@ -420,6 +423,7 @@ html,body{
   vertical-align:top;
   min-width:0;
   width:auto;
+  height:auto !important;
 }
 
 #column_prizeinfo{
@@ -428,13 +432,15 @@ html,body{
   min-width:0;
   width:auto;
   overflow:hidden;
+  height:auto !important;
 }
 
 #column_ticketinfo{
   display:block;
   vertical-align:top;
   min-width:0;
-  width:auto;
+  width:fit-content;
+  height:auto !important;
 }
 
 #column_ticketlist{
@@ -457,28 +463,19 @@ html,body{
   border:none;
   box-shadow:none;
   padding:0;
+  height:auto !important;
 }
 
 #right{
-  overflow:visible;
-}
-
-#right.ticket-panel-loading{
-  visibility:hidden;
-}
-
-#right.ticket-panel-ready{
-  visibility:visible;
+  min-width:500px;
+  overflow:hidden;
+  height:auto !important;
 }
 
 #ticket_info{
   width:100%;
   height:auto !important;
-  overflow:visible;
-}
-
-#ticket_info.ticket-table-ready{
-  visibility:visible;
+  overflow:hidden;
 }
 
 #ticket_info .handsontable th,
@@ -1185,8 +1182,6 @@ var get_ticket_table = function () {
 % if request.extended_tickets:
         $.getJSON(window.location.pathname + "json/get/tickets_extended", function (result) {
                 result = addTicketRanges(result, true)
-                $("#right").removeClass("ticket-panel-ready").addClass("ticket-panel-loading")
-                $("#ticket_info").removeClass("ticket-table-ready")
                 $("#ticket_info").handsontable("destroy")
                 $("#ticket_info").handsontable({
                         data: result,
@@ -1240,8 +1235,6 @@ var get_ticket_table = function () {
                         afterCreateRow: after_row_create,
                         afterChange: after_cell_change,
                         })
-                    $("#right").removeClass("ticket-panel-loading").addClass("ticket-panel-ready")
-                    $("#ticket_info").addClass("ticket-table-ready")
                     var data = $("#ticket_info").handsontable("getData")
                     var total_tickets = 0
                     var total_participants = data.length - 1
@@ -1256,8 +1249,6 @@ var get_ticket_table = function () {
 % else:
         $.getJSON(window.location.pathname + "json/get/tickets", function (result) {
                 result = addTicketRanges(result, false)
-                $("#right").removeClass("ticket-panel-ready").addClass("ticket-panel-loading")
-                $("#ticket_info").removeClass("ticket-table-ready")
                 $("#ticket_info").handsontable("destroy")
                 $("#ticket_info").handsontable({
                         data: result,
@@ -1319,8 +1310,6 @@ var get_ticket_table = function () {
                         afterCreateRow: after_row_create,
                         afterChange: after_cell_change,
                         })
-                    $("#right").removeClass("ticket-panel-loading").addClass("ticket-panel-ready")
-                    $("#ticket_info").addClass("ticket-table-ready")
                     var data = $("#ticket_info").handsontable("getData")
                     var total_tickets = 0
                     var total_participants = data.length - 1

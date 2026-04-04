@@ -43,6 +43,8 @@ Use this file as the durable memory for active work so we do not rely on chat hi
 - The ticket table also visibly slid in from the right on page load; the current fix hides `#ticket_info` until Handsontable has fully initialized, then reveals it without animation.
 - Additional follow-up on 2026-04-04: the prior fix still did not change the visible behavior. A stronger likely cause is panel-level clipping from `#right { overflow:hidden; }`, and the visible slide-in may be the whole right column reflowing as ticket content arrives rather than just the table node itself.
 - Current local fix changes `#right` to `overflow:visible` and toggles readiness on the whole right ticket panel instead of only on `#ticket_info`.
+- Additional follow-up on 2026-04-04: after deploying the panel-level fix, the final purchaser row and spare blank row became visible, but the table could extend beyond the rounded panel and the page-load slide-in effect still remained.
+- Current local fix returns the right panel to clipping its contents, overrides legacy fixed-height layout rules so the panel can grow naturally with the table, and reserves the ticket panel width up front to reduce reflow on initial load.
 
 ## Reconstructed Context
 - Recent committed work before the interruption was focused on the admin page in `mako_templates/admin_index.mako`.
@@ -76,6 +78,8 @@ Use this file as the durable memory for active work so we do not rely on chat hi
 - Confirm that hiding `#ticket_info` until initialization removes the table slide-in effect on page load.
 - Confirm that removing `#right` clipping restores the final purchaser row and spare blank row.
 - Confirm that hiding the whole right ticket panel until ready eliminates the apparent slide-in/reflow on page load.
+- Confirm that restoring normal clipping after the height overrides keeps the full table inside the right-side panel.
+- Confirm that reserving the right panel width up front removes the remaining load-time slide/reflow effect.
 
 ## Next Step
 - Review `mako_templates/admin_index.mako` in the browser and verify the updated admin layout behaves correctly on the target screen size.
