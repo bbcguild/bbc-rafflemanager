@@ -541,6 +541,10 @@ body{
   gap:10px;
   align-items:center;
 }
+.thead.has-range,
+.row.has-range{
+  grid-template-columns:.5fr 1.5fr .7fr 1.15fr;
+}
 .thead{
   padding:14px 8px 12px 8px;
   border-top:1px solid var(--line);
@@ -558,6 +562,11 @@ body{
 .idx,.total{
   text-align:right;
   font-variant-numeric:tabular-nums;
+}
+.range{
+  text-align:right;
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
 }
 .name{font-weight:750}
 .empty-state{
@@ -756,6 +765,68 @@ function escapeHtml(str) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+function shouldShowPublicTicketRanges(status) {
+  var normalizedStatus = normalizeRaffleStatus(status);
+  return normalizedStatus === "ROLLING" || normalizedStatus === "COMPLETE" || isArchiveDisplay();
+}
+
+function addTicketRanges(rows) {
+  var runningStart = 1;
+  return rows.map(function(row) {
+    if (!row) return row;
+
+    var total = Number(row[2]) || 0;
+    var rangeText = "";
+    if (total > 0) {
+      var runningEnd = runningStart + total - 1;
+      rangeText = String(runningStart) + "-" + String(runningEnd);
+      runningStart = runningEnd + 1;
+    }
+
+    var nextRow = row.slice();
+    nextRow.push(rangeText);
+    return nextRow;
+  });
+}
+
+function getEntrantsColumns() {
+  var columns = [
+    { key: "idx", label: "#", className: "idx", value: function(row) { return row[0]; } },
+    { key: "name", label: "Name", className: "name", value: function(row) { return row[1]; } },
+    { key: "total", label: "Total", className: "total", value: function(row) { return row[2]; } }
+  ];
+
+  if (shouldShowPublicTicketRanges(currentRaffleStatus)) {
+    columns.push({
+      key: "range",
+      label: "Range",
+      className: "range",
+      value: function(row) { return row[3] || ""; }
+    });
+  }
+
+  return columns;
+}
+
+function renderEntrantsHeader() {
+  var $head = $("#entrantsHead");
+  if (!$head.length) return;
+
+  var columns = getEntrantsColumns();
+  var headClass = "thead";
+  if (columns.length > 3) {
+    headClass += " has-range";
+  }
+
+  var html = '<div class="' + headClass + '">';
+  columns.forEach(function(column) {
+    html += '<div class="' + column.className + '">' + escapeHtml(column.label) + '</div>';
+  });
+  html += '</div>';
+
+  $head.replaceWith(html);
 }
 
 function normalizeEntrantSearch(value) {
@@ -1023,16 +1094,21 @@ function renderEntrantsRows(rows) {
     return;
   }
 
+  var columns = getEntrantsColumns();
+  var rowClass = "row hoverable";
+  if (columns.length > 3) {
+    rowClass += " has-range";
+  }
+
   var htmlRows = [];
   for (var i = 0; i < rows.length; i++) {
     var r = rows[i];
-    htmlRows.push(
-      '<div class="row hoverable">'
-      + '<div class="idx">' + escapeHtml(r[0]) + '</div>'
-      + '<div class="name">' + escapeHtml(r[1]) + '</div>'
-      + '<div class="total">' + escapeHtml(r[2]) + '</div>'
-      + '</div>'
-    );
+    var rowHtml = '<div class="' + rowClass + '">';
+    columns.forEach(function(column) {
+      rowHtml += '<div class="' + column.className + '">' + escapeHtml(column.value(r)) + '</div>';
+    });
+    rowHtml += '</div>';
+    htmlRows.push(rowHtml);
   }
 
   $all.append(htmlRows.join(''));
@@ -1061,7 +1137,13 @@ function applyEntrantFilter() {
 }
 
 function buildEntrantsTable(result) {
-  allEntrantsData = Array.isArray(result) ? result.slice() : [];
+  var rows = Array.isArray(result) ? result.slice() : [];
+  if (shouldShowPublicTicketRanges(currentRaffleStatus)) {
+    rows = addTicketRanges(rows);
+  }
+
+  allEntrantsData = rows;
+  renderEntrantsHeader();
 
   if (!allEntrantsData.length) {
     $("#allEntrants").html('<div class="empty-state">No entrants yet.</div>');
@@ -1216,10 +1298,10 @@ $(document).ready(function () {
       </div>
 
       <div class="entrants-body">
-        <div class="thead">
-          <div class="idx">#</div>
-          <div>Name</div>
-          <div class="total">Total</div>
+      <div class="thead" id="entrantsHead">
+        <div class="idx">#</div>
+        <div>Name</div>
+        <div class="total">Total</div>
         </div>
 
         <div class="entrants-scroll">
