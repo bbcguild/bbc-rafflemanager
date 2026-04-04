@@ -448,26 +448,38 @@ body{
   font-size:.95rem;
   padding:0 6px;
 }
-.pwinner{
-  width:100%;
-  padding:12px 18px;
-  border-radius:16px;
-  background:rgba(255,255,255,.03);
-  border:1px solid rgba(255,255,255,.05);
-  display:grid;
-  gap:6px;
-}
-.pwinner .label{
-  font-size:.8rem;
-  color:var(--muted);
-  text-transform:uppercase;
-  letter-spacing:.08em;
-  font-weight:800;
-}
-.pwinner .value{
-  font-size:1rem;
-  font-weight:700;
-}
+  .pwinner{
+    width:100%;
+    padding:12px 18px;
+    border-radius:16px;
+    background:rgba(255,255,255,.03);
+    border:1px solid rgba(255,255,255,.05);
+    display:grid;
+    grid-template-columns:minmax(110px,.9fr) minmax(0,1.45fr) minmax(132px,1fr);
+    gap:12px;
+    align-items:start;
+  }
+  .winner-cell{
+    min-width:0;
+    display:grid;
+    gap:6px;
+  }
+  .pwinner .label{
+    font-size:.8rem;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    font-weight:800;
+    white-space:nowrap;
+  }
+  .pwinner .value{
+    font-size:1rem;
+    font-weight:700;
+    min-width:0;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
 
 /* Entrants panel */
 .table-headline{
@@ -738,9 +750,14 @@ body{
   .num{min-height:98px;border-radius:14px;font-size:1.7rem}
   .ptitle{min-height:42px;padding:10px 12px;border-radius:12px;font-size:1.06rem}
   .pmeta{font-size:.88rem}
-  .pwinner{padding:10px 12px;border-radius:12px}
-  .pwinner .value{font-size:.95rem}
-}
+    .pwinner{
+      padding:10px 12px;
+      border-radius:12px;
+      grid-template-columns:minmax(92px,.9fr) minmax(0,1.3fr) minmax(116px,1fr);
+      gap:10px;
+    }
+    .pwinner .value{font-size:.95rem}
+  }
 </style>
 
 <script>
@@ -979,6 +996,11 @@ function buildPrizeCards(result) {
 
     var metaText = value["prize_text2"] || "";
     var prizeText = value["prize_text"] || "";
+    var ticketText = value["prize_winner"] || "TBD";
+    if (String(ticketText) === "0") {
+      ticketText = "TBD";
+    }
+    var prizeValueText = value["prize_value"] || "TBD";
 
     var card = ''
       + '<div class="prize">'
@@ -987,8 +1009,18 @@ function buildPrizeCards(result) {
       + '    <div class="ptitle">' + escapeHtml(prizeText) + '</div>'
       + '    <div class="pmeta"></div>'
       + '    <div class="pwinner">'
-      + '      <div class="label">Winner</div>'
-      + '      <div class="value">' + escapeHtml(winnerName) + '</div>'
+      + '      <div class="winner-cell">'
+      + '        <div class="label">Ticket #</div>'
+      + '        <div class="value">' + escapeHtml(ticketText) + '</div>'
+      + '      </div>'
+      + '      <div class="winner-cell">'
+      + '        <div class="label">Winner</div>'
+      + '        <div class="value">' + escapeHtml(winnerName) + '</div>'
+      + '      </div>'
+      + '      <div class="winner-cell">'
+      + '        <div class="label">Value</div>'
+      + '        <div class="value">' + escapeHtml(prizeValueText) + '</div>'
+      + '      </div>'
       + '    </div>'
       + '  </div>'
       + '</div>';
