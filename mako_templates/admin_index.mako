@@ -779,46 +779,39 @@ body.legacy-modal-open{
   text-overflow:ellipsis;
 }
 
-.ticket-totals-footer{
-  display:grid;
-  align-items:center;
-  gap:0;
-  margin-top:10px;
-  padding:10px 0;
-  border-top:1px solid rgba(80,120,210,.24);
+.ticket-summary-box{
+  margin-top:12px;
+  padding:12px 14px;
+  border:1px solid rgba(80,120,210,.2);
+  background:rgba(9,18,36,.72);
   color:#edf3ff;
-  font-variant-numeric:tabular-nums;
+  display:grid;
+  gap:6px;
 }
 
-.ticket-totals-footer.extended{
-  grid-template-columns:38px 150px 52px 52px 52px 112px;
+.ticket-summary-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  font-size:.95rem;
+  line-height:1.2;
 }
 
-.ticket-totals-footer.basic{
-  grid-template-columns:62px 180px 56px 112px;
-}
-
-.ticket-totals-footer .cell{
-  padding:0 4px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  font-size:.92rem;
-}
-
-.ticket-totals-footer .label-cell{
+.ticket-summary-label{
   color:#aebfe0;
-  font-weight:800;
+  font-weight:700;
 }
 
-.ticket-totals-footer .value-cell{
+.ticket-summary-value{
+  font-variant-numeric:tabular-nums;
   text-align:right;
-  font-weight:400;
+  white-space:nowrap;
 }
 
-.ticket-totals-footer .value-cell.total-value{
+.ticket-summary-value.total{
   color:#e6d77a;
-  font-weight:600;
+  font-weight:700;
 }
 
 .ticket-tools{
@@ -1932,24 +1925,13 @@ function renderTicketTotalsFooter(data, extended) {
         }
     }
 
-    var html = ''
+    var html = '<div class="ticket-summary-box">'
+    html += '  <div class="ticket-summary-row"><span class="ticket-summary-label">Total Tickets</span><span class="ticket-summary-value total">' + total.toLocaleString() + '</span></div>'
     if (extended) {
-        html += '<div class="ticket-totals-footer extended">'
-        html += '  <div class="cell"></div>'
-        html += '  <div class="cell label-cell">Totals</div>'
-        html += '  <div class="cell value-cell total-value">' + total.toLocaleString() + '</div>'
-        html += '  <div class="cell value-cell">' + paid.toLocaleString() + '</div>'
-        html += '  <div class="cell value-cell">' + bar.toLocaleString() + '</div>'
-        html += '  <div class="cell"></div>'
-        html += '</div>'
-    } else {
-        html += '<div class="ticket-totals-footer basic">'
-        html += '  <div class="cell"></div>'
-        html += '  <div class="cell label-cell">Totals</div>'
-        html += '  <div class="cell value-cell total-value">' + total.toLocaleString() + '</div>'
-        html += '  <div class="cell"></div>'
-        html += '</div>'
+        html += '  <div class="ticket-summary-row"><span class="ticket-summary-label">Paid</span><span class="ticket-summary-value">' + paid.toLocaleString() + '</span></div>'
+        html += '  <div class="ticket-summary-row"><span class="ticket-summary-label">Barter</span><span class="ticket-summary-value">' + bar.toLocaleString() + '</span></div>'
     }
+    html += '</div>'
 
     $("#ticket_totals_footer").html(html)
 }
