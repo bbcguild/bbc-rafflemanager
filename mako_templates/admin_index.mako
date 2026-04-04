@@ -117,6 +117,7 @@ html,body{
   display:flex;
   align-items:center;
   gap:12px;
+  position:relative;
 }
 .admin-flags{
   display:flex;
@@ -166,6 +167,129 @@ html,body{
 }
 .search-wrap input::placeholder{
   color:#8ea0bf;
+}
+.profile-menu{
+  position:relative;
+  flex:0 0 auto;
+}
+.profile-menu-trigger{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-height:72px;
+  padding:8px 18px 8px 14px;
+  border-radius:999px;
+  border:1px solid rgba(80,120,210,.34);
+  background:rgba(10,18,32,.9);
+  color:var(--text);
+  box-shadow:var(--shadow);
+  cursor:pointer;
+}
+.profile-menu-trigger:focus{
+  outline:none;
+  border-color:rgba(140,170,230,.45);
+}
+.profile-menu-logo{
+  width:54px;
+  height:54px;
+  border-radius:50%;
+  object-fit:cover;
+  border:1px solid rgba(255,255,255,.1);
+  flex:0 0 auto;
+}
+.profile-menu-caret{
+  font-size:1rem;
+  line-height:1;
+  color:#f4f7ff;
+}
+.profile-menu-panel{
+  position:absolute;
+  top:calc(100% + 14px);
+  right:0;
+  min-width:250px;
+  padding:18px;
+  border-radius:28px;
+  border:1px solid rgba(80,120,210,.34);
+  background:linear-gradient(180deg,rgba(10,18,32,.98),rgba(7,15,28,.98));
+  box-shadow:var(--shadow);
+  display:none;
+  z-index:60;
+}
+.profile-menu.open .profile-menu-panel{
+  display:block;
+}
+.profile-menu-list,
+.profile-submenu-list{
+  display:grid;
+  gap:14px;
+}
+.profile-menu-item,
+.profile-submenu-trigger{
+  width:100%;
+  min-height:56px;
+  padding:0 20px;
+  border:none;
+  border-radius:18px;
+  background:transparent;
+  color:var(--text);
+  font-size:1.15rem;
+  font-weight:850;
+  text-align:right;
+  text-decoration:none;
+  cursor:pointer;
+}
+.profile-menu-item:hover,
+.profile-submenu-trigger:hover,
+.profile-menu-item:focus,
+.profile-submenu-trigger:focus{
+  background:rgba(80,120,210,.15);
+  outline:none;
+}
+.profile-submenu{
+  position:relative;
+}
+.profile-submenu-trigger{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.profile-submenu-arrow{
+  font-size:.95rem;
+  line-height:1;
+}
+.profile-submenu-panel{
+  position:absolute;
+  top:0;
+  right:calc(100% + 16px);
+  min-width:250px;
+  padding:18px;
+  border-radius:28px;
+  border:1px solid rgba(80,120,210,.34);
+  background:linear-gradient(180deg,rgba(10,18,32,.98),rgba(7,15,28,.98));
+  box-shadow:var(--shadow);
+  display:none;
+}
+.profile-submenu.open .profile-submenu-panel{
+  display:block;
+}
+.profile-submenu-item{
+  width:100%;
+  min-height:56px;
+  padding:0 20px;
+  border:none;
+  border-radius:18px;
+  background:transparent;
+  color:var(--text);
+  font-size:1.15rem;
+  font-weight:850;
+  text-align:right;
+  cursor:pointer;
+}
+.profile-submenu-item:hover,
+.profile-submenu-item:focus{
+  background:rgba(80,120,210,.15);
+  outline:none;
 }
 
 /* NEW BUTTON BAR */
@@ -325,6 +449,9 @@ border:1px solid rgba(140,170,230,.12);
   }
   .header-right{
     margin-left:0;
+    width:100%;
+    justify-content:flex-end;
+    flex-wrap:wrap;
   }
   .button-bar{
     grid-template-columns:repeat(3,minmax(0,1fr));
@@ -334,6 +461,10 @@ border:1px solid rgba(140,170,230,.12);
 @media (max-width:1100px){
   .button-bar{
     grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .profile-submenu-panel{
+    right:0;
+    top:calc(100% + 12px);
   }
 }
 
@@ -1027,6 +1158,58 @@ $(document).ready(function () {
 $(window).resize(function () {
         $("#ticket_list").height($(window).height()-20)
         })
+
+document.addEventListener('DOMContentLoaded', function () {
+        var menu = document.getElementById('adminProfileMenu')
+        var trigger = document.getElementById('adminProfileMenuTrigger')
+        var submenu = document.getElementById('adminTemplateSubmenu')
+        var submenuTrigger = document.getElementById('adminTemplateSubmenuTrigger')
+
+        if (!menu || !trigger || !submenu || !submenuTrigger) {
+                return
+        }
+
+        function setMenuOpen(open) {
+                menu.classList.toggle('open', open)
+                trigger.setAttribute('aria-expanded', open ? 'true' : 'false')
+                if (!open) {
+                        submenu.classList.remove('open')
+                        submenuTrigger.setAttribute('aria-expanded', 'false')
+                }
+        }
+
+        function setSubmenuOpen(open) {
+                submenu.classList.toggle('open', open)
+                submenuTrigger.setAttribute('aria-expanded', open ? 'true' : 'false')
+        }
+
+        trigger.addEventListener('click', function (event) {
+                event.preventDefault()
+                event.stopPropagation()
+                setMenuOpen(!menu.classList.contains('open'))
+        })
+
+        submenuTrigger.addEventListener('click', function (event) {
+                event.preventDefault()
+                event.stopPropagation()
+                if (!menu.classList.contains('open')) {
+                        setMenuOpen(true)
+                }
+                setSubmenuOpen(!submenu.classList.contains('open'))
+        })
+
+        document.addEventListener('click', function (event) {
+                if (!menu.contains(event.target)) {
+                        setMenuOpen(false)
+                }
+        })
+
+        document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape') {
+                        setMenuOpen(false)
+                }
+        })
+})
 </script>
 </head>
 <body>
@@ -1065,6 +1248,34 @@ $(window).resize(function () {
       <span>🔍</span>
       <input type="text" id="raffle_lookup" name="raffle_lookup" placeholder="Enter raffle #" onkeydown="if (event.key === 'Enter') { event.preventDefault(); openRaffleLookup(); }" />
     </div>
+    <div class="profile-menu" id="adminProfileMenu">
+      <button type="button" class="profile-menu-trigger" id="adminProfileMenuTrigger" aria-expanded="false" aria-haspopup="true">
+        <img class="profile-menu-logo" src="https://www.bbcguild.com/wp-content/uploads/2020/04/cropped-cropped-BBC-LOGO-V2-2.gif" alt="Guild logo">
+        <span class="profile-menu-caret">▼</span>
+      </button>
+
+      <div class="profile-menu-panel" id="adminProfileMenuPanel">
+        <div class="profile-menu-list">
+          <div class="profile-submenu" id="adminTemplateSubmenu">
+            <button type="button" class="profile-submenu-trigger" id="adminTemplateSubmenuTrigger" aria-expanded="false">
+              <span class="profile-submenu-arrow">◀</span>
+              <span>Template</span>
+            </button>
+
+            <div class="profile-submenu-panel" id="adminTemplateSubmenuPanel">
+              <div class="profile-submenu-list">
+                <button type="button" class="profile-submenu-item">Holiday</button>
+                <button type="button" class="profile-submenu-item">Halloween</button>
+                <button type="button" class="profile-submenu-item">Birthday</button>
+                <button type="button" class="profile-submenu-item">Default</button>
+              </div>
+            </div>
+          </div>
+
+          <a class="profile-menu-item" href="/${request.matchdict.get('guild')}/auth/logout">Logout</a>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1083,9 +1294,6 @@ $(window).resize(function () {
         
         <td id="column_guildinfo">
     <div id="left" class="column">
-            <div style="margin-bottom:10px;">
-  <a href="/${request.matchdict.get('guild')}/auth/logout" style="color:#9fb0cf;text-decoration:none;font-weight:700;">Logout</a>
-</div>
             <form id="ginfo_form">
             <span id="guild_header" class="legacy-summary-hide"></span>
 
