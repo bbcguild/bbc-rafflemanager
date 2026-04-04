@@ -152,13 +152,7 @@ body{
 }
 
 .header-right{
-  margin-left:auto;
-  display:flex;
-  align-items:center;
-  justify-content:flex-end;
-  min-width:0;
-  flex:0 0 auto;
-  width:auto;
+  display:none;
 }
 
 .mobile-search-toggle-inline,
@@ -197,7 +191,7 @@ body{
 
 .raffle-nav{
   display:flex;
-  gap:10px;
+  gap:8px;
   flex-wrap:nowrap;
   justify-content:flex-end;
   align-items:center;
@@ -209,11 +203,11 @@ body{
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  min-height:42px;
-  min-width:42px;
-  padding:0 10px;
+  min-height:24px;
+  min-width:24px;
+  padding:0 4px;
   border-radius:0;
-  font-size:1.18rem;
+  font-size:.98rem;
   font-weight:800;
   line-height:1;
   text-decoration:none;
@@ -240,16 +234,25 @@ body{
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  min-height:42px;
-  padding:0 16px;
-  border:1px solid rgba(255,255,255,.08);
-  background:rgba(255,255,255,.03);
+  min-height:24px;
+  padding:0 8px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.05);
   color:var(--text);
-  font-size:.88rem;
+  font-size:.72rem;
   font-weight:800;
   letter-spacing:.08em;
   text-transform:uppercase;
   white-space:nowrap;
+}
+
+.info-bar.with-archives{
+  justify-content:space-between;
+  gap:12px;
+}
+
+.info-bar-title{
+  min-width:0;
 }
 
 /* Mid row */
@@ -579,18 +582,7 @@ body{
 /* Mobile */
 @media (max-width:1180px){
   .header-right{
-    width:auto;
-    margin-left:auto !important;
-    display:flex !important;
-    flex-direction:row !important;
-    justify-content:flex-end !important;
-    align-items:center !important;
-    gap:0 !important;
-    flex-wrap:nowrap;
-  }
-
-  .raffle-nav{
-    justify-content:flex-end;
+    display:none !important;
   }
 }
 
@@ -693,30 +685,25 @@ body{
   }
 
   .header-right{
-    grid-area:search !important;
-    width:100%;
-    display:flex !important;
-    justify-content:center !important;
-    align-items:center !important;
-    gap:0 !important;
+    display:none !important;
   }
 
   .raffle-nav{
-    justify-content:center;
+    justify-content:flex-end;
     gap:6px;
   }
 
   .archive-nav-link,
   .archive-nav-disabled{
-    min-height:38px;
-    min-width:38px;
-    font-size:1.08rem;
+    min-height:22px;
+    min-width:22px;
+    font-size:.92rem;
   }
 
   .archive-nav-label{
-    min-height:38px;
-    padding:0 12px;
-    font-size:.8rem;
+    min-height:22px;
+    padding:0 7px;
+    font-size:.68rem;
   }
 
   .info-bar{height:36px;font-size:.92rem}
@@ -880,7 +867,7 @@ function applyPublicStatus(status, title) {
 }
 
 function updateRaffleNav() {
-  var $nav = $("#raffle_nav");
+  var $nav = $("#raffle_nav_primary");
   if (!$nav.length) return;
 
   $nav.empty();
@@ -1208,7 +1195,7 @@ $(document).ready(function () {
     </div>
 
     <div class="card info-panel">
-      <div class="info-bar">More Info</div>
+      <div class="info-bar with-archives"><span class="info-bar-title">More Info</span><div class="raffle-nav" id="raffle_nav_primary"></div></div>
       <div class="info-body rich-notes pending-note"></div>
     </div>
   </section>
