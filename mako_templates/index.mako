@@ -559,13 +559,12 @@ body{
   border-top:1px solid rgba(255,255,255,.05);
 }
 .row.hoverable:hover{background:var(--hover)}
-.idx,.total{
+.idx,.total,.range{
   text-align:right;
   font-variant-numeric:tabular-nums;
+  justify-self:end;
 }
 .range{
-  text-align:right;
-  font-variant-numeric:tabular-nums;
   white-space:nowrap;
 }
 .name{font-weight:750}
