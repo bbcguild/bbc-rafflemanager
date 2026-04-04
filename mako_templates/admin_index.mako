@@ -416,19 +416,24 @@ body.legacy-modal-open{
 /* NEW BUTTON BAR */
 .button-bar{
   display:grid;
-  grid-template-columns:repeat(6,minmax(0,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
   gap:12px;
   margin-bottom:14px;
   width:100%;
 }
 .action-btn{
   height:44px;
+  min-width:0;
+  padding:0 14px;
   border-radius:18px;
   border:1px solid var(--line2);
   background:linear-gradient(180deg,#0b1a34,#09142a);
   color:#f4f7ff;
-  font-size:1rem;
+  font-size:.98rem;
   font-weight:850;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
   box-shadow:var(--shadow);
   cursor:pointer;
 }
@@ -1239,9 +1244,6 @@ div#paid_template{
     justify-content:flex-end;
     flex-wrap:wrap;
   }
-  .button-bar{
-    grid-template-columns:repeat(3,minmax(0,1fr));
-  }
   .admin-utility-band{
     grid-template-columns:1fr;
   }
@@ -1272,9 +1274,6 @@ div#paid_template{
   #column_ticketinfo{
     max-width:none;
   }
-  .button-bar{
-    grid-template-columns:repeat(2,minmax(0,1fr));
-  }
   .profile-submenu-panel{
     right:0;
     top:calc(100% + 12px);
@@ -1282,9 +1281,6 @@ div#paid_template{
 }
 
 @media (max-width:900px){
-  .button-bar{
-    grid-template-columns:1fr;
-  }
   .utility-panel{
     min-height:180px;
   }
