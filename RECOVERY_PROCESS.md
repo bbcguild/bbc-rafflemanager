@@ -23,7 +23,8 @@ Use this process whenever a session starts, pauses, or crashes.
 - known unknowns
 2. Update `DECISIONS.md` with any newly settled decisions.
 3. Commit the code plus recovery notes together.
-4. Push when appropriate.
+4. Deploy to Fly by default after completed modifications unless a blocker or user question requires pausing first.
+5. Push when appropriate.
 
 ## Crash Recovery
 1. Do not rely on memory.

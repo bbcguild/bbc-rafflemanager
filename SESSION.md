@@ -17,6 +17,9 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - The ticket panel gained a `Copy Names + Totals` workflow for easier Google Sheets pasting.
 - Public-facing prize cards and entrants tables were also modernized during the same iteration wave.
 - Domain routing work was added so the public/admin hosts behave differently on Fly.
+- On 2026-04-04 after DreamHost DNS setup, Fly verification showed all four custom hosts with issued certificates: `raffles.bbcguild.com`, `raffle.bbcguild.com`, `tickets.bbcguild.com`, and `raffle-admin.bbcguild.com`.
+- DNS lookup from this machine showed all four subdomains resolving to Fly edge addresses `66.241.125.77` and `2a09:8280:1::ec:6211:0`.
+- Login routing follow-up on 2026-04-04: `raffle-admin.bbcguild.com` was correctly redirecting to `/login`, but that bare auth route was rendering the stale `auth/mako_templates/login_simple.mako` template while `/{guild}/auth/login` used the newer root `mako_templates/login_simple.mako`. The auth-package template has now been updated to match the newer design so both entry points stay visually consistent.
 
 ## Known Facts
 - `SESSION.md` was introduced after an earlier crash because conversation state had been lost.
@@ -24,6 +27,10 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - That older "live matches local but not git HEAD" note is historical only; later commits moved the repo forward from there.
 - A visual `Prize Value` field exists in the admin/public UI direction, but it is not yet known from repo notes to be fully wired end-to-end in the backend/schema.
 - `FREE` was hidden in UI paths as a band-aid and is still a likely cleanup candidate.
+- The app routing code currently expects:
+- `raffles.bbcguild.com` as canonical public host
+- `raffle.bbcguild.com` and `tickets.bbcguild.com` as public aliases that redirect to the canonical public host
+- `raffle-admin.bbcguild.com` as the admin host
 
 ## Unknowns
 - Which layout issues were fully resolved in-browser versus only partially improved in code.
@@ -84,3 +91,7 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - Is `FREE` truly obsolete across the whole app?
 - Are there still visible admin layout issues in the right gutter or ticket panel on the target screen size?
 - Do we want to commit this recovery scaffolding immediately after setup?
+- Browser-level verification still needed:
+- confirm `raffle.bbcguild.com` redirects to `raffles.bbcguild.com`
+- confirm `tickets.bbcguild.com` redirects to `raffles.bbcguild.com`
+- confirm `raffle-admin.bbcguild.com/login` serves the admin login flow cleanly
