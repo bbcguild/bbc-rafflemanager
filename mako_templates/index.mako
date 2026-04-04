@@ -748,6 +748,7 @@ if (!Number.isFinite(currentDepth) || currentDepth < 0) {
 let allEntrantsData = [];
 let currentDisplayedRaffleNum = initialRequestedRaffleNum || null;
 let liveCurrentRaffleNum = null;
+let currentRaffleStatus = "LIVE";
 
 $(document).ready(function() {
   $.ajaxSetup({cache:false});
@@ -926,6 +927,7 @@ function escapeHtml(value) {
 
 function applyPublicStatus(status, title) {
   var normalizedStatus = normalizeRaffleStatus(status);
+  currentRaffleStatus = normalizedStatus;
   var $header = $(".raffle-live-header");
 
   $header.removeClass("status-live status-rolling status-complete");
