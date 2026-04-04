@@ -537,13 +537,13 @@ body{
 }
 .thead,.row{
   display:grid;
-  grid-template-columns:.5fr 1.8fr .8fr;
+  grid-template-columns:minmax(34px,.45fr) minmax(0,1.85fr) minmax(72px,.72fr);
   gap:10px;
   align-items:center;
 }
 .thead.has-range,
 .row.has-range{
-  grid-template-columns:.5fr 1.5fr .7fr 1.15fr;
+  grid-template-columns:minmax(34px,.45fr) minmax(0,1.55fr) minmax(72px,.72fr) minmax(122px,1.08fr);
 }
 .thead{
   padding:14px 8px 12px 8px;
@@ -568,6 +568,12 @@ body{
   white-space:nowrap;
 }
 .name{font-weight:750}
+.name{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
 .empty-state{
   padding:16px 8px;
   margin:0 8px;
