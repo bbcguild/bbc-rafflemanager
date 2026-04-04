@@ -1798,6 +1798,13 @@ document.addEventListener('DOMContentLoaded', function () {
             <form id="ginfo_form">
             <span id="guild_header" class="legacy-summary-hide"></span>
 
+            <label class="settings-block-label" for="raffle_status">Status</label>
+            <select id="raffle_status" class="ginfo_change_save" name="raffle_status">
+                <option value="LIVE">LIVE</option>
+                <option value="ROLLING">ROLLING</option>
+                <option value="COMPLETE">COMPLETE</option>
+            </select>
+
             <label class="settings-block-label" for="raffle_subheader">Raffle Number</label>
             <input type="text" id="raffle_subheader" class="ginfo_change_save" name="raffle_guild_num"/>
 
@@ -1809,13 +1816,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
             <label class="settings-block-label" for="raffle_title">Raffle Title</label>
 <input type="text" id="raffle_title" class="ginfo_change_save" name="raffle_title"/>
-
-<label class="settings-block-label" for="raffle_status">Status</label>
-<select id="raffle_status" class="ginfo_change_save" name="raffle_status">
-    <option value="LIVE">LIVE</option>
-    <option value="ROLLING">ROLLING</option>
-    <option value="COMPLETE">COMPLETE</option>
-</select>
 
             <span id="raffle_sold" class="legacy-summary-hide"></span>
             <span id="raffle_participants" class="legacy-summary-hide"></span>
