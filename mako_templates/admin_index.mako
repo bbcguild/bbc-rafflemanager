@@ -338,6 +338,9 @@ body.legacy-modal-open{
   width:100%;
   min-height:56px;
   padding:0 20px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
   border:none;
   border-radius:18px;
   background:transparent;
@@ -359,8 +362,6 @@ body.legacy-modal-open{
   position:relative;
 }
 .profile-submenu-trigger{
-  display:flex;
-  align-items:center;
   justify-content:space-between;
   gap:12px;
 }
@@ -371,7 +372,7 @@ body.legacy-modal-open{
 .profile-submenu-panel{
   position:absolute;
   top:0;
-  right:calc(100% + 16px);
+  right:calc(100% - 6px);
   min-width:250px;
   padding:18px;
   border-radius:28px;
@@ -379,6 +380,14 @@ body.legacy-modal-open{
   background:linear-gradient(180deg,rgba(10,18,32,.98),rgba(7,15,28,.98));
   box-shadow:var(--shadow);
   display:none;
+}
+.profile-submenu-panel::before{
+  content:"";
+  position:absolute;
+  top:0;
+  right:-16px;
+  width:16px;
+  height:100%;
 }
 .profile-submenu.open .profile-submenu-panel{
   display:block;
