@@ -509,6 +509,36 @@ body{
 #ticket_info .handsontable th,
 #ticket_info .handsontable td{
   white-space:nowrap;
+  border-color:rgba(80,120,210,.16) !important;
+}
+
+#ticket_info .handsontable th,
+#ticket_info .handsontable .ht_clone_top th,
+#ticket_info .handsontable .ht_clone_left th,
+#ticket_info .handsontable .ht_clone_top_left_corner th,
+#ticket_info .handsontable td:first-of-type{
+  background:#182233 !important;
+  color:#aebfe0 !important;
+}
+
+#ticket_info .handsontable td{
+  background:#0d1524 !important;
+  color:#edf3ff !important;
+}
+
+#ticket_info .handsontable .htDimmed,
+#ticket_info .handsontable .colHeader{
+  color:#aebfe0 !important;
+}
+
+#ticket_info .handsontable td:first-of-type{
+  font-weight:700;
+}
+
+#ticket_info .handsontable .currentRow,
+#ticket_info .handsontable .currentCol,
+#ticket_info .handsontable .area{
+  background:inherit !important;
 }
 
 #ticket_info .wtHolder,
