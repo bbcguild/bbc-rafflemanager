@@ -40,8 +40,21 @@ html,body{
   margin:0;
   padding:0;
   background:radial-gradient(circle at top left, rgba(40,76,166,.18), transparent 24%),linear-gradient(180deg,#05070d 0%,#060a12 100%);
+  background-color:#060a12;
   color:var(--text);
   font-family:Inter,system-ui,Arial,sans-serif;
+  height:auto !important;
+  min-height:100%;
+}
+
+html{
+  overflow-y:scroll;
+}
+
+body{
+  position:static !important;
+  min-height:100vh;
+  overflow-x:hidden;
 }
 
 .page-shell{
@@ -439,7 +452,8 @@ html,body{
   display:block;
   vertical-align:top;
   min-width:0;
-  width:fit-content;
+  width:520px;
+  max-width:520px;
   height:auto !important;
 }
 
@@ -467,7 +481,8 @@ html,body{
 }
 
 #right{
-  min-width:500px;
+  width:100%;
+  min-width:0;
   overflow:hidden;
   height:auto !important;
 }
@@ -504,6 +519,7 @@ html,body{
   display:flex;
   justify-content:flex-end;
   margin-bottom:10px;
+  width:100%;
 }
 
 .ticket-copy-btn{

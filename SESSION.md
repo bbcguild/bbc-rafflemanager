@@ -45,6 +45,9 @@ Use this file as the durable memory for active work so we do not rely on chat hi
 - Current local fix changes `#right` to `overflow:visible` and toggles readiness on the whole right ticket panel instead of only on `#ticket_info`.
 - Additional follow-up on 2026-04-04: after deploying the panel-level fix, the final purchaser row and spare blank row became visible, but the table could extend beyond the rounded panel and the page-load slide-in effect still remained.
 - Current local fix returns the right panel to clipping its contents, overrides legacy fixed-height layout rules so the panel can grow naturally with the table, and reserves the ticket panel width up front to reduce reflow on initial load.
+- Additional follow-up on 2026-04-04: the latest deploy fixed the table containment and removed the main table animation, but the `Copy Names + Totals` button still animated to the right on load.
+- Longstanding scroll artifact note: users see white ghost boxes flicker at the top/bottom during scroll; after the recent layout changes, that artifact became much larger and more obvious.
+- Current local fix overrides legacy `body` absolute/100%-height rules from `static/css/main.css`, pins the page background color at the document level, and sets a stable fixed width for the ticket panel so the copy button does not shift during load.
 
 ## Reconstructed Context
 - Recent committed work before the interruption was focused on the admin page in `mako_templates/admin_index.mako`.
@@ -80,6 +83,8 @@ Use this file as the durable memory for active work so we do not rely on chat hi
 - Confirm that hiding the whole right ticket panel until ready eliminates the apparent slide-in/reflow on page load.
 - Confirm that restoring normal clipping after the height overrides keeps the full table inside the right-side panel.
 - Confirm that reserving the right panel width up front removes the remaining load-time slide/reflow effect.
+- Confirm that the fixed-width ticket panel stops the copy button from animating off to the right.
+- Confirm that overriding the legacy `body` sizing removes the white flicker/strobe effect during scroll.
 
 ## Next Step
 - Review `mako_templates/admin_index.mako` in the browser and verify the updated admin layout behaves correctly on the target screen size.
