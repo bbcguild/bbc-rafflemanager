@@ -1600,6 +1600,61 @@ function normalizeFieldValue(value) {
     return $.trim(String(value))
 }
 
+function padWeekNumber(value) {
+    return String(value).padStart(2, "0")
+}
+
+function getIsoWeekParts(date) {
+    var workingDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()))
+    var day = workingDate.getUTCDay() || 7
+    workingDate.setUTCDate(workingDate.getUTCDate() + 4 - day)
+    var yearStart = new Date(Date.UTC(workingDate.getUTCFullYear(), 0, 1))
+    var week = Math.ceil((((workingDate - yearStart) / 86400000) + 1) / 7)
+
+    return {
+        year: workingDate.getUTCFullYear(),
+        week: week
+    }
+}
+
+function getSuggestedRaffleNumber() {
+    var currentNumber = normalizeFieldValue(CURRENT_RAFFLE_INFO.raffle_subheader)
+    if (/^\d{4}$/.test(currentNumber)) {
+        var yearPart = parseInt(currentNumber.slice(0, 2), 10)
+        var weekPart = parseInt(currentNumber.slice(2), 10)
+
+        if (weekPart >= 52) {
+            return String(yearPart + 1).padStart(2, "0") + "01"
+        }
+
+        return String(yearPart).padStart(2, "0") + padWeekNumber(weekPart + 1)
+    }
+
+    var weekParts = getIsoWeekParts(new Date())
+    var fallbackYearPart = String(weekParts.year).slice(-2)
+    return fallbackYearPart + padWeekNumber(weekParts.week)
+}
+
+function promptForNewRaffleNumber() {
+    var suggestedNumber = getSuggestedRaffleNumber()
+    var enteredNumber = window.prompt(
+        "Open a new raffle.\nSuggested raffle number (editable):",
+        suggestedNumber
+    )
+
+    if (enteredNumber === null) {
+        return null
+    }
+
+    enteredNumber = normalizeFieldValue(enteredNumber)
+    if (enteredNumber === "") {
+        alert("Please enter a raffle number before opening the new raffle.")
+        return null
+    }
+
+    return enteredNumber
+}
+
 function confirmDangerousFieldChange(fieldId, oldValue, newValue) {
     if (oldValue === newValue) {
         return true
@@ -2093,10 +2148,13 @@ $(document).ready(function () {
                 get_ticket_list()
             })
             $("#new_raffle_button").click(function () {
-                    var r = confirm("This will close the current raffle, open a new raffle, carry forward the drawing time and ticket cost, and auto-increment the raffle number. Are you sure?")
+                    var newRaffleNumber = promptForNewRaffleNumber()
+                    if (newRaffleNumber === null) { return }
+
+                    var r = confirm("This will close the current raffle, open raffle #" + newRaffleNumber + ", carry forward the drawing time and ticket cost, clear the raffle title, and set status to LIVE. Continue?")
                     if (r == false) { return }
 
-                    $.getJSON("json/set/open_raffle", function (result) {
+                    $.getJSON("json/set/open_raffle", { raffle_guild_num: newRaffleNumber }, function (result) {
                             refresher()
                         })
                     })

@@ -267,10 +267,24 @@ def close_current_raffle (request):
 @view_config(route_name="open_new_raffle", renderer="json", permission="akaviri")
 def open_new_raffle (request):
     cur_id = db.get_cur_raffle_id()
+    current_info = db.get_cur_raffle_info() or {}
+    requested_number = (request.params.get("raffle_guild_num") or "").strip()
+
+    new_raffle_info = {
+        "raffle_guild_num": requested_number or 0,
+        "raffle_time": current_info.get("raffle_time", "Fill this in!"),
+        "raffle_ticket_cost": current_info.get("raffle_ticket_cost", "1000g"),
+        "raffle_closed": 0,
+        "raffle_notes": "",
+        "raffle_title": "",
+        "raffle_status": "LIVE",
+        "raffle_notes_admin": "",
+        "raffle_notes_public_2": ""
+    }
 
     db.close_raffle_by_id(cur_id)
     
-    if db.create_new_raffle():
+    if db.create_new_raffle(new_raffle_info):
         return True
 
     return False
