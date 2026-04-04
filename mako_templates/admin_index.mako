@@ -35,7 +35,6 @@
   --blue2:#183a8f;
   --shadow:0 18px 48px rgba(0,0,0,.38);
   --page-gutter:18px;
-  --scrollbar-comp:18px;
 }
 
 *,
@@ -63,7 +62,7 @@ body{
   position:static !important;
   min-height:100vh;
   overflow-x:hidden;
-  padding:0 calc(var(--page-gutter) + var(--scrollbar-comp)) 0 var(--page-gutter);
+  padding:0 var(--page-gutter);
 }
 body.legacy-modal-open{
   overflow:hidden;
@@ -644,7 +643,7 @@ body.legacy-modal-open{
 #main_table{
   width:100%;
   display:grid;
-  grid-template-columns:260px minmax(0,1fr) fit-content(520px);
+  grid-template-columns:240px minmax(0,1fr) minmax(430px, 480px);
   gap:12px;
   align-items:start;
   border-collapse:separate;
@@ -677,8 +676,8 @@ body.legacy-modal-open{
   display:block;
   vertical-align:top;
   min-width:0;
-  width:520px;
-  max-width:520px;
+  width:100%;
+  max-width:480px;
   height:auto !important;
 }
 
@@ -1253,6 +1252,9 @@ div#paid_template{
 }
 
 @media (max-width:1450px){
+  #main_table{
+    grid-template-columns:220px minmax(0,1fr) minmax(400px, 440px);
+  }
   .admin-header{
     flex-wrap:wrap;
   }
@@ -1264,6 +1266,12 @@ div#paid_template{
 }
 
 @media (max-width:1100px){
+  #main_table{
+    grid-template-columns:1fr;
+  }
+  #column_ticketinfo{
+    max-width:none;
+  }
   .button-bar{
     grid-template-columns:repeat(2,minmax(0,1fr));
   }
@@ -2046,7 +2054,7 @@ var get_ticket_table = function () {
                         height: "auto",
                         rowHeaders: false,
                         colHeaders: ["#", "Name", "Total", "Paid", "Bar", "Range"],
-                        colWidths: [38, 150, 52, 52, 52, 112],
+                        colWidths: [36, 138, 50, 50, 50, 104],
                         contextMenu: false,
                         enterMoves: {row: 0, col: 1},
                         columnSorting: true,
@@ -2118,7 +2126,7 @@ var get_ticket_table = function () {
                         height: "auto",
                         rowHeaders: false,
                         colHeaders: ["#", "Name", "Total", "Range"],
-                        colWidths: [62, 180, 56, 112],
+                        colWidths: [54, 156, 54, 104],
                         contextMenu: false,
                         enterMoves: {row: 0, col: 1},
                         columnSorting: true,
