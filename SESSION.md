@@ -20,6 +20,7 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - On 2026-04-04 after DreamHost DNS setup, Fly verification showed all four custom hosts with issued certificates: `raffles.bbcguild.com`, `raffle.bbcguild.com`, `tickets.bbcguild.com`, and `raffle-admin.bbcguild.com`.
 - DNS lookup from this machine showed all four subdomains resolving to Fly edge addresses `66.241.125.77` and `2a09:8280:1::ec:6211:0`.
 - Login routing follow-up on 2026-04-04: `raffle-admin.bbcguild.com` was correctly redirecting to `/login`, but that bare auth route was rendering the stale `auth/mako_templates/login_simple.mako` template while `/{guild}/auth/login` used the newer root `mako_templates/login_simple.mako`. The auth-package template has now been updated to match the newer design so both entry points stay visually consistent.
+- Login routing follow-up on 2026-04-04: the template-unification fix was committed as `f240a93` (`auth: unify admin login template`) and deployed to Fly.
 
 ## Known Facts
 - `SESSION.md` was introduced after an earlier crash because conversation state had been lost.
@@ -94,4 +95,4 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - Browser-level verification still needed:
 - confirm `raffle.bbcguild.com` redirects to `raffles.bbcguild.com`
 - confirm `tickets.bbcguild.com` redirects to `raffles.bbcguild.com`
-- confirm `raffle-admin.bbcguild.com/login` serves the admin login flow cleanly
+- confirm `raffle-admin.bbcguild.com/login` now shows the new-style login page cleanly
