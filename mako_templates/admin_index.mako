@@ -2147,7 +2147,8 @@ $(document).ready(function () {
                 get_ticket_table()
                 get_ticket_list()
             })
-            $("#new_raffle_button").click(function () {
+            $("#new_raffle_button").click(function (event) {
+                    event.preventDefault()
                     var newRaffleNumber = promptForNewRaffleNumber()
                     if (newRaffleNumber === null) { return }
 
@@ -2546,7 +2547,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <br />
             </form>
 
-            <input type="submit" value="Open new raffle" id="new_raffle_button" class="hidden-original-action" />
+            <input type="button" value="Open new raffle" id="new_raffle_button" class="hidden-original-action" />
             <input type="submit" value="Manually refresh" id="manual_refresh" class="hidden-original-action" />
             <input type="submit" value="Re-Show Import Pane" id="reshow_import" class="hidden-original-action" />
             <input type="submit" value="Re-Show Confirmations Pane" id="reshow_confirm" class="hidden-original-action" />
