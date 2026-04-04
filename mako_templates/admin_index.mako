@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>   
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.js"></script>
@@ -84,26 +84,49 @@ body.legacy-modal-open{
   width:100%;
 }
 
+.admin-topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:10px;
+}
+.admin-topbar-updated{
+  color:#e6d77a;
+  font-size:clamp(.96rem,1vw,1.08rem);
+  font-weight:700;
+  letter-spacing:.01em;
+  min-width:0;
+}
+.admin-topbar-controls{
+  display:flex;
+  align-items:flex-start;
+  justify-content:flex-end;
+  gap:12px;
+  margin-left:auto;
+}
+
 /* NEW HEADER */
 .admin-header{
   display:grid;
-  grid-template-columns:minmax(0,1.4fr) auto;
+  grid-template-columns:minmax(0,1fr) auto;
   align-items:start;
   gap:18px 24px;
-  padding:18px 22px;
+  padding:24px 26px;
   margin-bottom:14px;
   min-width:0;
+  min-height:230px;
 }
 .header-left{
   display:grid;
-  grid-template-columns:84px minmax(0,1fr);
+  grid-template-columns:88px minmax(0,1fr);
   align-items:start;
   gap:18px;
   min-width:0;
 }
 .admin-header img#mainLogo{
-  width:84px;
-  height:84px;
+  width:88px;
+  height:88px;
   object-fit:contain;
   flex:0 0 auto;
 }
@@ -115,20 +138,18 @@ body.legacy-modal-open{
 }
 .title-block h1{
   margin:0;
-  font-size:clamp(2rem,2.8vw,3.35rem);
+  font-size:clamp(1.9rem,2.45vw,3rem);
   line-height:1;
   font-weight:700;
   letter-spacing:-.03em;
 }
 .title-block .sub{
   color:#b8c7e4;
-  font-size:clamp(1rem,1.3vw,1.15rem);
+  font-size:clamp(1rem,1.15vw,1.1rem);
   font-weight:600;
 }
 .title-block .updated{
-  color:#e6d77a;
-  font-size:clamp(.96rem,1.05vw,1.1rem);
-  font-weight:600;
+  display:none;
 }
 .stats-inline{
   display:flex;
@@ -159,19 +180,13 @@ body.legacy-modal-open{
 }
 .header-right{
   display:flex;
-  flex-direction:column;
-  align-items:flex-end;
-  justify-content:space-between;
-  gap:16px;
+  align-items:flex-start;
+  justify-content:flex-start;
   position:relative;
   min-width:0;
 }
-.header-tools{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  flex-wrap:wrap;
-  justify-content:flex-end;
+.header-right .stats-inline{
+  justify-content:flex-start;
 }
 .admin-flags{
   display:flex;
@@ -296,89 +311,135 @@ body.legacy-modal-open{
   flex:0 0 auto;
 }
 .profile-menu-trigger{
+  --profile-trigger-bg:linear-gradient(180deg,rgba(17,28,48,.98),rgba(8,17,31,.98));
+  --profile-trigger-border:rgba(95,132,212,.34);
   display:flex;
   align-items:center;
-  gap:10px;
-  min-height:50px;
-  padding:5px 14px 5px 10px;
-  border-radius:999px;
-  border:1px solid rgba(80,120,210,.34);
-  background:rgba(10,18,32,.9);
+  gap:0;
+  min-height:56px;
+  padding:0;
+  border-radius:18px;
+  border:1px solid var(--profile-trigger-border);
+  background:var(--profile-trigger-bg);
   color:var(--text);
   box-shadow:var(--shadow);
   cursor:pointer;
+  overflow:hidden;
 }
 .profile-menu-trigger:focus{
   outline:none;
-  border-color:rgba(140,170,230,.45);
+  border-color:rgba(140,170,230,.5);
+}
+.profile-trigger-logo-shell{
+  min-width:64px;
+  min-height:56px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:8px 10px;
+  background:linear-gradient(180deg,rgba(26,41,71,.95),rgba(14,24,42,.95));
+  border-right:1px solid rgba(95,132,212,.26);
 }
 .profile-menu-logo{
-  width:36px;
-  height:36px;
-  border-radius:50%;
+  width:38px;
+  height:38px;
+  border-radius:12px;
   object-fit:cover;
-  border:1px solid rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.14);
   flex:0 0 auto;
 }
+.profile-trigger-label{
+  min-height:56px;
+  display:flex;
+  align-items:center;
+  padding:0 14px 0 16px;
+  color:#dce8ff;
+  font-size:.86rem;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
 .profile-menu-caret{
-  font-size:.85rem;
+  min-width:40px;
+  min-height:56px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-left:1px solid rgba(95,132,212,.22);
+  background:linear-gradient(180deg,rgba(20,34,58,.94),rgba(9,17,31,.94));
+  font-size:.9rem;
   line-height:1;
   color:#f4f7ff;
 }
 .profile-menu-panel{
   position:absolute;
-  top:calc(100% + 14px);
+  top:calc(100% - 2px);
   right:0;
-  min-width:290px;
-  padding:18px;
-  border-radius:28px;
-  border:1px solid rgba(80,120,210,.34);
-  background:linear-gradient(180deg,rgba(10,18,32,.98),rgba(7,15,28,.98));
+  width:340px;
+  padding:0;
+  border-radius:0 0 18px 18px;
+  border:1px solid rgba(95,132,212,.34);
+  border-top:none;
+  background:linear-gradient(180deg,rgba(20,31,54,.99),rgba(9,17,31,.99));
   box-shadow:var(--shadow);
   display:none;
   z-index:60;
+  overflow:hidden;
 }
 .profile-menu.open .profile-menu-panel{
   display:block;
 }
 .profile-menu-lookup{
-  margin-bottom:14px;
+  padding:16px 16px 14px;
+  background:linear-gradient(180deg,rgba(29,44,73,.95),rgba(18,28,47,.95));
+  border-bottom:1px solid rgba(95,132,212,.2);
 }
 .profile-menu-list,
 .profile-submenu-list{
   display:grid;
-  gap:14px;
+  gap:0;
 }
 .profile-menu-item,
 .profile-submenu-trigger{
   width:100%;
-  min-height:56px;
-  padding:0 20px;
+  min-height:52px;
+  padding:0 16px;
   display:flex;
   align-items:center;
-  justify-content:flex-end;
+  justify-content:space-between;
   border:none;
-  border-radius:18px;
+  border-radius:0;
   background:transparent;
   color:var(--text);
-  font-size:1.15rem;
-  font-weight:850;
-  text-align:right;
+  font-size:1rem;
+  font-weight:800;
+  text-align:left;
   text-decoration:none;
   cursor:pointer;
+  border-top:1px solid rgba(95,132,212,.12);
 }
 .profile-menu-item:hover,
 .profile-submenu-trigger:hover,
 .profile-menu-item:focus,
 .profile-submenu-trigger:focus{
-  background:rgba(80,120,210,.15);
+  background:rgba(80,120,210,.11);
   outline:none;
+}
+.profile-menu-icon{
+  width:18px;
+  text-align:center;
+  color:#b8c7e4;
+  flex:0 0 18px;
+}
+.profile-menu-text{
+  flex:1 1 auto;
+  padding-left:12px;
 }
 .profile-submenu{
   position:relative;
 }
 .profile-submenu-trigger{
-  justify-content:space-between;
   gap:12px;
 }
 .profile-submenu-arrow{
@@ -387,22 +448,23 @@ body.legacy-modal-open{
 }
 .profile-submenu-panel{
   position:absolute;
-  top:0;
-  right:calc(100% - 6px);
-  min-width:250px;
-  padding:18px;
-  border-radius:28px;
-  border:1px solid rgba(80,120,210,.34);
-  background:linear-gradient(180deg,rgba(10,18,32,.98),rgba(7,15,28,.98));
+  top:-1px;
+  right:100%;
+  width:260px;
+  padding:0;
+  border-radius:18px 0 18px 18px;
+  border:1px solid rgba(95,132,212,.34);
+  background:linear-gradient(180deg,rgba(18,29,50,.99),rgba(9,17,31,.99));
   box-shadow:var(--shadow);
   display:none;
+  overflow:hidden;
 }
 .profile-submenu-panel::before{
   content:"";
   position:absolute;
   top:0;
-  right:-16px;
-  width:16px;
+  right:-12px;
+  width:12px;
   height:100%;
 }
 .profile-submenu.open .profile-submenu-panel{
@@ -413,20 +475,21 @@ body.legacy-modal-open{
 }
 .profile-submenu-item{
   width:100%;
-  min-height:56px;
-  padding:0 20px;
+  min-height:48px;
+  padding:0 16px;
   border:none;
-  border-radius:18px;
+  border-radius:0;
   background:transparent;
   color:var(--text);
-  font-size:1.15rem;
-  font-weight:850;
-  text-align:right;
+  font-size:.96rem;
+  font-weight:800;
+  text-align:left;
   cursor:pointer;
+  border-top:1px solid rgba(95,132,212,.12);
 }
 .profile-submenu-item:hover,
 .profile-submenu-item:focus{
-  background:rgba(80,120,210,.15);
+  background:rgba(80,120,210,.11);
   outline:none;
 }
 
@@ -1265,16 +1328,6 @@ div#paid_template{
 }
 
 @media (max-width:1200px){
-  .admin-header{
-    grid-template-columns:1fr;
-  }
-  .header-left{
-    grid-template-columns:72px minmax(0,1fr);
-  }
-  .header-right{
-    width:100%;
-    align-items:flex-start;
-  }
   .admin-utility-band{
     grid-template-columns:1fr;
   }
@@ -1303,6 +1356,13 @@ div#paid_template{
 }
 
 @media (max-width:900px){
+  .admin-topbar{
+    flex-wrap:wrap;
+  }
+  .admin-header{
+    grid-template-columns:1fr;
+    min-height:0;
+  }
   .header-left{
     grid-template-columns:1fr;
   }
@@ -1310,7 +1370,7 @@ div#paid_template{
     width:72px;
     height:72px;
   }
-  .header-tools{
+  .header-right{
     width:100%;
   }
   .stats-inline{
@@ -2532,41 +2592,31 @@ document.addEventListener('DOMContentLoaded', function () {
 <body>
 <div class="page-shell">
 
-<section class="card admin-header">
-  <div class="header-left">
-  <img id="mainLogo" src="https://www.bbcguild.com/wp-content/uploads/2020/04/cropped-cropped-BBC-LOGO-V2-2.gif" alt="BBC logo">
-
-  <div class="title-block">
-    <h1 id="display_guild_header">Guild</h1>
-    <div class="sub"><strong id="display_raffle_subheader">Raffle</strong> • <span id="display_raffle_time">Drawing</span></div>
-    <div class="updated" id="display_raffle_updated">Last Updated</div>
-  </div>
-
-  </div>
-
-  <div class="header-right">
-    <div class="stats-inline">
-      <div class="stat"><div class="k">Total Tickets</div><div class="v" id="display_raffle_sold">0</div></div>
-      <div class="stat"><div class="k">Participants</div><div class="v" id="display_raffle_participants">0</div></div>
-    </div>
-
-    <div class="header-tools">
-    <div class="search-wrap">
-      <span>🔍</span>
-      <input type="text" id="raffle_lookup" name="raffle_lookup" placeholder="Raffle Lookup" onkeydown="if (event.key === 'Enter') { event.preventDefault(); openRaffleLookup(); }" />
-    </div>
+<div class="admin-topbar">
+  <div class="admin-topbar-updated" id="display_raffle_updated">Last Updated</div>
+  <div class="admin-topbar-controls">
     <div class="profile-menu" id="adminProfileMenu">
       <button type="button" class="profile-menu-trigger" id="adminProfileMenuTrigger" aria-expanded="false" aria-haspopup="true">
-        <img class="profile-menu-logo" src="https://www.bbcguild.com/wp-content/uploads/2020/04/cropped-cropped-BBC-LOGO-V2-2.gif" alt="Guild logo">
-        <span class="profile-menu-caret">▼</span>
+        <span class="profile-trigger-logo-shell">
+          <img class="profile-menu-logo" src="https://www.bbcguild.com/wp-content/uploads/2020/04/cropped-cropped-BBC-LOGO-V2-2.gif" alt="Guild logo">
+        </span>
+        <span class="profile-trigger-label">Control Panel</span>
+        <span class="profile-menu-caret">v</span>
       </button>
 
       <div class="profile-menu-panel" id="adminProfileMenuPanel">
+        <div class="profile-menu-lookup">
+          <div class="search-wrap">
+            <span>Search</span>
+            <input type="text" id="raffle_lookup" name="raffle_lookup" placeholder="Raffle Lookup" onkeydown="if (event.key === 'Enter') { event.preventDefault(); openRaffleLookup(); }" />
+          </div>
+        </div>
         <div class="profile-menu-list">
           <div class="profile-submenu" id="adminTemplateSubmenu">
             <button type="button" class="profile-submenu-trigger" id="adminTemplateSubmenuTrigger" aria-expanded="false">
-              <span class="profile-submenu-arrow">◀</span>
-              <span>Template</span>
+              <span class="profile-menu-icon">T</span>
+              <span class="profile-menu-text">Theme</span>
+              <span class="profile-submenu-arrow">&lt;</span>
             </button>
 
             <div class="profile-submenu-panel" id="adminTemplateSubmenuPanel">
@@ -2579,10 +2629,30 @@ document.addEventListener('DOMContentLoaded', function () {
             </div>
           </div>
 
-          <a class="profile-menu-item" href="/${request.matchdict.get('guild')}/auth/logout">Logout</a>
+          <a class="profile-menu-item" href="/${request.matchdict.get('guild')}/auth/logout">
+            <span class="profile-menu-icon">X</span>
+            <span class="profile-menu-text">Logout</span>
+          </a>
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<section class="card admin-header">
+  <div class="header-left">
+    <img id="mainLogo" src="https://www.bbcguild.com/wp-content/uploads/2020/04/cropped-cropped-BBC-LOGO-V2-2.gif" alt="BBC logo">
+
+    <div class="title-block">
+      <h1 id="display_guild_header">Guild</h1>
+      <div class="sub"><strong id="display_raffle_subheader">Raffle</strong> • <span id="display_raffle_time">Drawing</span></div>
+    </div>
+  </div>
+
+  <div class="header-right">
+    <div class="stats-inline">
+      <div class="stat"><div class="k">Total Tickets</div><div class="v" id="display_raffle_sold">0</div></div>
+      <div class="stat"><div class="k">Participants</div><div class="v" id="display_raffle_participants">0</div></div>
     </div>
   </div>
 </section>
@@ -2617,7 +2687,7 @@ document.addEventListener('DOMContentLoaded', function () {
         <button type="button" class="note-tool" data-cmd="bold" title="Bold">B</button>
         <button type="button" class="note-tool" data-cmd="italic" title="Italic">I</button>
         <button type="button" class="note-tool" data-cmd="underline" title="Underline">U</button>
-        <button type="button" class="note-tool" data-cmd="insertUnorderedList" title="Bulleted list">• List</button>
+        <button type="button" class="note-tool" data-cmd="insertUnorderedList" title="Bulleted list">â€¢ List</button>
         <button type="button" class="note-tool" data-cmd="insertOrderedList" title="Numbered list">1. List</button>
         <button type="button" class="note-tool note-link" data-cmd="createLink" title="Insert link">Link</button>
         <input type="color" id="notesTextColor" class="note-color" value="#f4f7ff" title="Text color" />
@@ -2655,9 +2725,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
             <label class="settings-block-label" for="raffle_status">Status</label>
             <select id="raffle_status" class="ginfo_change_save" name="raffle_status">
-                <option value="LIVE">🟢 LIVE</option>
-                <option value="ROLLING">🎲 ROLLING</option>
-                <option value="COMPLETE">🔴 CLOSED</option>
+                <option value="LIVE">ðŸŸ¢ LIVE</option>
+                <option value="ROLLING">ðŸŽ² ROLLING</option>
+                <option value="COMPLETE">ðŸ”´ CLOSED</option>
             </select>
 
             <label class="settings-block-label" for="raffle_subheader">Raffle Number</label>
@@ -2763,9 +2833,9 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
     </div>
     <div class="prize-actions">
-        <a href="#" id="prize_finalise" class="prize_finalise prize-action" title="Finalize winner">🔒</a>
-        <a href="#" id="prize_roll" class="prize_roll prize-action" title="Roll winner">🎲</a>
-        <a href="#" id="prize_delete" class="prize_delete prize-action" title="Delete prize">🗑️</a>
+        <a href="#" id="prize_finalise" class="prize_finalise prize-action" title="Finalize winner">ðŸ”’</a>
+        <a href="#" id="prize_roll" class="prize_roll prize-action" title="Roll winner">ðŸŽ²</a>
+        <a href="#" id="prize_delete" class="prize_delete prize-action" title="Delete prize">ðŸ—‘ï¸</a>
     </div>
 </div>
 <input type="hidden" name="prize_id" value="" class="prize_id" />
@@ -2829,3 +2899,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 </body>
 </html>
+
+
+
