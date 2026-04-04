@@ -169,26 +169,30 @@ body{
 .search-wrap{
   display:flex;
   align-items:center;
-  border:1px solid var(--line2);
+  border:1px solid rgba(140,170,230,.12);
   border-radius:999px;
-  background:#f3f4f6;
+  background:#0f1622;
   padding:6px 12px;
   height:34px;
   min-width:0;
   width:100%;
 }
 .search-wrap span{
-  color:#6b7280;
+  color:#8ea0bf;
   margin-right:6px;
 }
 .search-wrap input{
   border:none;
   outline:none;
   background:transparent;
-  color:#000;
-  font-weight:700;
+  color:#d6deeb;
+  font-weight:600;
   width:100%;
   min-width:0;
+}
+.search-wrap input::placeholder{
+  color:#8ea0bf;
+  font-weight:500;
 }
 
 .raffle-nav{
@@ -501,11 +505,14 @@ body{
   width:100%;
   padding:10px 12px;
   border-radius:10px;
-  border:none;
+  border:1px solid rgba(140,170,230,.12);
   outline:none;
-  background:#fff;
-  color:#000;
+  background:#0f1622;
+  color:#d6deeb;
   font:inherit;
+}
+.lookup-input::placeholder{
+  color:#8ea0bf;
 }
 .thead,.row{
   display:grid;
@@ -975,8 +982,47 @@ function updateRaffleStatusLine(timestampValue) {
     return;
   }
 
-  var updated = DateFormat.format.date(parseInt(timestampValue) * 1000, "yyyy-MM-dd hh:mm:ss");
-  $updated.text("Last Updated " + updated.toString());
+  var timestamp = parseInt(timestampValue, 10);
+  if (isNaN(timestamp)) {
+    $updated.text("Last Updated");
+    return;
+  }
+
+  var updated = new Date(timestamp * 1000);
+  var parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York",
+    month: "2-digit",
+    day: "2-digit",
+    year: "2-digit",
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+    timeZoneName: "short"
+  }).formatToParts(updated);
+
+  var formatted = {
+    month: "",
+    day: "",
+    year: "",
+    hour: "",
+    minute: "",
+    second: "",
+    dayPeriod: "",
+    timeZoneName: ""
+  };
+
+  parts.forEach(function(part) {
+    if (formatted.hasOwnProperty(part.type)) {
+      formatted[part.type] = part.value;
+    }
+  });
+
+  var rendered = formatted.month + "-" + formatted.day + "-" + formatted.year
+    + " " + formatted.hour + ":" + formatted.minute + ":" + formatted.second
+    + " " + formatted.dayPeriod + " " + formatted.timeZoneName;
+
+  $updated.text("Last Updated " + rendered);
 }
 
 function buildPrizeCards(result) {
