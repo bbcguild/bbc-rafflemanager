@@ -55,7 +55,6 @@ html,body{
 
 html{
   overflow-y:scroll;
-  scrollbar-gutter:stable both-edges;
 }
 
 body{
@@ -65,10 +64,10 @@ body{
 }
 
 .page-shell{
-  width:auto;
-  max-width:1880px;
+  width:min(1880px, calc(100% - 36px));
+  max-width:none;
   margin:0 auto;
-  padding:18px;
+  padding:18px 0;
   box-sizing:border-box;
 }
 

@@ -52,6 +52,8 @@ Use this file as the durable memory for active work so we do not rely on chat hi
 - Current local fix normalizes box-sizing at the template level, makes the page shell explicitly border-box and full-width, removes the header's extra right margin, and makes the main sections respect the shell width consistently.
 - Additional follow-up on 2026-04-04: edge alignment is now consistent and the copy button is fully visible, but the whole layout still appears flush to the browser on the right while a visible gutter remains on the left.
 - Current local fix adds a stable scrollbar gutter and relaxes `.page-shell` away from forced `width:100%` so the browser scrollbar does not visually consume the right-side outer padding.
+- Additional follow-up on 2026-04-04: the scrollbar-gutter tweak did not create a visible right-side gap.
+- Current local fix stops relying on shell padding for the outer gutter and instead makes `.page-shell` physically narrower than the viewport with `width:min(1880px, calc(100% - 36px))`, which should force a real 18px margin on both sides.
 
 ## Reconstructed Context
 - Recent committed work before the interruption was focused on the admin page in `mako_templates/admin_index.mako`.
@@ -91,6 +93,7 @@ Use this file as the durable memory for active work so we do not rely on chat hi
 - Confirm that overriding the legacy `body` sizing removes the white flicker/strobe effect during scroll.
 - Confirm that the right-edge spacing is now consistent across the header, button row, and ticket section.
 - Confirm that the right-side outer gutter now visually matches the left side.
+- Confirm that using a narrower shell width creates a real matching gutter on the right.
 
 ## Next Step
 - Review `mako_templates/admin_index.mako` in the browser and verify the updated admin layout behaves correctly on the target screen size.
