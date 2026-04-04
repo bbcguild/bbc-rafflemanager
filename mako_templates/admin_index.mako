@@ -465,12 +465,28 @@ html,body{
 
 #ticket_info{
   width:100%;
-  overflow:hidden;
+  height:auto !important;
+  overflow:visible;
+  visibility:hidden;
+}
+
+#ticket_info.ticket-table-ready{
+  visibility:visible;
 }
 
 #ticket_info .handsontable th,
 #ticket_info .handsontable td{
   white-space:nowrap;
+}
+
+#ticket_info .wtHolder,
+#ticket_info .wtHider,
+#ticket_info .wtSpreader{
+  height:auto !important;
+}
+
+#ticket_info .wtHolder{
+  overflow:visible !important;
 }
 
 #ticket_info .handsontable td.ticket-range-cell,
@@ -1162,6 +1178,7 @@ var get_ticket_table = function () {
 % if request.extended_tickets:
         $.getJSON(window.location.pathname + "json/get/tickets_extended", function (result) {
                 result = addTicketRanges(result, true)
+                $("#ticket_info").removeClass("ticket-table-ready")
                 $("#ticket_info").handsontable("destroy")
                 $("#ticket_info").handsontable({
                         data: result,
@@ -1215,6 +1232,7 @@ var get_ticket_table = function () {
                         afterCreateRow: after_row_create,
                         afterChange: after_cell_change,
                         })
+                    $("#ticket_info").addClass("ticket-table-ready")
                     var data = $("#ticket_info").handsontable("getData")
                     var total_tickets = 0
                     var total_participants = data.length - 1
@@ -1229,6 +1247,7 @@ var get_ticket_table = function () {
 % else:
         $.getJSON(window.location.pathname + "json/get/tickets", function (result) {
                 result = addTicketRanges(result, false)
+                $("#ticket_info").removeClass("ticket-table-ready")
                 $("#ticket_info").handsontable("destroy")
                 $("#ticket_info").handsontable({
                         data: result,
@@ -1290,6 +1309,7 @@ var get_ticket_table = function () {
                         afterCreateRow: after_row_create,
                         afterChange: after_cell_change,
                         })
+                    $("#ticket_info").addClass("ticket-table-ready")
                     var data = $("#ticket_info").handsontable("getData")
                     var total_tickets = 0
                     var total_participants = data.length - 1

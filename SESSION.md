@@ -39,6 +39,8 @@ Use this file as the durable memory for active work so we do not rely on chat hi
 - Follow-up layout feedback on 2026-04-04: the right-side ticket table still showed a black empty strip on the right, and the scrollbar returned because range values started wrapping around row 44 and increased row height.
 - Corrected follow-up fix in `admin_index.mako`: the ticket table should not stretch to consume extra width; instead, the right column should size to the table's needed width while the center winner-card area receives the leftover space, with the range column kept on one line.
 - Additional follow-up on 2026-04-04: after deploying the width fix, the black strip was nearly gone and row wrapping was resolved, but a small internal table scrollbar still remained; next adjustment changed the ticket table to `height: "auto"` so Handsontable can grow to full content height instead of using a guessed pixel height.
+- Additional follow-up on 2026-04-04: after `height: "auto"`, the nested scrollbar disappeared but the final populated row and the usual blank manual-entry row were still not fully visible. Root cause appears to be legacy global Handsontable wrapper CSS (`.wtHolder { height: 100%; }`) fighting auto-height.
+- The ticket table also visibly slid in from the right on page load; the current fix hides `#ticket_info` until Handsontable has fully initialized, then reveals it without animation.
 
 ## Reconstructed Context
 - Recent committed work before the interruption was focused on the admin page in `mako_templates/admin_index.mako`.
@@ -68,6 +70,8 @@ Use this file as the durable memory for active work so we do not rely on chat hi
 - Confirm that the new Handsontable stretch/no-wrap fix removes the black strip and prevents range wrapping for longer ticket ranges.
 - Confirm that the corrected content-width right column removes the black strip while giving extra width back to the center winner cards.
 - Confirm that using `height: "auto"` removes the last remaining internal scrollbar without creating a new layout problem.
+- Confirm that overriding the legacy `.wtHolder` height restores visibility of the last real row plus the spare blank row.
+- Confirm that hiding `#ticket_info` until initialization removes the table slide-in effect on page load.
 
 ## Next Step
 - Review `mako_templates/admin_index.mako` in the browser and verify the updated admin layout behaves correctly on the target screen size.
