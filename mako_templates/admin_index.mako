@@ -925,6 +925,27 @@ function copyNamesAndTotals() {
         showCopiedState()
 }
 
+function normalizePrizeValue(rawValue) {
+        var digits = String(rawValue == null ? "" : rawValue).replace(/[^\d]/g, "")
+        if (!digits) {
+                return ""
+        }
+
+        return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+}
+
+function formatPrizeValueField(field) {
+        if (!field) {
+                return
+        }
+
+        field.value = normalizePrizeValue(field.value)
+}
+
+$(document).on("input blur", ".prize_value", function () {
+        formatPrizeValueField(this)
+})
+
 
 // Some of my best friends use JSON!
 var GLOBAL_PRIZE_ALERTED = false
@@ -1009,6 +1030,7 @@ var get_prize_info = function () {
                     // at least the prize details are here
                     $("#prize_item", template).attr({"id": new_id + "item"}).val(value["prize_text"])
                     $("#prize_value", template).attr({"id": new_id + "value"})
+                    formatPrizeValueField($("#" + new_id + "value", template)[0])
                     if (value["prize_finalised"] != 0) {
                         $("#prize_finalise", template).remove()
                         $("#prize_delete", template).remove()
@@ -1842,7 +1864,7 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
         <div class="prize-bottom-row">
             <div class="prize-field">
-                <input type="text" id="prize_winner" class="prize_winner" name="prize_winner" placeholder="Winning Number" />
+                <input type="text" id="prize_winner" class="prize_winner" name="prize_winner" placeholder="Ticket #" />
             </div>
             <div class="prize-winner-display">
                 <span id="prize_winner_name" class="prize_winner_name" data-placeholder="Winner"></span>
