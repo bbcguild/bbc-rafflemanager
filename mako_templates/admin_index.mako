@@ -165,6 +165,9 @@ body{
   margin-right:4px;
   min-width:70px;
 }
+.admin-flags.admin-only{
+  justify-content:center;
+}
 .admin-flag{
   display:flex;
   flex-direction:column;
@@ -929,9 +932,13 @@ function applyAdminStatus(status) {
         var statusLabel = $("#adminStatusLabel")
         var statusSelect = $("#raffle_status")
 
-        statusFlag.removeClass("status-live status-rolling status-complete")
-        statusFlag.addClass("status-" + normalizedStatus.toLowerCase())
-        statusLabel.text(normalizedStatus)
+        if (statusFlag.length) {
+                statusFlag.removeClass("status-live status-rolling status-complete")
+                statusFlag.addClass("status-" + normalizedStatus.toLowerCase())
+        }
+        if (statusLabel.length) {
+                statusLabel.text(normalizedStatus)
+        }
         statusSelect.removeClass("status-live status-rolling status-complete")
         statusSelect.addClass("status-" + normalizedStatus.toLowerCase())
 }
@@ -1765,18 +1772,10 @@ document.addEventListener('DOMContentLoaded', function () {
   </div>
 
   <div class="header-right">
-    <div class="admin-flags">
+    <div class="admin-flags admin-only">
       <div class="admin-flag">
         <div class="admin-flag-label">ADMIN</div>
         <div class="admin-flag-bar" style="background:#c97a1f;"></div>
-      </div>
-      <div class="admin-flag status-live" id="adminStatusFlag">
-        <div class="admin-flag-label admin-status-label">
-          <span class="admin-status-dot"></span>
-          <span class="admin-status-dice" aria-hidden="true">🎲</span>
-          <span id="adminStatusLabel">LIVE</span>
-        </div>
-        <div class="admin-flag-bar"></div>
       </div>
     </div>
 
