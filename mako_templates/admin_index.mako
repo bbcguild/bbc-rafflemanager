@@ -65,6 +65,9 @@ body{
   overflow-x:hidden;
   padding:0 calc(var(--page-gutter) + var(--scrollbar-comp)) 0 var(--page-gutter);
 }
+body.legacy-modal-open{
+  overflow:hidden;
+}
 
 .page-shell{
   width:100%;
@@ -754,6 +757,104 @@ border:1px solid rgba(140,170,230,.12);
   font-size:.92rem;
 }
 
+#legacy_modal_backdrop{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(7,11,18,.58);
+  z-index:1900;
+}
+
+#import_template,
+#confirm_template,
+#barter_template,
+#paid_template{
+  display:none;
+  position:fixed !important;
+  left:50% !important;
+  top:50% !important;
+  transform:translate(-50%, -50%);
+  width:min(1100px, calc(100vw - 48px)) !important;
+  max-height:calc(100vh - 48px) !important;
+  min-height:320px;
+  z-index:2000 !important;
+  box-sizing:border-box;
+  border:1px solid #6b727c !important;
+  border-radius:18px;
+  background:linear-gradient(180deg,#d7dade,#cfd4da) !important;
+  color:#000000 !important;
+  padding:0 !important;
+  overflow:hidden;
+  box-shadow:0 28px 90px rgba(0,0,0,.48);
+}
+
+#import_buttons,
+#confirm_buttons,
+#barter_buttons,
+#paid_buttons{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  align-items:center;
+  padding:12px 16px !important;
+  background:#c7ccd2 !important;
+  border-bottom:1px solid #8b9199 !important;
+}
+
+#import_data,
+#confirm_data,
+#barter_data,
+#paid_data{
+  height:auto !important;
+  max-height:calc(100vh - 118px) !important;
+  overflow:auto;
+  padding:16px !important;
+  box-sizing:border-box;
+  background:#d8dce1 !important;
+}
+
+#import_data_here{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+}
+
+#import_data_here th{
+  position:sticky;
+  top:0;
+  background:#cfd4da;
+  z-index:2;
+}
+
+#import_data_here th,
+#import_data_here td{
+  padding:8px 10px;
+}
+
+#import_template input,
+#import_template textarea,
+#confirm_template input,
+#confirm_template textarea,
+#barter_template input,
+#barter_template textarea,
+#paid_template input,
+#paid_template textarea{
+  color:#000000 !important;
+  background:#f5f6f7 !important;
+  border:1px solid #777d86 !important;
+  box-sizing:border-box;
+}
+
+#confirm_string,
+#confirm_names,
+#barter_import_string,
+#barter_confirm_string,
+#paid_import_string,
+#paid_confirm_string{
+  width:100%;
+  min-height:180px;
+}
+
 #add_prize_block{
   margin-top:12px;
 }
@@ -986,10 +1087,14 @@ border:1px solid rgba(140,170,230,.12);
 
 <script>
 jQuery.fn.center = function() {
-    var container = $(window);
-    var top = -this.height() / 2;
-    var left = -this.width() / 2;
-    return this.css('position', 'absolute').css({ 'margin-left': left + 'px', 'margin-top': top + 'px', 'left': '50%', 'top': '50%' });
+    return this.css({
+        position: 'fixed',
+        left: '50%',
+        top: '50%',
+        transform: 'translate(-50%, -50%)',
+        marginLeft: 0,
+        marginTop: 0
+    });
 }
 
 $(document).ready(function() {
@@ -1110,8 +1215,36 @@ function formatPrizeValueField(field) {
         field.value = normalizePrizeValue(field.value)
 }
 
+function syncLegacyModalState() {
+        var anyVisible = $("#import_template:visible, #confirm_template:visible, #barter_template:visible, #paid_template:visible").length > 0
+        $("#legacy_modal_backdrop").toggle(anyVisible)
+        $("body").toggleClass("legacy-modal-open", anyVisible)
+}
+
+function showLegacyModal(selector, modalClass) {
+        var modal = $(selector)
+        modal.removeClass("import confirm barter paid")
+        if (modalClass) {
+                modal.addClass(modalClass)
+        }
+        modal.center().show()
+        syncLegacyModalState()
+}
+
+function hideLegacyModal(selector) {
+        $(selector).hide()
+        syncLegacyModalState()
+}
+
 $(document).on("input blur", ".prize_value", function () {
         formatPrizeValueField(this)
+})
+
+$(document).on("click", "#legacy_modal_backdrop", function () {
+        hideLegacyModal("#import_template")
+        hideLegacyModal("#confirm_template")
+        hideLegacyModal("#barter_template")
+        hideLegacyModal("#paid_template")
 })
 
 
@@ -1648,7 +1781,7 @@ $(document).ready(function () {
                     return;
                 }
                 
-                $("#import_template").css({'width': '900px', 'height': '600px', 'z-index': 100}).addClass("import").center().show()
+                showLegacyModal("#import_template", "import")
                 // get the first header
                 var headline = $("#import_data_here tr").first().clone() 
                 $("#import_data_here").empty().append(headline)
@@ -1693,10 +1826,10 @@ $(document).ready(function () {
                 }
             })
 
-            $("#import_close_button").click(function () { $("#import_template").hide() })
-            $("#confirm_close_button").click(function () { $("#confirm_template").hide() })
-            $("#barter_close_button").click(function () { $("#barter_template").hide() })
-            $("#paid_close_button").click(function () { $("#paid_template").hide() })
+            $("#import_close_button").click(function () { hideLegacyModal("#import_template") })
+            $("#confirm_close_button").click(function () { hideLegacyModal("#confirm_template") })
+            $("#barter_close_button").click(function () { hideLegacyModal("#barter_template") })
+            $("#paid_close_button").click(function () { hideLegacyModal("#paid_template") })
             $("#import_selected").click(function () {
                 if ($("#import_template").is(":visible")) {
                         var formData = $("#import_this").serialize();
@@ -1709,8 +1842,8 @@ $(document).ready(function () {
                                 success: function (result) {
                                     // refresh everything!
                                     refresher()
-                                    $("#import_template").hide()
-                                    $("#confirm_template").css({'width': '900px', 'height': '600px', 'z-index': 100}).addClass("import").center().show()
+                                    hideLegacyModal("#import_template")
+                                    showLegacyModal("#confirm_template", "confirm")
                                     $("#confirm_string").val(result[0])
                                     $("#confirm_names").val(result[1])
                                 },
@@ -1724,15 +1857,15 @@ $(document).ready(function () {
 
                 }
                     })
-          $("#reshow_import").click(function () { $("#confirm_template").hide()
-                                                  $("#import_template").show() })
-          $("#reshow_confirm").click(function () { $("#confirm_template").show()
-                                                  $("#import_template").hide() })
-          $("#import_barter").click(function () { $("#confirm_template").hide()
-                                                  $("#barter_template").css({'width': '900px', 'height': '600px', 'z-index': 100}).addClass("barter").center().show() })
-          $("#import_paid").click(function () { $("#confirm_template").hide()
-                                                  $("#paid_template").css({'width': '900px', 'height': '600px', 'z-index': 100, 'background-color': '#f8f8f8', 'border': '1px solid #000000', 'padding': '2px'}).addClass("paid").center().show() })
-          $("#barter_import").click(function () {
+          $("#reshow_import").click(function () { hideLegacyModal("#confirm_template")
+                                                  showLegacyModal("#import_template", "import") })
+          $("#reshow_confirm").click(function () { showLegacyModal("#confirm_template", "confirm")
+                                                  hideLegacyModal("#import_template") })
+          $("#import_barter").click(function () { hideLegacyModal("#confirm_template")
+                                                  showLegacyModal("#barter_template", "barter") })
+          $("#import_paid").click(function () { hideLegacyModal("#confirm_template")
+                                                  showLegacyModal("#paid_template", "paid") })
+            $("#barter_import").click(function () {
                 if ($("#barter_template").is(":visible")) {
                         $.ajax({
                                 type: "POST",
@@ -1741,8 +1874,8 @@ $(document).ready(function () {
                                 success: function (result) {
                                     // refresh everything!
                                     refresher()
-                                    $("#barter_template").hide()
-                                    $("#confirm_template").css({'width': '900px', 'height': '600px', 'z-index': 100}).addClass("import").center().show()
+                                    hideLegacyModal("#barter_template")
+                                    showLegacyModal("#confirm_template", "confirm")
                                     $("#confirm_string").val(result[0])
                                     $("#confirm_names").val(result[1])
                                 },
@@ -1762,8 +1895,8 @@ $(document).ready(function () {
                                 success: function (result) {
                                     // refresh everything!
                                     refresher()
-                                    $("#paid_template").hide()
-                                    $("#confirm_template").css({'width': '900px', 'height': '600px', 'z-index': 100}).addClass("import").center().show()
+                                    hideLegacyModal("#paid_template")
+                                    showLegacyModal("#confirm_template", "confirm")
                                     $("#confirm_string").val(result[0])
                                     $("#confirm_names").val(result[1])
                                 },
@@ -2020,6 +2153,8 @@ document.addEventListener('DOMContentLoaded', function () {
 </table>
 </div>
 </div>
+
+<div id="legacy_modal_backdrop"></div>
 
 <div id="prize_template">
 <form id="prize_template_form">
