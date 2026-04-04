@@ -41,6 +41,8 @@ Use this file as the durable memory for active work so we do not rely on chat hi
 - Additional follow-up on 2026-04-04: after deploying the width fix, the black strip was nearly gone and row wrapping was resolved, but a small internal table scrollbar still remained; next adjustment changed the ticket table to `height: "auto"` so Handsontable can grow to full content height instead of using a guessed pixel height.
 - Additional follow-up on 2026-04-04: after `height: "auto"`, the nested scrollbar disappeared but the final populated row and the usual blank manual-entry row were still not fully visible. Root cause appears to be legacy global Handsontable wrapper CSS (`.wtHolder { height: 100%; }`) fighting auto-height.
 - The ticket table also visibly slid in from the right on page load; the current fix hides `#ticket_info` until Handsontable has fully initialized, then reveals it without animation.
+- Additional follow-up on 2026-04-04: the prior fix still did not change the visible behavior. A stronger likely cause is panel-level clipping from `#right { overflow:hidden; }`, and the visible slide-in may be the whole right column reflowing as ticket content arrives rather than just the table node itself.
+- Current local fix changes `#right` to `overflow:visible` and toggles readiness on the whole right ticket panel instead of only on `#ticket_info`.
 
 ## Reconstructed Context
 - Recent committed work before the interruption was focused on the admin page in `mako_templates/admin_index.mako`.
@@ -72,6 +74,8 @@ Use this file as the durable memory for active work so we do not rely on chat hi
 - Confirm that using `height: "auto"` removes the last remaining internal scrollbar without creating a new layout problem.
 - Confirm that overriding the legacy `.wtHolder` height restores visibility of the last real row plus the spare blank row.
 - Confirm that hiding `#ticket_info` until initialization removes the table slide-in effect on page load.
+- Confirm that removing `#right` clipping restores the final purchaser row and spare blank row.
+- Confirm that hiding the whole right ticket panel until ready eliminates the apparent slide-in/reflow on page load.
 
 ## Next Step
 - Review `mako_templates/admin_index.mako` in the browser and verify the updated admin layout behaves correctly on the target screen size.

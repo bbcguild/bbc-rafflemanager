@@ -460,14 +460,21 @@ html,body{
 }
 
 #right{
-  overflow:hidden;
+  overflow:visible;
+}
+
+#right.ticket-panel-loading{
+  visibility:hidden;
+}
+
+#right.ticket-panel-ready{
+  visibility:visible;
 }
 
 #ticket_info{
   width:100%;
   height:auto !important;
   overflow:visible;
-  visibility:hidden;
 }
 
 #ticket_info.ticket-table-ready{
@@ -1178,6 +1185,7 @@ var get_ticket_table = function () {
 % if request.extended_tickets:
         $.getJSON(window.location.pathname + "json/get/tickets_extended", function (result) {
                 result = addTicketRanges(result, true)
+                $("#right").removeClass("ticket-panel-ready").addClass("ticket-panel-loading")
                 $("#ticket_info").removeClass("ticket-table-ready")
                 $("#ticket_info").handsontable("destroy")
                 $("#ticket_info").handsontable({
@@ -1232,6 +1240,7 @@ var get_ticket_table = function () {
                         afterCreateRow: after_row_create,
                         afterChange: after_cell_change,
                         })
+                    $("#right").removeClass("ticket-panel-loading").addClass("ticket-panel-ready")
                     $("#ticket_info").addClass("ticket-table-ready")
                     var data = $("#ticket_info").handsontable("getData")
                     var total_tickets = 0
@@ -1247,6 +1256,7 @@ var get_ticket_table = function () {
 % else:
         $.getJSON(window.location.pathname + "json/get/tickets", function (result) {
                 result = addTicketRanges(result, false)
+                $("#right").removeClass("ticket-panel-ready").addClass("ticket-panel-loading")
                 $("#ticket_info").removeClass("ticket-table-ready")
                 $("#ticket_info").handsontable("destroy")
                 $("#ticket_info").handsontable({
@@ -1309,6 +1319,7 @@ var get_ticket_table = function () {
                         afterCreateRow: after_row_create,
                         afterChange: after_cell_change,
                         })
+                    $("#right").removeClass("ticket-panel-loading").addClass("ticket-panel-ready")
                     $("#ticket_info").addClass("ticket-table-ready")
                     var data = $("#ticket_info").handsontable("getData")
                     var total_tickets = 0
