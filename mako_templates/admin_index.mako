@@ -779,6 +779,46 @@ body.legacy-modal-open{
   text-overflow:ellipsis;
 }
 
+.ticket-totals-footer{
+  display:grid;
+  align-items:center;
+  gap:0;
+  margin-top:10px;
+  padding:10px 0;
+  border-top:1px solid rgba(80,120,210,.24);
+  color:#edf3ff;
+  font-variant-numeric:tabular-nums;
+}
+
+.ticket-totals-footer.extended{
+  grid-template-columns:38px 150px 52px 52px 52px 112px;
+}
+
+.ticket-totals-footer.basic{
+  grid-template-columns:62px 180px 56px 112px;
+}
+
+.ticket-totals-footer .cell{
+  padding:0 8px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.ticket-totals-footer .label-cell{
+  color:#aebfe0;
+  font-weight:800;
+}
+
+.ticket-totals-footer .value-cell{
+  text-align:right;
+}
+
+.ticket-totals-footer .value-cell.total-value{
+  color:#e6d77a;
+  font-weight:700;
+}
+
 .ticket-tools{
   display:flex;
   justify-content:flex-end;
@@ -1843,6 +1883,75 @@ function addTicketRanges(rows, extended) {
     return output
 }
 
+function getTicketDataRows(data, extended) {
+    var rows = []
+
+    for (var i = 0; i < (data || []).length; i++) {
+        var row = data[i]
+        if (!row) {
+            continue
+        }
+
+        var name = row[1]
+        if (name == null || $.trim(String(name)) === "") {
+            continue
+        }
+
+        if (extended) {
+            var paid = Number(row[3]) || 0
+            var bar = Number(row[4]) || 0
+            if (paid === 0 && bar === 0) {
+                continue
+            }
+        } else {
+            var total = Number(row[2]) || 0
+            if (total === 0) {
+                continue
+            }
+        }
+
+        rows.push(row)
+    }
+
+    return rows
+}
+
+function renderTicketTotalsFooter(data, extended) {
+    var rows = getTicketDataRows(data, extended)
+    var total = 0
+    var paid = 0
+    var bar = 0
+
+    for (var i = 0; i < rows.length; i++) {
+        total += Number(rows[i][2]) || 0
+        if (extended) {
+            paid += Number(rows[i][3]) || 0
+            bar += Number(rows[i][4]) || 0
+        }
+    }
+
+    var html = ''
+    if (extended) {
+        html += '<div class="ticket-totals-footer extended">'
+        html += '  <div class="cell"></div>'
+        html += '  <div class="cell label-cell">Totals</div>'
+        html += '  <div class="cell value-cell total-value">' + total.toLocaleString() + '</div>'
+        html += '  <div class="cell value-cell">' + paid.toLocaleString() + '</div>'
+        html += '  <div class="cell value-cell">' + bar.toLocaleString() + '</div>'
+        html += '  <div class="cell"></div>'
+        html += '</div>'
+    } else {
+        html += '<div class="ticket-totals-footer basic">'
+        html += '  <div class="cell"></div>'
+        html += '  <div class="cell label-cell">Totals</div>'
+        html += '  <div class="cell value-cell total-value">' + total.toLocaleString() + '</div>'
+        html += '  <div class="cell"></div>'
+        html += '</div>'
+    }
+
+    $("#ticket_totals_footer").html(html)
+}
+
 var get_ticket_table = function () {
         function after_row_create (index, amount) {
             setTimeout(function () {
@@ -1912,6 +2021,7 @@ var get_ticket_table = function () {
 % endif
             setTimeout(function () {
                 var data = $("#ticket_info").handsontable("getData")
+                renderTicketTotalsFooter(data, ${'true' if request.extended_tickets else 'false'})
                 $.ajax({
                     type: "POST",
 % if request.extended_tickets:
@@ -2003,11 +2113,13 @@ var get_ticket_table = function () {
                         afterChange: after_cell_change,
                         })
                     var data = $("#ticket_info").handsontable("getData")
+                    var rows = getTicketDataRows(data, true)
                     var total_tickets = 0
-                    var total_participants = data.length - 1
-                    for (var i = 0; i < data.length; i++) {
-                        total_tickets = total_tickets + data[i][2]
+                    var total_participants = rows.length
+                    for (var i = 0; i < rows.length; i++) {
+                        total_tickets = total_tickets + (Number(rows[i][2]) || 0)
                     }
+                    renderTicketTotalsFooter(data, true)
                     $("#raffle_sold").text(total_tickets + " tickets sold.")
                     $("#raffle_participants").text(total_participants + " unique participants.")
                     $("#display_raffle_sold").text(total_tickets)
@@ -2078,11 +2190,13 @@ var get_ticket_table = function () {
                         afterChange: after_cell_change,
                         })
                     var data = $("#ticket_info").handsontable("getData")
+                    var rows = getTicketDataRows(data, false)
                     var total_tickets = 0
-                    var total_participants = data.length - 1
-                    for (var i = 0; i < data.length; i++) {
-                        total_tickets = total_tickets + data[i][2]
+                    var total_participants = rows.length
+                    for (var i = 0; i < rows.length; i++) {
+                        total_tickets = total_tickets + (Number(rows[i][2]) || 0)
                     }
+                    renderTicketTotalsFooter(data, false)
                     $("#raffle_sold").text(total_tickets + " tickets sold.")
                     $("#raffle_participants").text(total_participants + " unique participants.")
                     $("#display_raffle_sold").text(total_tickets)
@@ -2592,6 +2706,7 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
         <div id="ticket_info">
         </div>
+        <div id="ticket_totals_footer"></div>
     </div>
         </td>
     </tr>
