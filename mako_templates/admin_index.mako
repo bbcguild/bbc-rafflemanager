@@ -316,7 +316,7 @@ body.legacy-modal-open{
   display:flex;
   align-items:center;
   gap:6px;
-  min-height:40px;
+  min-height:34px;
   padding:0;
   border:none;
   background:transparent;
@@ -329,24 +329,25 @@ body.legacy-modal-open{
   outline:none;
 }
 .profile-trigger-logo-shell{
-  min-width:46px;
-  min-height:40px;
+  min-width:36px;
+  min-height:36px;
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:5px 7px;
-  background:linear-gradient(180deg,rgba(26,41,71,.95),rgba(14,24,42,.95));
-  border:1px solid rgba(95,132,212,.34);
-  border-radius:12px;
-  box-shadow:var(--shadow);
+  padding:0;
+  background:transparent;
+  border:none;
+  border-radius:0;
+  box-shadow:none;
 }
 .profile-menu-logo{
-  width:30px;
-  height:30px;
+  width:34px;
+  height:34px;
   border-radius:8px;
   object-fit:cover;
   border:1px solid rgba(255,255,255,.14);
   flex:0 0 auto;
+  box-shadow:var(--shadow);
 }
 .profile-menu-caret{
   min-width:24px;
