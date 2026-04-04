@@ -55,6 +55,7 @@ html,body{
 
 html{
   overflow-y:scroll;
+  scrollbar-gutter:stable both-edges;
 }
 
 body{
@@ -64,7 +65,7 @@ body{
 }
 
 .page-shell{
-  width:100%;
+  width:auto;
   max-width:1880px;
   margin:0 auto;
   padding:18px;
