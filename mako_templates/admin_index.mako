@@ -738,6 +738,10 @@ body.legacy-modal-open{
   color:#edf3ff !important;
 }
 
+#ticket_info .handsontable td.totals-column{
+  color:#e6d77a !important;
+}
+
 #ticket_info .handsontable .htDimmed,
 #ticket_info .handsontable .colHeader{
   color:#aebfe0 !important;
@@ -1958,11 +1962,13 @@ var get_ticket_table = function () {
                                 type: 'numeric',
                                 format: '1,000,000',
                                 readOnly: true,
+                                className: 'totals-column',
                                 currentColClassName: 'totals-column',
                             },
                             {
                                 type: 'numeric',
                                 format: '1,000,000',
+                                className: 'totals-column',
                                 allowInvalid: false,
                             },
                             {
