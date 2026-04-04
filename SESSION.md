@@ -24,6 +24,7 @@ Use this file as the durable memory for active work so we do not rely on chat hi
 - Improve the three-column layout, prize card UI, and ticket table usability.
 - Preserve session context in this file so VS Code/chat restarts do not erase working memory.
 - Resolve layout conflicts between the center winner/prize cards and the right-side ticket list/table.
+- Adjust the winner card layout so `Prize Value` sits under the prize description, with `Winning Number` and `Winner` sharing the bottom row.
 
 ## Decisions
 - Includes reconstructed notes plus user recap on 2026-04-04.
@@ -36,6 +37,7 @@ Use this file as the durable memory for active work so we do not rely on chat hi
 - The `FREE` ticket field/column was only hidden as a band-aid; it still exists in code paths and data handling.
 - The copy button was added so users no longer need to drag-select two Handsontable columns to paste name and total ticket counts into Google Sheets.
 - Long-term cleanup idea: fully remove `FREE` from the codebase if it is confirmed obsolete.
+- Winner card follow-up on 2026-04-04: move `Prize Value` into its own row below the prize description and simplify the bottom row to `Winning Number` plus `Winner`.
 - Follow-up layout feedback on 2026-04-04: the right-side ticket table still showed a black empty strip on the right, and the scrollbar returned because range values started wrapping around row 44 and increased row height.
 - Corrected follow-up fix in `admin_index.mako`: the ticket table should not stretch to consume extra width; instead, the right column should size to the table's needed width while the center winner-card area receives the leftover space, with the range column kept on one line.
 - Additional follow-up on 2026-04-04: after deploying the width fix, the black strip was nearly gone and row wrapping was resolved, but a small internal table scrollbar still remained; next adjustment changed the ticket table to `height: "auto"` so Handsontable can grow to full content height instead of using a guessed pixel height.

@@ -680,24 +680,26 @@ border:1px solid rgba(140,170,230,.12);
 
 .prize-main{
   display:grid;
-  grid-template-rows:auto auto;
+  grid-template-rows:auto auto auto;
   gap:14px;
   min-width:0;
 }
 
 .prize-top-row,
+.prize-middle-row,
 .prize-bottom-row{
   display:grid;
   gap:14px;
   min-width:0;
 }
 
-.prize-top-row{
+.prize-top-row,
+.prize-middle-row{
   grid-template-columns:minmax(0,1fr);
 }
 
 .prize-bottom-row{
-  grid-template-columns:110px 150px minmax(0,1fr);
+  grid-template-columns:110px minmax(0,1fr);
   align-items:center;
 }
 
@@ -1833,12 +1835,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 <input type="text" id="prize_item" class="prize_item" name="prize_text" placeholder="Prize" />
             </div>
         </div>
+        <div class="prize-middle-row">
+            <div class="prize-field">
+                <input type="text" id="prize_value" class="prize_value" placeholder="Prize Value" />
+            </div>
+        </div>
         <div class="prize-bottom-row">
             <div class="prize-field">
                 <input type="text" id="prize_winner" class="prize_winner" name="prize_winner" placeholder="Winning Number" />
-            </div>
-            <div class="prize-field">
-                <input type="text" id="prize_value" class="prize_value" placeholder="Prize Value" />
             </div>
             <div class="prize-winner-display">
                 <span id="prize_winner_name" class="prize_winner_name" data-placeholder="Winner"></span>
