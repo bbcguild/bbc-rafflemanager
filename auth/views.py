@@ -23,11 +23,30 @@ from auth.lib.form import ExtendedForm
 from auth.models import AuthUser
 from auth.forms import LoginForm
 
+ADMIN_HOST = "raffle-admin.bbcguild.com"
+PUBLIC_HOSTS = {"raffles.bbcguild.com", "raffle.bbcguild.com", "tickets.bbcguild.com"}
+
+def _request_host(request):
+    return (request.host or "").split(":", 1)[0].strip().lower()
+
+def _redirect_to_host(request, target_host, path=None, query_string=None):
+    scheme = request.scheme or "https"
+    path = path if path is not None else request.path
+    query_string = request.query_string if query_string is None else query_string
+    location = "%s://%s%s" % (scheme, target_host, path)
+    if query_string:
+        location += "?" + query_string
+    return HTTPFound(location=location)
+
 def login(request):
     """ login(request): User login.
     Function called from route_url('apex_login', request)
     """
     title = _('Login')
+
+    host = _request_host(request)
+    if host in PUBLIC_HOSTS:
+        return _redirect_to_host(request, ADMIN_HOST, path=request.path, query_string=request.query_string)
     
     # Get came_from with fallback
     try:

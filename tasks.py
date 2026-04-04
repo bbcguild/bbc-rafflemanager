@@ -61,6 +61,36 @@ log = logging.getLogger(__file__)
 
 here = os.path.dirname(os.path.abspath(__file__))
 
+CANONICAL_PUBLIC_HOST = "raffles.bbcguild.com"
+PUBLIC_ALIAS_HOSTS = {"raffle.bbcguild.com", "tickets.bbcguild.com"}
+ADMIN_HOST = "raffle-admin.bbcguild.com"
+
+def request_host(request):
+    host = (request.host or "").split(":", 1)[0].strip().lower()
+    return host
+
+def is_admin_host(request):
+    return request_host(request) == ADMIN_HOST
+
+def is_public_alias_host(request):
+    return request_host(request) in PUBLIC_ALIAS_HOSTS
+
+def is_fallback_host(request):
+    host = request_host(request)
+    return (
+        host.endswith(".fly.dev")
+        or host in {"localhost", "127.0.0.1"}
+    )
+
+def redirect_to_host(request, target_host, path=None, query_string=None):
+    scheme = request.scheme or "https"
+    path = path if path is not None else request.path
+    query_string = request.query_string if query_string is None else query_string
+    location = "%s://%s%s" % (scheme, target_host, path)
+    if query_string:
+        location += "?" + query_string
+    return HTTPFound(location=location)
+
 def guild_bonus_five (request):
     return False
 
@@ -102,6 +132,10 @@ def get_select_guilds():
 
 @view_config(route_name='home', renderer="mako_templates/select.mako")
 def home (request):
+    if is_public_alias_host(request):
+        return redirect_to_host(request, CANONICAL_PUBLIC_HOST)
+    if is_admin_host(request):
+        return HTTPFound(location=request.route_url('apex_login'))
     return {"guilds": get_select_guilds()}
 
 @view_config(route_name='health', renderer='json')
@@ -127,6 +161,10 @@ def health_check(request):
 
 @view_config(route_name='guild_landing_noslash', renderer="mako_templates/select.mako")
 def landing_noslash (request):
+    if is_public_alias_host(request):
+        return redirect_to_host(request, CANONICAL_PUBLIC_HOST)
+    if is_admin_host(request) and request.user is None:
+        return HTTPFound(location=request.route_url('apex_login', _query={"came_from": request.current_route_url()}))
     if "guild" in request.matchdict:
         guild = request.matchdict["guild"]
 
@@ -137,13 +175,19 @@ def landing_noslash (request):
 @view_config(route_name='guild_landing', renderer="mako_templates/index.mako")
 @view_config(route_name='guild_landing_raffle', renderer="mako_templates/index.mako")
 def landing (request):
+    if is_public_alias_host(request):
+        return redirect_to_host(request, CANONICAL_PUBLIC_HOST)
+
     # Auth system re-enabled - check for admin user
     # IMPORTANT: Do NOT force admin mode on archived raffle URLs.
     # Public/archive view for /{guild}/{raffle}/ should work even when logged in.
     is_archive_view = bool(request.matchdict and request.matchdict.get("raffle"))
 
+    if is_admin_host(request) and request.user is None and not is_archive_view:
+        return HTTPFound(location=request.route_url('apex_login', _query={"came_from": request.current_route_url()}))
+
     if request.user is not None:
-        if request.user.in_group("akaviri") and not is_archive_view:
+        if request.user.in_group("akaviri") and not is_archive_view and (is_admin_host(request) or is_fallback_host(request)):
             request.override_renderer = "mako_templates/admin_index.mako"
         if gdata.extended:
             request.extended_tickets = True
@@ -155,6 +199,10 @@ def landing (request):
 
 @view_config(route_name='raffle_lookup')
 def raffle_lookup(request):
+    if is_public_alias_host(request):
+        return redirect_to_host(request, CANONICAL_PUBLIC_HOST)
+    if is_admin_host(request) and request.user is None:
+        return HTTPFound(location=request.route_url('apex_login', _query={"came_from": request.current_route_url()}))
     guild = request.matchdict.get("guild")
     raffle_code = request.params.get("raffle_lookup", "").strip()
 
