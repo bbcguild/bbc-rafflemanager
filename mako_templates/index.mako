@@ -1088,8 +1088,8 @@ function refresher() {
 }
     $("#raffle_lookup").attr("placeholder", "Enter Raffle #");
     applyPublicStatus(result["raffle_status"], result["raffle_title"]);
-    $("#raffle_notes_public_1").html(result["raffle_notes"] || "Welcome to this week's raffle.").removeClass("pending-note");
-    $(".mid-row .info-panel:last .info-body").attr("id", "raffle_notes_public_2").addClass("rich-notes").html(result["raffle_notes_public_2"] || "Use the admin notes editor to add more public raffle info.").removeClass("pending-note");
+    $("#raffle_notes_public_1").html(result["raffle_notes"] || "").removeClass("pending-note");
+    $(".mid-row .info-panel:last .info-body").attr("id", "raffle_notes_public_2").addClass("rich-notes").html(result["raffle_notes_public_2"] || "").removeClass("pending-note");
     $("#entrants_headline").text("#" + raffleNum + " Raffle Entrants");
 
     updateRaffleNav();
@@ -1179,13 +1179,8 @@ $(document).ready(function () {
     </div>
 
     <div class="card info-panel">
-      <div class="info-bar">Raffle Info</div>
-      <div class="info-body">🎟 Ticket numbers are assigned just prior to draw and will be listed below.
-
-🕒 Ticket Deadline: 10:30P EDT Tuesday
-🎲 Winners announced: 11P EDT Tuesday
-📍 Rolls in Discord #bleakrock-diceroom
-📦 All prizes mailed within 7 days</div>
+      <div class="info-bar">More Info</div>
+      <div class="info-body rich-notes pending-note"></div>
     </div>
   </section>
 
