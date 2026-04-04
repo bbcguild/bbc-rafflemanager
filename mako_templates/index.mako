@@ -765,7 +765,7 @@ const guildSlug = "${request.matchdict['guild']}";
 const initialRequestedRaffleNum = "${initial_lookup_raffle}";
 const liveRaffleEndpoint = "/" + guildSlug + "/json/get/raffle";
 const MAX_HISTORY_DEPTH = 5;
-const publicExtendedTicketsEnabled = ${'true' if getattr(request, 'extended_tickets', False) else 'false'};
+const publicExtendedTicketsEnabled = true;
 const urlParams = new URLSearchParams(window.location.search);
 const requestedDepthRaw = urlParams.get('depth');
 let currentDepth = requestedDepthRaw === null ? null : parseInt(requestedDepthRaw, 10);
@@ -804,7 +804,7 @@ function shouldShowPublicTicketRanges(status) {
 }
 
 function shouldUseBarterMode(rows) {
-  if (!publicExtendedTicketsEnabled || !Array.isArray(rows)) {
+  if (!Array.isArray(rows)) {
     return false;
   }
 
@@ -1250,7 +1250,7 @@ function refresher() {
     updateRaffleNav();
   });
 
-  $.getJSON(publicExtendedTicketsEnabled ? "json/get/tickets_extended" : "json/get/tickets", function(result) {
+  $.getJSON("json/get/tickets_extended", function(result) {
     $("#raffle_participants").text(result.length);
     $("#raffle_participants_mobile").text(result.length);
 
