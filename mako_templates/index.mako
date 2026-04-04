@@ -395,7 +395,7 @@ body{
 /* Bottom row */
 .bottom-row{
   display:grid;
-  grid-template-columns:minmax(0,.94fr) minmax(0,1.06fr);
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
   gap:14px;
   align-items:start;
 }
@@ -421,18 +421,18 @@ body{
 }
 .entrants-scroll{
   overflow:auto;
-  padding:0 20px 16px 12px;
+  padding:0 16px 16px 10px;
   max-height:2200px;
-  margin-right:32px;
+  margin-right:20px;
 }
 
 /* Prize cards */
 .prize{
   display:grid;
-  grid-template-columns:96px minmax(0,1fr);
-  gap:18px;
+  grid-template-columns:84px minmax(0,1fr);
+  gap:14px;
   align-items:stretch;
-  padding:14px;
+  padding:12px;
   border-radius:0;
   border:1px solid var(--line);
   background:linear-gradient(180deg,rgba(11,19,35,.96),rgba(8,14,24,.98));
@@ -442,29 +442,29 @@ body{
   display:flex;
   align-items:center;
   justify-content:center;
-  min-height:148px;
+  min-height:138px;
   border-radius:0;
   border:1px solid var(--line);
   background:linear-gradient(180deg,rgba(15,28,51,.96),rgba(8,16,29,.98));
-  font-size:2.4rem;
+  font-size:2.15rem;
   font-weight:900;
 }
 .pmid{
   display:grid;
   grid-template-rows:auto auto auto;
-  gap:12px;
+  gap:10px;
   min-width:0;
 }
 .ptitle{
   width:100%;
-  min-height:54px;
-  padding:12px 18px;
+  min-height:50px;
+  padding:10px 14px;
   border-radius:0;
   border:1px solid var(--line);
   background:rgba(10,20,38,.88);
   display:flex;
   align-items:center;
-  font-size:1.34rem;
+  font-size:1.2rem;
   font-weight:850;
   line-height:1.22;
 }
@@ -476,15 +476,15 @@ body{
   .pwinner{
     width:100%;
     display:grid;
-    grid-template-columns:minmax(110px,.9fr) minmax(0,1.45fr) minmax(132px,1fr);
-    gap:12px;
+    grid-template-columns:minmax(96px,.78fr) minmax(0,1.3fr) minmax(118px,.9fr);
+    gap:10px;
     align-items:start;
   }
   .winner-cell{
     min-width:0;
     display:grid;
     gap:6px;
-    padding:12px 18px;
+    padding:10px 14px;
     border-radius:0;
     background:rgba(255,255,255,.03);
     border:1px solid rgba(255,255,255,.05);
@@ -498,7 +498,7 @@ body{
     white-space:nowrap;
   }
   .pwinner .value{
-    font-size:1rem;
+    font-size:.95rem;
     font-weight:700;
     min-width:0;
     white-space:nowrap;
@@ -509,7 +509,7 @@ body{
 /* Entrants panel */
 .table-headline{
   padding:18px 20px 8px 20px;
-  font-size:1.15rem;
+  font-size:1.08rem;
   font-weight:800;
 }
 .table-sub{
@@ -537,42 +537,43 @@ body{
 }
 .thead,.row{
   display:grid;
-  grid-template-columns:minmax(34px,.45fr) minmax(0,1.85fr) minmax(72px,.72fr);
-  gap:10px;
+  grid-template-columns:minmax(28px,.28fr) minmax(0,2.15fr) minmax(64px,.58fr);
+  gap:8px;
   align-items:center;
 }
 .thead.mode-range,
 .row.mode-range{
-  grid-template-columns:minmax(34px,.38fr) minmax(0,2.15fr) minmax(72px,.66fr) minmax(122px,.96fr);
+  grid-template-columns:minmax(28px,.24fr) minmax(0,2.2fr) minmax(62px,.5fr) minmax(104px,.72fr);
 }
 .thead.mode-barter,
 .row.mode-barter{
-  grid-template-columns:minmax(34px,.34fr) minmax(0,1.7fr) minmax(70px,.56fr) minmax(70px,.56fr) minmax(62px,.5fr);
+  grid-template-columns:minmax(28px,.22fr) minmax(0,1.72fr) minmax(58px,.42fr) minmax(58px,.42fr) minmax(52px,.34fr);
 }
 .thead.mode-barter-range,
 .row.mode-barter-range{
-  grid-template-columns:minmax(34px,.32fr) minmax(0,1.5fr) minmax(66px,.5fr) minmax(66px,.5fr) minmax(56px,.42fr) minmax(116px,.9fr);
+  grid-template-columns:minmax(28px,.2fr) minmax(0,1.72fr) minmax(54px,.36fr) minmax(54px,.36fr) minmax(46px,.28fr) minmax(96px,.58fr);
 }
 .thead{
-  padding:14px 8px 12px 8px;
+  padding:12px 8px 10px 8px;
   border-top:1px solid var(--line);
   color:#eef5ff;
-  font-size:1rem;
+  font-size:.94rem;
   font-weight:900;
-  margin:0 56px 0 8px;
+  margin:0 42px 0 8px;
 }
 .row{
-  padding:12px 8px;
+  padding:10px 8px;
   margin:0 8px;
   border-top:1px solid rgba(255,255,255,.05);
+  font-size:.95rem;
 }
 .thead.mode-barter,
 .thead.mode-barter-range{
-  font-size:.92rem;
+  font-size:.84rem;
 }
 .row.mode-barter,
 .row.mode-barter-range{
-  font-size:.96rem;
+  font-size:.88rem;
 }
 .row.hoverable:hover{background:var(--hover)}
 .idx,.total,.paid,.bar,.range{
@@ -586,8 +587,15 @@ body{
 .name{font-weight:750}
 .name{
   min-width:0;
-  overflow:hidden;
   white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.row.mode-standard .name,
+.row.mode-range .name,
+.thead.mode-standard .name,
+.thead.mode-range .name{
+  text-overflow:clip;
 }
 .empty-state{
   padding:16px 8px;
