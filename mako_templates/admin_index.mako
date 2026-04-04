@@ -2566,7 +2566,7 @@ document.addEventListener('DOMContentLoaded', function () {
         <div id="prize_info">
         </div>
         <div id="add_prize_block">
-            <input type="button" value="Add prize" id="add_prize_button" onclick="return addPrizeCard()" />
+            <input type="button" value="Add prize" id="add_prize_button" />
         </div>
     </div>
         </td>
