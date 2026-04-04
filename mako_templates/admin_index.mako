@@ -1927,7 +1927,7 @@ document.addEventListener('DOMContentLoaded', function () {
     <div class="utility-panel-body">
       <form action="json/set/tickets_import" class="dropzone" id="dropzone_uploader">
         <div class="dz-message">
-          <strong>Drop ticket files here</strong>
+          <strong>Drop RaffleManager.lua here</strong>
           <span>or click to choose files</span>
         </div>
       </form>
