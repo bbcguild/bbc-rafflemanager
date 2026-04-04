@@ -36,6 +36,8 @@ Use this file as the durable memory for active work so we do not rely on chat hi
 - The `FREE` ticket field/column was only hidden as a band-aid; it still exists in code paths and data handling.
 - The copy button was added so users no longer need to drag-select two Handsontable columns to paste name and total ticket counts into Google Sheets.
 - Long-term cleanup idea: fully remove `FREE` from the codebase if it is confirmed obsolete.
+- Follow-up layout feedback on 2026-04-04: the right-side ticket table still showed a black empty strip on the right, and the scrollbar returned because range values started wrapping around row 44 and increased row height.
+- Corrected follow-up fix in `admin_index.mako`: the ticket table should not stretch to consume extra width; instead, the right column should size to the table's needed width while the center winner-card area receives the leftover space, with the range column kept on one line.
 
 ## Reconstructed Context
 - Recent committed work before the interruption was focused on the admin page in `mako_templates/admin_index.mako`.
@@ -62,11 +64,14 @@ Use this file as the durable memory for active work so we do not rely on chat hi
 - Confirm whether the ticket table width/height changes feel right with real raffle data.
 - Confirm whether the currently deployed live version was intentionally deployed from an uncommitted local state or from a later local build step outside git.
 - Confirm whether `FREE` is truly obsolete so we can remove it from the codebase instead of continuing to hide it in the UI.
+- Confirm that the new Handsontable stretch/no-wrap fix removes the black strip and prevents range wrapping for longer ticket ranges.
+- Confirm that the corrected content-width right column removes the black strip while giving extra width back to the center winner cards.
 
 ## Next Step
 - Review `mako_templates/admin_index.mako` in the browser and verify the updated admin layout behaves correctly on the target screen size.
 - Decide what to do with `#prize_value` before shipping this diff.
 - Decide whether the next pass should focus on layout polish or on removing `FREE` end-to-end.
+- Verify the ticket range column still behaves correctly with very large ranges such as `100000-1000001`.
 - Keep this file updated whenever the task direction changes or we stop for the day.
 
 ## Resume Prompt

@@ -404,7 +404,7 @@ html,body{
 #main_table{
   width:100%;
   display:grid;
-  grid-template-columns:260px minmax(560px,1.08fr) minmax(500px,.92fr);
+  grid-template-columns:260px minmax(0,1fr) fit-content(520px);
   gap:12px;
   align-items:start;
   border-collapse:separate;
@@ -466,6 +466,18 @@ html,body{
 #ticket_info{
   width:100%;
   overflow:hidden;
+}
+
+#ticket_info .handsontable th,
+#ticket_info .handsontable td{
+  white-space:nowrap;
+}
+
+#ticket_info .handsontable td.ticket-range-cell,
+#ticket_info .handsontable th.ticket-range-cell{
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 
 .ticket-tools{
@@ -1157,7 +1169,7 @@ var get_ticket_table = function () {
                         height: ticketTableHeight,
                         rowHeaders: false,
                         colHeaders: ["#", "Name", "Total", "Paid", "Bar", "Range"],
-                        colWidths: [38, 150, 52, 52, 52, 96],
+                        colWidths: [38, 150, 52, 52, 52, 112],
                         contextMenu: false,
                         enterMoves: {row: 0, col: 1},
                         columnSorting: true,
@@ -1185,6 +1197,7 @@ var get_ticket_table = function () {
                                 allowInvalid: false,
                             },
                             {
+                                className: "ticket-range-cell",
                                 readOnly: true,
                             },
                         ],
@@ -1224,7 +1237,7 @@ var get_ticket_table = function () {
                         height: ticketTableHeight,
                         rowHeaders: false,
                         colHeaders: ["#", "Name", "Total", "Range"],
-                        colWidths: [62, 180, 56, 98],
+                        colWidths: [62, 180, 56, 112],
                         contextMenu: false,
                         enterMoves: {row: 0, col: 1},
                         columnSorting: true,
@@ -1258,6 +1271,7 @@ var get_ticket_table = function () {
                                 allowInvalid: false,
                             },
                                                     {
+                                className: "ticket-range-cell",
                                 readOnly: true,
                             },
 
