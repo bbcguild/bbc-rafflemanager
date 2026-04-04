@@ -422,6 +422,71 @@ body{
   cursor:pointer;
 }
 
+.admin-utility-band{
+  display:grid;
+  grid-template-columns:minmax(0,1.45fr) minmax(320px,.95fr);
+  gap:12px;
+  margin-bottom:14px;
+  width:100%;
+  align-items:stretch;
+}
+
+.utility-panel{
+  display:flex;
+  flex-direction:column;
+  min-height:204px;
+  background:linear-gradient(180deg,var(--panel),var(--panel2));
+  border:1px solid var(--line);
+  border-radius:22px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+
+.utility-panel-title{
+  min-height:42px;
+  padding:0 18px;
+  display:flex;
+  align-items:center;
+  color:#f4f7ff;
+  font-size:1rem;
+  font-weight:850;
+  letter-spacing:.02em;
+}
+
+.notes-panel .utility-panel-title{
+  background:linear-gradient(90deg,#1773c8,#1a4f8d);
+}
+
+.upload-panel .utility-panel-title{
+  background:linear-gradient(90deg,#c97a1f,#a25e11);
+}
+
+.utility-panel-body{
+  flex:1;
+  padding:16px;
+  display:flex;
+  min-height:0;
+}
+
+.notes-placeholder{
+  width:100%;
+  min-height:150px;
+  resize:none;
+  border:none;
+  outline:none;
+  border-radius:0;
+  background:rgba(10,18,32,.62);
+  color:#d6deeb;
+  padding:18px 20px;
+  box-sizing:border-box;
+  font-size:1rem;
+  line-height:1.45;
+}
+
+.notes-placeholder::placeholder{
+  color:#8194b4;
+}
+
 /* LEGACY LAYOUT CLEANUP */
 #main{
   width:100%;
@@ -604,18 +669,6 @@ body{
   font-weight:700;
 }
 
-#raffle_notes{
-  width:100%;
-  max-width:220px;
-  min-height:180px;
-  background:#182233;
-  color:#f4f7ff;
-  border:1px solid rgba(140,170,230,.20);
-  border-radius:10px;
-  padding:10px;
-  box-sizing:border-box;
-}
-
 #raffle_subheader,
 #raffle_time,
 #raffle_cost,
@@ -665,8 +718,39 @@ border:1px solid rgba(140,170,230,.12);
 
 #dropzone_uploader{
   width:100%;
-  max-width:220px;
+  max-width:none;
   box-sizing:border-box;
+  min-height:150px;
+  margin:0;
+  border:2px dashed rgba(140,170,230,.22);
+  border-radius:18px;
+  background:rgba(10,18,32,.62);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:14px;
+}
+
+#dropzone_uploader .dz-message{
+  margin:0;
+  color:#d6deeb;
+  font-weight:700;
+  text-align:center;
+  line-height:1.5;
+}
+
+#dropzone_uploader .dz-message strong{
+  display:block;
+  font-size:1rem;
+  font-weight:850;
+  color:#f4f7ff;
+}
+
+#dropzone_uploader .dz-message span{
+  display:block;
+  margin-top:6px;
+  color:#8ea0bf;
+  font-size:.92rem;
 }
 
 #add_prize_block{
@@ -859,6 +943,9 @@ border:1px solid rgba(140,170,230,.12);
   .button-bar{
     grid-template-columns:repeat(3,minmax(0,1fr));
   }
+  .admin-utility-band{
+    grid-template-columns:1fr;
+  }
   .search-wrap{
     flex:1 1 96px;
     max-width:130px;
@@ -889,6 +976,9 @@ border:1px solid rgba(140,170,230,.12);
 @media (max-width:900px){
   .button-bar{
     grid-template-columns:1fr;
+  }
+  .utility-panel{
+    min-height:180px;
   }
 }
 </style>
@@ -1823,6 +1913,27 @@ document.addEventListener('DOMContentLoaded', function () {
   <button type="button" class="action-btn" onclick="$('#manual_refresh').click()">Manual Refresh</button>
 </section>
 
+<section class="admin-utility-band">
+  <div class="utility-panel notes-panel">
+    <div class="utility-panel-title">Admin Notes</div>
+    <div class="utility-panel-body">
+      <textarea id="raffle_notes" class="notes-placeholder" placeholder="Notes area reserved for the upcoming editor." readonly></textarea>
+    </div>
+  </div>
+
+  <div class="utility-panel upload-panel">
+    <div class="utility-panel-title">Import Tickets</div>
+    <div class="utility-panel-body">
+      <form action="json/set/tickets_import" class="dropzone" id="dropzone_uploader">
+        <div class="dz-message">
+          <strong>Drop ticket files here</strong>
+          <span>or click to choose files</span>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
 <div id="main">
 <table id="main_table" valign="top">
     <tr>
@@ -1868,10 +1979,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 For every 2 tickets purchased, you get 1 bonus ticket!
             </span>
             % endif
-
-            <label class="settings-block-label" for="raffle_notes">Admin Notes</label>
-            <textarea id="raffle_notes" name="raffle_notes" class="ginfo_change_save">
-            </textarea>
             <br />
             <br />
             </form>
@@ -1888,7 +1995,6 @@ document.addEventListener('DOMContentLoaded', function () {
             <br />
             <br />
 % endif
-            <form action="json/set/tickets_import" class="dropzone" id="dropzone_uploader"></form>
     </div>
         </td>
         <td id="column_prizeinfo">
