@@ -150,6 +150,55 @@ html,body{
   line-height:1;
   text-align:center;
 }
+.admin-status-label{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  justify-content:center;
+  color:#eefff5;
+}
+.admin-status-dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#2bff9d;
+  box-shadow:0 0 8px rgba(43,255,157,.75);
+  display:inline-block;
+  flex:0 0 auto;
+}
+.admin-flag.status-live .admin-status-label{
+  color:#eefff5;
+  text-shadow:0 0 6px rgba(43,255,157,.4), 0 0 14px rgba(43,255,157,.22);
+}
+.admin-flag.status-live .admin-status-dot{
+  background:#2bff9d;
+  box-shadow:0 0 8px rgba(43,255,157,.75);
+}
+.admin-flag.status-live .admin-flag-bar{
+  background:#1fe38f;
+}
+.admin-flag.status-complete .admin-status-label{
+  color:#ffe3c2;
+  text-shadow:0 0 6px rgba(255,179,71,.42), 0 0 14px rgba(255,179,71,.24);
+}
+.admin-flag.status-complete .admin-status-dot{
+  background:#ffb347;
+  box-shadow:0 0 8px rgba(255,179,71,.78);
+}
+.admin-flag.status-complete .admin-flag-bar{
+  background:#ffb347;
+}
+.admin-flag.status-closed .admin-status-label{
+  color:#ffd6d6;
+  text-shadow:0 0 6px rgba(255,91,91,.42), 0 0 14px rgba(255,91,91,.24);
+}
+.admin-flag.status-closed .admin-status-dot{
+  background:#ff5b5b;
+  box-shadow:0 0 8px rgba(255,91,91,.78);
+}
+.admin-flag.status-closed .admin-flag-bar{
+  background:#ff5b5b;
+}
 .admin-flag-bar{
   height:6px;
   width:100%;
@@ -523,6 +572,24 @@ var openRaffleLookup = function () {
         return false
 }
 
+function normalizeRaffleStatus(status) {
+        var value = (status || "LIVE").toString().trim().toUpperCase()
+        if (value !== "LIVE" && value !== "CLOSED" && value !== "COMPLETE") {
+                return "LIVE"
+        }
+        return value
+}
+
+function applyAdminStatus(status) {
+        var normalizedStatus = normalizeRaffleStatus(status)
+        var statusFlag = $("#adminStatusFlag")
+        var statusLabel = $("#adminStatusLabel")
+
+        statusFlag.removeClass("status-live status-closed status-complete")
+        statusFlag.addClass("status-" + normalizedStatus.toLowerCase())
+        statusLabel.text(normalizedStatus)
+}
+
 
 // Some of my best friends use JSON!
 var GLOBAL_PRIZE_ALERTED = false
@@ -575,6 +642,7 @@ $("#raffle_cost").val(result["raffle_ticket_cost"])
 $("#raffle_title").val(result["raffle_title"] || "")
 $("#raffle_status").val(result["raffle_status"] || "LIVE")
 $("#raffle_notes").val(result["raffle_notes"])
+                applyAdminStatus(result["raffle_status"])
 
                 CURRENT_RAFFLE_INFO.raffle_subheader = normalizeFieldValue(result["raffle_guild_num"])
                 CURRENT_RAFFLE_INFO.raffle_time = normalizeFieldValue(result["raffle_time"])
@@ -1270,12 +1338,12 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="admin-flag-label">ADMIN</div>
         <div class="admin-flag-bar" style="background:#c97a1f;"></div>
       </div>
-      <div class="admin-flag">
-        <div class="admin-flag-label" style="display:flex;align-items:center;gap:6px;justify-content:center;">
-          <span style="width:8px;height:8px;border-radius:50%;background:#ff3b3b;display:inline-block;"></span>
-          LIVE
+      <div class="admin-flag status-live" id="adminStatusFlag">
+        <div class="admin-flag-label admin-status-label">
+          <span class="admin-status-dot"></span>
+          <span id="adminStatusLabel">LIVE</span>
         </div>
-        <div class="admin-flag-bar" style="background:#1fe38f;"></div>
+        <div class="admin-flag-bar"></div>
       </div>
     </div>
 

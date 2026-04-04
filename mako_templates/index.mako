@@ -237,6 +237,30 @@ body{
 .raffle-live-header{
   gap:10px;
 }
+.raffle-live-header.status-live .live-dot{
+  background:#36ff8e;
+  box-shadow:0 0 8px rgba(54,255,142,.8);
+}
+.raffle-live-header.status-live #raffle_titlebar{
+  color:#eafff3;
+  text-shadow:0 0 6px rgba(54,255,142,.45), 0 0 14px rgba(54,255,142,.28);
+}
+.raffle-live-header.status-closed .live-dot{
+  background:#ffb347;
+  box-shadow:0 0 8px rgba(255,179,71,.82);
+}
+.raffle-live-header.status-closed #raffle_titlebar{
+  color:#ffe7bf;
+  text-shadow:0 0 6px rgba(255,179,71,.45), 0 0 14px rgba(255,179,71,.28);
+}
+.raffle-live-header.status-complete .live-dot{
+  background:#ff5b5b;
+  box-shadow:0 0 8px rgba(255,91,91,.82);
+}
+.raffle-live-header.status-complete #raffle_titlebar{
+  color:#ffd6d6;
+  text-shadow:0 0 6px rgba(255,91,91,.42), 0 0 14px rgba(255,91,91,.24);
+}
 .live-dot{
   width:10px;
   height:10px;
@@ -772,6 +796,23 @@ function isArchiveDisplay() {
   return !!(liveCurrentRaffleNum && currentDisplayedRaffleNum && liveCurrentRaffleNum !== currentDisplayedRaffleNum);
 }
 
+function normalizeRaffleStatus(status) {
+  var value = (status || "LIVE").toString().trim().toUpperCase();
+  if (value !== "LIVE" && value !== "CLOSED" && value !== "COMPLETE") {
+    return "LIVE";
+  }
+  return value;
+}
+
+function applyPublicStatus(status, title) {
+  var normalizedStatus = normalizeRaffleStatus(status);
+  var $header = $(".raffle-live-header");
+
+  $header.removeClass("status-live status-closed status-complete");
+  $header.addClass("status-" + normalizedStatus.toLowerCase());
+  $("#raffle_titlebar").text(normalizedStatus + " - " + (title || "Raffle"));
+}
+
 function updateRaffleNav() {
   var $nav = $("#raffle_nav");
   if (!$nav.length) return;
@@ -954,7 +995,7 @@ function refresher() {
   $("#raffle_subheader").text("#" + raffleNum + " Raffle • Drawing: " + result["raffle_time"]);
 }
     $("#raffle_lookup").attr("placeholder", "Enter Raffle #");
-    $("#raffle_titlebar").text((result["raffle_status"] || "LIVE") + " - " + (result["raffle_title"] || "Raffle"));
+    applyPublicStatus(result["raffle_status"], result["raffle_title"]);
 $("#raffle_notes").html(result["raffle_notes"] || "Welcome to this week's raffle.");
     $("#entrants_headline").text("#" + raffleNum + " Raffle Entrants");
 
