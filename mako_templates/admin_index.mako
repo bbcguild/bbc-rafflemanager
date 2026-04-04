@@ -1099,9 +1099,6 @@ $(document).ready(function () {
             $("#confirm_close_button").click(function () { $("#confirm_template").hide() })
             $("#barter_close_button").click(function () { $("#barter_template").hide() })
             $("#paid_close_button").click(function () { $("#paid_template").hide() })
-            $("#clear_imported").click(function () {
-                    $.getJSON("json/set/fix_dupes", function (result) { })
-                    })
             $("#import_selected").click(function () {
                 if ($("#import_template").is(":visible")) {
                         var formData = $("#import_this").serialize();
@@ -1381,9 +1378,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
             <input type="submit" value="Open new raffle" id="new_raffle_button" class="hidden-original-action" />
             <input type="submit" value="Manually refresh" id="manual_refresh" class="hidden-original-action" />
-            <input type="submit" value="Clear dupes" id="clear_imported" />
-            <br />
-            <br />
             <input type="submit" value="Re-Show Import Pane" id="reshow_import" class="hidden-original-action" />
             <input type="submit" value="Re-Show Confirmations Pane" id="reshow_confirm" class="hidden-original-action" />
             <br />
@@ -1394,9 +1388,6 @@ document.addEventListener('DOMContentLoaded', function () {
             <br />
             <br />
 % endif
-            <a href="json/get/csv" target="_blank">Export as CSV</a>
-            <br />
-            <br />
             <form action="json/set/tickets_import" class="dropzone" id="dropzone_uploader"></form>
     </div>
         </td>
