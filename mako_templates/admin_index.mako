@@ -64,6 +64,8 @@ html,body{
   gap:18px;
   padding:14px 20px;
   margin-bottom:14px;
+  margin-right:10px;
+  min-width:0;
 }
 .header-left{
   display:flex;
@@ -126,16 +128,17 @@ html,body{
 .header-right{
   display:flex;
   align-items:center;
-  gap:12px;
+  gap:10px;
   position:relative;
-  flex:0 0 auto;
+  flex:0 1 auto;
+  min-width:0;
 }
 .admin-flags{
   display:flex;
   flex-direction:column;
   gap:4px;
   align-items:center;
-  margin-right:8px;
+  margin-right:4px;
   min-width:70px;
 }
 .admin-flag{
@@ -542,6 +545,17 @@ border:1px solid rgba(140,170,230,.12);
   .search-wrap{
     flex:1 1 96px;
     max-width:130px;
+  }
+}
+
+@media (max-width:1450px){
+  .admin-header{
+    flex-wrap:wrap;
+  }
+  .header-right{
+    width:100%;
+    justify-content:flex-end;
+    flex-wrap:wrap;
   }
 }
 
