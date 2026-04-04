@@ -21,6 +21,7 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - DNS lookup from this machine showed all four subdomains resolving to Fly edge addresses `66.241.125.77` and `2a09:8280:1::ec:6211:0`.
 - Login routing follow-up on 2026-04-04: `raffle-admin.bbcguild.com` was correctly redirecting to `/login`, but that bare auth route was rendering the stale `auth/mako_templates/login_simple.mako` template while `/{guild}/auth/login` used the newer root `mako_templates/login_simple.mako`. The auth-package template has now been updated to match the newer design so both entry points stay visually consistent.
 - Login routing follow-up on 2026-04-04: the template-unification fix was committed as `f240a93` (`auth: unify admin login template`) and deployed to Fly.
+- Login routing follow-up on 2026-04-04: bare admin-host login still appeared to do nothing after submit because successful `/login` defaulted to the `home` route, while the admin-host `home` view redirected to `/login` unconditionally. The `home` route now only redirects unauthenticated admin-host requests to login; authenticated admin-host requests can fall through to the guild selector instead of looping back to `/login`.
 
 ## Known Facts
 - `SESSION.md` was introduced after an earlier crash because conversation state had been lost.

@@ -134,7 +134,7 @@ def get_select_guilds():
 def home (request):
     if is_public_alias_host(request):
         return redirect_to_host(request, CANONICAL_PUBLIC_HOST)
-    if is_admin_host(request):
+    if is_admin_host(request) and request.user is None:
         return HTTPFound(location=request.route_url('apex_login'))
     return {"guilds": get_select_guilds()}
 
