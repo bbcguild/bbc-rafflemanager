@@ -118,6 +118,25 @@ body.legacy-modal-open{
   margin-bottom:12px;
   min-width:0;
   min-height:104px;
+  position:relative;
+  overflow:hidden;
+  isolation:isolate;
+}
+.admin-header::before{
+  content:"";
+  position:absolute;
+  inset:-8% auto -18% 42%;
+  width:min(500px,48vw);
+  background-image:
+    linear-gradient(90deg, rgba(7,12,22,0) 0%, rgba(7,12,22,.2) 18%, rgba(7,12,22,.35) 100%),
+    url("/static/eso-ouroboros.png");
+  background-repeat:no-repeat;
+  background-position:left center, center center;
+  background-size:100% 100%, contain;
+  opacity:.13;
+  filter:saturate(.52) brightness(.72);
+  pointer-events:none;
+  z-index:0;
 }
 .header-left{
   display:grid;
@@ -186,6 +205,11 @@ body.legacy-modal-open{
   justify-content:flex-start;
   position:relative;
   min-width:0;
+}
+.header-left,
+.header-right{
+  position:relative;
+  z-index:1;
 }
 .header-right .stats-inline{
   justify-content:flex-start;
