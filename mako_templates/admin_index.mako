@@ -61,11 +61,12 @@ body{
   position:static !important;
   min-height:100vh;
   overflow-x:hidden;
+  padding:0 18px;
 }
 
 .page-shell{
-  width:min(1880px, calc(100% - 36px));
-  max-width:none;
+  width:100%;
+  max-width:1880px;
   margin:0 auto;
   padding:18px 0;
   box-sizing:border-box;

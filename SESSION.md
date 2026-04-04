@@ -54,6 +54,8 @@ Use this file as the durable memory for active work so we do not rely on chat hi
 - Current local fix adds a stable scrollbar gutter and relaxes `.page-shell` away from forced `width:100%` so the browser scrollbar does not visually consume the right-side outer padding.
 - Additional follow-up on 2026-04-04: the scrollbar-gutter tweak did not create a visible right-side gap.
 - Current local fix stops relying on shell padding for the outer gutter and instead makes `.page-shell` physically narrower than the viewport with `width:min(1880px, calc(100% - 36px))`, which should force a real 18px margin on both sides.
+- Additional follow-up on 2026-04-04: the narrower shell width still did not create a visible right gutter in practice.
+- Current local fix moves the horizontal gutter to the `body` itself with `padding: 0 18px` and returns `.page-shell` to a normal `width:100%` centered container, so the browser viewport always reserves the same left/right outer spacing.
 
 ## Reconstructed Context
 - Recent committed work before the interruption was focused on the admin page in `mako_templates/admin_index.mako`.
@@ -94,6 +96,7 @@ Use this file as the durable memory for active work so we do not rely on chat hi
 - Confirm that the right-edge spacing is now consistent across the header, button row, and ticket section.
 - Confirm that the right-side outer gutter now visually matches the left side.
 - Confirm that using a narrower shell width creates a real matching gutter on the right.
+- Confirm that the body-level horizontal padding creates a visible matching right gutter.
 
 ## Next Step
 - Review `mako_templates/admin_index.mako` in the browser and verify the updated admin layout behaves correctly on the target screen size.
