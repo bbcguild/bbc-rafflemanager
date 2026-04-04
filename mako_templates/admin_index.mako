@@ -744,7 +744,12 @@ border:1px solid rgba(140,170,230,.12);
 }
 
 .prize_winner_name.finalised{
-  color:#ffe7ae;
+  color:#cfe8d4;
+  background:rgba(88,140,104,.18);
+  border-radius:6px;
+  padding:2px 8px;
+  box-shadow:none;
+  text-shadow:none;
 }
 
 .prize-actions{
