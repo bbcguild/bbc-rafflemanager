@@ -166,6 +166,14 @@ html,body{
   display:inline-block;
   flex:0 0 auto;
 }
+.admin-status-dice{
+  display:none;
+  align-items:center;
+  justify-content:center;
+  font-size:.95rem;
+  line-height:1;
+  flex:0 0 auto;
+}
 .admin-flag.status-live .admin-status-label{
   color:#eefff5;
   text-shadow:0 0 6px rgba(43,255,157,.4), 0 0 14px rgba(43,255,157,.22);
@@ -188,15 +196,19 @@ html,body{
 .admin-flag.status-complete .admin-flag-bar{
   background:#ff0000;
 }
-.admin-flag.status-closed .admin-status-label{
+.admin-flag.status-rolling .admin-status-label{
   color:#ffe3c2;
   text-shadow:0 0 6px rgba(201,122,31,.45), 0 0 14px rgba(201,122,31,.26);
 }
-.admin-flag.status-closed .admin-status-dot{
-  background:#c97a1f;
-  box-shadow:0 0 8px rgba(201,122,31,.82);
+.admin-flag.status-rolling .admin-status-dot{
+  display:none;
 }
-.admin-flag.status-closed .admin-flag-bar{
+.admin-flag.status-rolling .admin-status-dice{
+  display:inline-flex;
+  color:#c97a1f;
+  text-shadow:0 0 6px rgba(201,122,31,.45), 0 0 14px rgba(201,122,31,.26);
+}
+.admin-flag.status-rolling .admin-flag-bar{
   background:#c97a1f;
 }
 .admin-flag-bar{
@@ -574,7 +586,10 @@ var openRaffleLookup = function () {
 
 function normalizeRaffleStatus(status) {
         var value = (status || "LIVE").toString().trim().toUpperCase()
-        if (value !== "LIVE" && value !== "CLOSED" && value !== "COMPLETE") {
+        if (value === "CLOSED") {
+                return "ROLLING"
+        }
+        if (value !== "LIVE" && value !== "ROLLING" && value !== "COMPLETE") {
                 return "LIVE"
         }
         return value
@@ -585,7 +600,7 @@ function applyAdminStatus(status) {
         var statusFlag = $("#adminStatusFlag")
         var statusLabel = $("#adminStatusLabel")
 
-        statusFlag.removeClass("status-live status-closed status-complete")
+        statusFlag.removeClass("status-live status-rolling status-complete")
         statusFlag.addClass("status-" + normalizedStatus.toLowerCase())
         statusLabel.text(normalizedStatus)
 }
@@ -640,7 +655,7 @@ var get_raffle_info = function () {
 $("#raffle_time").val(result["raffle_time"])
 $("#raffle_cost").val(result["raffle_ticket_cost"])
 $("#raffle_title").val(result["raffle_title"] || "")
-$("#raffle_status").val(result["raffle_status"] || "LIVE")
+$("#raffle_status").val(normalizeRaffleStatus(result["raffle_status"]))
 $("#raffle_notes").val(result["raffle_notes"])
                 applyAdminStatus(result["raffle_status"])
 
@@ -1341,6 +1356,7 @@ document.addEventListener('DOMContentLoaded', function () {
       <div class="admin-flag status-live" id="adminStatusFlag">
         <div class="admin-flag-label admin-status-label">
           <span class="admin-status-dot"></span>
+          <span class="admin-status-dice" aria-hidden="true">🎲</span>
           <span id="adminStatusLabel">LIVE</span>
         </div>
         <div class="admin-flag-bar"></div>
@@ -1415,7 +1431,7 @@ document.addEventListener('DOMContentLoaded', function () {
 <label class="settings-block-label" for="raffle_status">Status</label>
 <select id="raffle_status" class="ginfo_change_save" name="raffle_status">
     <option value="LIVE">LIVE</option>
-    <option value="CLOSED">CLOSED</option>
+    <option value="ROLLING">ROLLING</option>
     <option value="COMPLETE">COMPLETE</option>
 </select>
 

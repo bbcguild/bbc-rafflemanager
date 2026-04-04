@@ -269,15 +269,23 @@ body{
 .raffle-live-header.status-live .raffle-status-text{
   text-shadow:0 0 6px rgba(54,255,142,.45), 0 0 14px rgba(54,255,142,.28);
 }
+.raffle-live-header.status-rolling .live-dot{
+  display:none;
+}
+.raffle-live-header.status-rolling .status-dice{
+  display:inline-flex;
+  color:#c97a1f;
+  text-shadow:0 0 6px rgba(201,122,31,.48), 0 0 14px rgba(201,122,31,.3);
+}
+.raffle-live-header.status-rolling #raffle_titlebar{
+  color:#ffe2b3;
+}
+.raffle-live-header.status-rolling .raffle-status-text{
+  text-shadow:0 0 6px rgba(201,122,31,.48), 0 0 14px rgba(201,122,31,.3);
+}
 .raffle-live-header.status-closed .live-dot{
   background:#c97a1f;
   box-shadow:0 0 8px rgba(201,122,31,.85);
-}
-.raffle-live-header.status-closed #raffle_titlebar{
-  color:#ffe2b3;
-}
-.raffle-live-header.status-closed .raffle-status-text{
-  text-shadow:0 0 6px rgba(201,122,31,.48), 0 0 14px rgba(201,122,31,.3);
 }
 .raffle-live-header.status-complete .live-dot{
   background:#ff0000;
@@ -295,6 +303,14 @@ body{
   border-radius:50%;
   background:#36ff8e;
   box-shadow:0 0 8px rgba(54,255,142,.8);
+  flex:0 0 auto;
+}
+.status-dice{
+  display:none;
+  align-items:center;
+  justify-content:center;
+  font-size:1rem;
+  line-height:1;
   flex:0 0 auto;
 }
 .live-label{
@@ -843,7 +859,10 @@ function isArchiveDisplay() {
 
 function normalizeRaffleStatus(status) {
   var value = (status || "LIVE").toString().trim().toUpperCase();
-  if (value !== "LIVE" && value !== "CLOSED" && value !== "COMPLETE") {
+  if (value === "CLOSED") {
+    return "ROLLING";
+  }
+  if (value !== "LIVE" && value !== "ROLLING" && value !== "COMPLETE") {
     return "LIVE";
   }
   return value;
@@ -857,7 +876,7 @@ function applyPublicStatus(status, title) {
   var normalizedStatus = normalizeRaffleStatus(status);
   var $header = $(".raffle-live-header");
 
-  $header.removeClass("status-live status-closed status-complete");
+  $header.removeClass("status-live status-rolling status-complete");
   $header.addClass("status-" + normalizedStatus.toLowerCase());
   $("#raffle_titlebar").html(
     '<span class="raffle-status-text">' + escapeHtml(normalizedStatus) + '</span>' +
@@ -1131,6 +1150,7 @@ $(document).ready(function () {
   <section class="mid-row">
     <div class="info-bar raffle-live-header">
   <span class="live-dot"></span>
+  <span class="status-dice" aria-hidden="true">🎲</span>
   <strong id="raffle_titlebar"><span class="raffle-status-text">LIVE</span><span class="raffle-title-sep">-</span><span class="raffle-name-text">Raffle</span></strong>
 </div>
       <div class="info-body" id="raffle_notes">Welcome to this week's raffle.</div>
