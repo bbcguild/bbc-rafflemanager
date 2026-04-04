@@ -48,6 +48,8 @@ Use this file as the durable memory for active work so we do not rely on chat hi
 - Additional follow-up on 2026-04-04: the latest deploy fixed the table containment and removed the main table animation, but the `Copy Names + Totals` button still animated to the right on load.
 - Longstanding scroll artifact note: users see white ghost boxes flicker at the top/bottom during scroll; after the recent layout changes, that artifact became much larger and more obvious.
 - Current local fix overrides legacy `body` absolute/100%-height rules from `static/css/main.css`, pins the page background color at the document level, and sets a stable fixed width for the ticket panel so the copy button does not shift during load.
+- Additional follow-up on 2026-04-04: the latest deploy successfully removed the white strobe/flicker effect. Remaining issues are right-edge spacing: the header leaves an odd gap before the right edge, the far-right button sits against the browser edge, and the ticket section can exceed the chrome window and partially cut off the copy button.
+- Current local fix normalizes box-sizing at the template level, makes the page shell explicitly border-box and full-width, removes the header's extra right margin, and makes the main sections respect the shell width consistently.
 
 ## Reconstructed Context
 - Recent committed work before the interruption was focused on the admin page in `mako_templates/admin_index.mako`.
@@ -85,6 +87,7 @@ Use this file as the durable memory for active work so we do not rely on chat hi
 - Confirm that reserving the right panel width up front removes the remaining load-time slide/reflow effect.
 - Confirm that the fixed-width ticket panel stops the copy button from animating off to the right.
 - Confirm that overriding the legacy `body` sizing removes the white flicker/strobe effect during scroll.
+- Confirm that the right-edge spacing is now consistent across the header, button row, and ticket section.
 
 ## Next Step
 - Review `mako_templates/admin_index.mako` in the browser and verify the updated admin layout behaves correctly on the target screen size.

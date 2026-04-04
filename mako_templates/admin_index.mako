@@ -36,6 +36,12 @@
   --shadow:0 18px 48px rgba(0,0,0,.38);
 }
 
+*,
+*::before,
+*::after{
+  box-sizing:border-box;
+}
+
 html,body{
   margin:0;
   padding:0;
@@ -58,9 +64,11 @@ body{
 }
 
 .page-shell{
+  width:100%;
   max-width:1880px;
   margin:0 auto;
   padding:18px;
+  box-sizing:border-box;
 }
 
 .card{
@@ -68,6 +76,7 @@ body{
   border:1px solid var(--line);
   border-radius:22px;
   box-shadow:var(--shadow);
+  width:100%;
 }
 
 /* NEW HEADER */
@@ -77,7 +86,6 @@ body{
   gap:18px;
   padding:14px 20px;
   margin-bottom:14px;
-  margin-right:10px;
   min-width:0;
 }
 .header-left{
@@ -394,6 +402,7 @@ body{
   grid-template-columns:repeat(6,minmax(0,1fr));
   gap:12px;
   margin-bottom:14px;
+  width:100%;
 }
 .action-btn{
   height:44px;
@@ -409,6 +418,7 @@ body{
 
 /* LEGACY LAYOUT CLEANUP */
 #main{
+  width:100%;
   max-width:none;
   margin:0;
   padding:0;
