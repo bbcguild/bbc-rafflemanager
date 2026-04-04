@@ -722,13 +722,14 @@ border:1px solid rgba(140,170,230,.12);
   box-sizing:border-box;
   min-height:150px;
   margin:0;
-  border:2px dashed rgba(140,170,230,.22);
-  border-radius:18px;
-  background:rgba(10,18,32,.62);
+  border:4px dotted rgba(70,118,208,.6);
+  border-radius:20px;
+  background:linear-gradient(180deg,rgba(6,14,28,.96),rgba(4,11,23,.96));
   display:flex;
   align-items:center;
   justify-content:center;
   padding:14px;
+  box-shadow:inset 0 0 0 1px rgba(22,40,78,.55);
 }
 
 #dropzone_uploader .dz-message{
