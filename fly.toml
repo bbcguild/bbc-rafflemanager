@@ -14,6 +14,7 @@ primary_region = 'iad'
 
 [env]
   DATABASE_PATH = '/data/raffle.db'
+  GA4_MEASUREMENT_ID = 'G-8C00Y7WF9G'
   IMPORT_PATH = '/data/import'
   LOG_LEVEL = 'INFO'
   PYRAMID_DEBUG = '0'

@@ -59,7 +59,7 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - Public entrants follow-up on 2026-04-05: when the raffle status was not `LIVE`, the public entrants table correctly exposed the extra `Range` column but populated it with the wrong numeric field instead of the computed ticket ranges. Root cause was the range renderer using a hard-coded index that matched the paid-ticket slot in non-barter rows. Current fix reads the appended trailing range field directly so `Range` shows the actual ticket spans again.
 - Archive navigation follow-up on 2026-04-05: added a dedicated public `Home` return control for archive browsing so users can jump back to the current raffle without stepping forward raffle-by-raffle. The control is styled in the same family as the existing archive arrows, appears only when viewing an older raffle, and uses a slight accent to distinguish the “return to current” action from previous/next archive movement.
 - Archive navigation icon follow-up on 2026-04-05: the first `Home` glyph read too abstractly, so the control is now moving to an inline SVG house outline with a roof, chimney, and door for clearer recognition while keeping the same pill/button footprint.
-- Analytics follow-up on 2026-04-05: GA4 integration scaffolding is now being added for public, admin, and login pages using one configurable `GA4_MEASUREMENT_ID` app setting. The shared snippet sends page-level context (`site_area`, `raffle_view`, `raffle_number`, `guild_slug`, `host_name`) and tracks outbound clicks to Google Sheets URLs. Activation is currently blocked only on the real measurement ID value; no deploy should happen until that ID is supplied so the feature can be turned on intentionally.
+- Analytics follow-up on 2026-04-05: GA4 integration scaffolding is now in place for public, admin, and login pages using one configurable `GA4_MEASUREMENT_ID` app setting. The shared snippet sends page-level context (`site_area`, `raffle_view`, `raffle_number`, `guild_slug`, `host_name`) and tracks outbound clicks to Google Sheets URLs. The real measurement ID has now been supplied as `G-8C00Y7WF9G`, so the next step is activation via deploy and post-deploy verification in GA4 Realtime/DebugView.
 
 ## Known Facts
 - `SESSION.md` was introduced after an earlier crash because conversation state had been lost.
@@ -109,9 +109,8 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - `DECISIONS.md`
 
 ## Exact Next Step
-- Get the real GA4 measurement ID for the shared BBCGuild property.
-- Set `GA4_MEASUREMENT_ID`, then deploy the analytics scaffolding.
-- After deploy, verify in-browser:
+- Commit, push, and deploy the GA4 activation pass.
+- Then verify in-browser and GA4:
 - page views appear with `site_area` distinguishing `public`, `admin`, and `admin_auth`
 - archive views report `raffle_view=archive`
 - clicks on Google Sheets links register as outbound `google_sheet_link` events
