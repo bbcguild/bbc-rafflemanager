@@ -1406,6 +1406,230 @@ border:1px solid rgba(140,170,230,.12);
   z-index:1900;
 }
 
+#new_raffle_modal{
+  display:none;
+  position:fixed;
+  left:50%;
+  top:50%;
+  transform:translate(-50%, -50%);
+  width:min(1180px, calc(100vw - 48px));
+  max-height:calc(100vh - 48px);
+  overflow:hidden;
+  z-index:2050;
+  border:1px solid rgba(80,120,210,.2);
+  border-radius:24px;
+  background:linear-gradient(180deg,#101b30,#091321);
+  box-shadow:0 32px 100px rgba(0,0,0,.5);
+}
+
+.new-raffle-modal-shell{
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+  max-height:calc(100vh - 48px);
+}
+
+.new-raffle-modal-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:18px;
+  padding:18px 20px 16px;
+  border-bottom:1px solid rgba(80,120,210,.16);
+  background:linear-gradient(180deg,rgba(17,31,55,.96),rgba(11,22,39,.96));
+}
+
+.new-raffle-modal-title{
+  display:grid;
+  gap:6px;
+}
+
+.new-raffle-modal-title h2{
+  margin:0;
+  color:#f4f7ff;
+  font-size:1.5rem;
+  line-height:1.1;
+}
+
+.new-raffle-modal-title p{
+  margin:0;
+  color:#aebfe0;
+  font-size:.95rem;
+  line-height:1.45;
+}
+
+.new-raffle-modal-close{
+  min-height:34px;
+  padding:0 14px;
+  border:1px solid rgba(95,132,212,.18);
+  border-radius:12px;
+  background:rgba(10,18,31,.72);
+  color:#f4f7ff;
+  font-size:.9rem;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.new-raffle-modal-body{
+  overflow:auto;
+  padding:18px 20px 20px;
+  display:grid;
+  gap:18px;
+}
+
+.new-raffle-overview{
+  display:grid;
+  grid-template-columns:repeat(4, minmax(0,1fr));
+  gap:12px;
+}
+
+.new-raffle-field{
+  display:grid;
+  gap:7px;
+}
+
+.new-raffle-field label,
+.new-raffle-note-header h3{
+  color:#c2d2ee;
+  font-size:.76rem;
+  font-weight:800;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  margin:0;
+}
+
+.new-raffle-field input{
+  min-height:40px;
+  padding:0 12px;
+  border:1px solid rgba(95,132,212,.18);
+  border-radius:12px;
+  background:#0f1622;
+  color:#edf3ff;
+  font-size:.94rem;
+  font-weight:600;
+}
+
+.new-raffle-status-chip{
+  min-height:40px;
+  display:flex;
+  align-items:center;
+  padding:0 12px;
+  border:1px solid rgba(76,182,126,.18);
+  border-radius:12px;
+  background:rgba(11,34,20,.56);
+  color:#8ff0ba;
+  font-size:.94rem;
+  font-weight:800;
+}
+
+.new-raffle-status-chip::before{
+  content:"";
+  width:9px;
+  height:9px;
+  margin-right:9px;
+  border-radius:999px;
+  background:currentColor;
+  box-shadow:0 0 0 2px rgba(255,255,255,.08);
+}
+
+.new-raffle-notes-grid{
+  display:grid;
+  gap:14px;
+}
+
+.new-raffle-note-card{
+  border:1px solid rgba(95,132,212,.16);
+  border-radius:18px;
+  background:linear-gradient(180deg,rgba(14,24,41,.92),rgba(9,17,31,.96));
+  overflow:hidden;
+}
+
+.new-raffle-note-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:12px 14px;
+  border-bottom:1px solid rgba(95,132,212,.12);
+  background:rgba(15,29,50,.84);
+}
+
+.new-raffle-note-actions{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.new-raffle-clear{
+  border:none;
+  background:transparent;
+  color:#dfe8fb;
+  font-size:.84rem;
+  font-weight:800;
+  cursor:pointer;
+  opacity:.9;
+}
+
+.new-raffle-toolbar{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  padding:12px 14px 0;
+}
+
+.new-raffle-editor{
+  margin:12px 14px 14px;
+  min-height:120px;
+  max-height:220px;
+  overflow:auto;
+  padding:14px 16px;
+  border:1px solid rgba(140,170,230,.16);
+  border-radius:16px;
+  background:rgba(10,18,32,.68);
+  color:#d6deeb;
+  line-height:1.55;
+  outline:none;
+}
+
+.new-raffle-editor.is-empty::before{
+  content:attr(data-placeholder);
+  color:#8194b4;
+}
+
+.new-raffle-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:12px;
+  padding:0 20px 20px;
+}
+
+.new-raffle-secondary,
+.new-raffle-primary{
+  min-height:40px;
+  padding:0 16px;
+  border-radius:14px;
+  font-size:.92rem;
+  font-weight:850;
+  cursor:pointer;
+}
+
+.new-raffle-secondary{
+  border:1px solid rgba(95,132,212,.18);
+  background:rgba(10,18,31,.72);
+  color:#f4f7ff;
+}
+
+.new-raffle-primary{
+  border:1px solid rgba(109,145,218,.24);
+  background:linear-gradient(180deg,#1f5fa7,#194a86);
+  color:#f4f7ff;
+}
+
+.new-raffle-primary:disabled{
+  opacity:.65;
+  cursor:default;
+}
+
 #import_template,
 #confirm_template,
 #barter_template,
@@ -1775,6 +1999,16 @@ div#paid_template{
     margin-left:0;
     flex-wrap:wrap;
   }
+  .new-raffle-overview{
+    grid-template-columns:1fr;
+  }
+  .new-raffle-modal-header{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+  .new-raffle-actions{
+    flex-wrap:wrap;
+  }
 }
 </style>
 
@@ -1905,7 +2139,7 @@ function formatPrizeValueField(field) {
 }
 
 function syncLegacyModalState() {
-        var anyVisible = $("#import_template:visible, #confirm_template:visible, #barter_template:visible, #paid_template:visible").length > 0
+        var anyVisible = $("#import_template:visible, #confirm_template:visible, #barter_template:visible, #paid_template:visible, #new_raffle_modal:visible").length > 0
         $("#legacy_modal_backdrop").toggle(anyVisible)
         $("body").toggleClass("legacy-modal-open", anyVisible)
 }
@@ -2123,6 +2357,86 @@ $(document).on("click", "#notesEditorToggle", function () {
         setNotesEditingMode(!NOTE_EDITOR_STATE.isEditing)
 })
 
+$(document).on("click", ".new-raffle-tool", function () {
+        var cmd = $(this).data("cmd")
+        var editor = this.closest(".new-raffle-note-card").querySelector(".new-raffle-editor")
+        if (!cmd || !editor) {
+                return
+        }
+
+        if (cmd === "createLink") {
+                var url = window.prompt("Enter a link URL")
+                if (!url) {
+                        return
+                }
+                execRichTextCommand(editor, cmd, url)
+                return
+        }
+
+        execRichTextCommand(editor, cmd)
+})
+
+$(document).on("change input", ".new-raffle-color", function () {
+        var editor = this.closest(".new-raffle-note-card").querySelector(".new-raffle-editor")
+        execRichTextCommand(editor, "foreColor", this.value)
+})
+
+$(document).on("input", ".new-raffle-editor", function () {
+        syncEditorPlaceholder(this)
+})
+
+$(document).on("click", ".new-raffle-clear", function () {
+        var editor = this.closest(".new-raffle-note-card").querySelector(".new-raffle-editor")
+        if (!editor) {
+                return
+        }
+        editor.innerHTML = ""
+        syncEditorPlaceholder(editor)
+        editor.focus()
+})
+
+$(document).on("click", "#newRaffleModalClose, #newRaffleCancel", function () {
+        hideNewRaffleModal()
+})
+
+$(document).on("click", "#newRaffleCreate", function () {
+        var payload = collectNewRafflePayload()
+        var createBtn = this
+
+        if (!payload.raffle_guild_num) {
+                alert("Please enter a raffle number before creating the new raffle.")
+                $("#newRaffleNumber").focus()
+                return
+        }
+
+        createBtn.disabled = true
+        createBtn.textContent = "Creating..."
+
+        $.ajax({
+                type: "POST",
+                url: "json/set/open_raffle",
+                data: payload,
+                success: function (result) {
+                        if (!result) {
+                                alert("Unable to create the new raffle.")
+                                return
+                        }
+                        hideNewRaffleModal()
+                        refresher()
+                },
+                error: function () {
+                        alert("Unable to create the new raffle.")
+                },
+                complete: function () {
+                        createBtn.disabled = false
+                        createBtn.textContent = "Create Raffle"
+                },
+                xhrFields: {
+                        withCredentials: true
+                }
+        })
+})
+
 $(document).on("input", "#notesEditorSurface", function () {
         persistActiveNoteDraft()
         setNoteSaveState(true, "Unsaved changes")
@@ -2141,6 +2455,7 @@ $(document).on("click", "#legacy_modal_backdrop", function () {
         hideLegacyModal("#confirm_template")
         hideLegacyModal("#barter_template")
         hideLegacyModal("#paid_template")
+        hideNewRaffleModal()
 })
 
 window.addEventListener("beforeunload", function (event) {
@@ -2221,6 +2536,76 @@ function promptForNewRaffleNumber() {
     }
 
     return enteredNumber
+}
+
+function syncEditorPlaceholder(surface) {
+    if (!surface) {
+        return
+    }
+
+    var plainText = (surface.textContent || "").replace(/\u00a0/g, " ").trim()
+    surface.classList.toggle("is-empty", !plainText && !surface.querySelector("img, ul, ol, li, a, span, div, p, br"))
+}
+
+function execRichTextCommand(surface, command, value) {
+    if (!surface) {
+        return
+    }
+
+    surface.focus()
+    document.execCommand(command, false, value || null)
+    syncEditorPlaceholder(surface)
+}
+
+function populateNewRaffleModal() {
+    $("#newRaffleNumber").val(getSuggestedRaffleNumber())
+    $("#newRaffleTime").val($("#raffle_time").val() || CURRENT_RAFFLE_INFO.raffle_time || "")
+    $("#newRaffleCost").val($("#raffle_cost").val() || CURRENT_RAFFLE_INFO.raffle_cost || "")
+    $("#newRaffleTitle").val("")
+
+    document.querySelectorAll(".new-raffle-editor").forEach(function (surface) {
+        var noteKey = surface.getAttribute("data-note-key")
+        var html = (NOTE_EDITOR_STATE.drafts && NOTE_EDITOR_STATE.drafts[noteKey]) || $("#" + noteKey).val() || ""
+        surface.innerHTML = html
+        syncEditorPlaceholder(surface)
+    })
+}
+
+function showNewRaffleModal() {
+    closeToolMenus()
+    populateNewRaffleModal()
+    $("#legacy_modal_backdrop").show()
+    $("body").addClass("legacy-modal-open")
+    $("#new_raffle_modal").show()
+    window.setTimeout(function () {
+        var field = document.getElementById("newRaffleNumber")
+        if (field) {
+            field.focus()
+            field.select()
+        }
+    }, 0)
+}
+
+function hideNewRaffleModal() {
+    $("#new_raffle_modal").hide()
+    syncLegacyModalState()
+}
+
+function collectNewRafflePayload() {
+    var payload = {
+        raffle_guild_num: normalizeFieldValue($("#newRaffleNumber").val()),
+        raffle_time: normalizeFieldValue($("#newRaffleTime").val()),
+        raffle_ticket_cost: normalizeFieldValue($("#newRaffleCost").val()),
+        raffle_title: normalizeFieldValue($("#newRaffleTitle").val()),
+        raffle_status: "LIVE"
+    }
+
+    document.querySelectorAll(".new-raffle-editor").forEach(function (surface) {
+        var noteKey = surface.getAttribute("data-note-key")
+        payload[noteKey] = surface.innerHTML
+    })
+
+    return payload
 }
 
 function confirmDangerousFieldChange(fieldId, oldValue, newValue) {
@@ -2790,15 +3175,7 @@ $(document).ready(function () {
             })
             $("#new_raffle_button").click(function (event) {
                     event.preventDefault()
-                    var newRaffleNumber = promptForNewRaffleNumber()
-                    if (newRaffleNumber === null) { return }
-
-                    var r = confirm("This will close the current raffle, open raffle #" + newRaffleNumber + ", carry forward the drawing time and ticket cost, clear the raffle title, and set status to LIVE. Continue?")
-                    if (r == false) { return }
-
-                    $.getJSON("json/set/open_raffle", { raffle_guild_num: newRaffleNumber }, function (result) {
-                            refresher()
-                        })
+                    showNewRaffleModal()
                     })
             $("#ticket_list").height($(window).height()-20)
 
@@ -3012,6 +3389,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         document.addEventListener('keydown', function (event) {
                 if (event.key === 'Escape') {
+                        hideNewRaffleModal()
                         setMenuOpen(false)
                         closeToolMenus()
                 }
@@ -3329,6 +3707,108 @@ document.addEventListener('DOMContentLoaded', function () {
 </div>
 
 <div id="legacy_modal_backdrop"></div>
+
+<div id="new_raffle_modal">
+  <div class="new-raffle-modal-shell">
+    <div class="new-raffle-modal-header">
+      <div class="new-raffle-modal-title">
+        <h2>Open New Raffle</h2>
+        <p>Review the next raffle setup in one place. Leave anything alone to carry it forward, clear it, or edit it before creating the new week.</p>
+      </div>
+      <button type="button" class="new-raffle-modal-close" id="newRaffleModalClose">Close</button>
+    </div>
+
+    <div class="new-raffle-modal-body">
+      <div class="new-raffle-overview">
+        <div class="new-raffle-field">
+          <label for="newRaffleNumber">Raffle Number</label>
+          <input type="text" id="newRaffleNumber" />
+        </div>
+        <div class="new-raffle-field">
+          <label for="newRaffleTime">Drawing Time</label>
+          <input type="text" id="newRaffleTime" />
+        </div>
+        <div class="new-raffle-field">
+          <label for="newRaffleCost">Ticket Cost</label>
+          <input type="text" id="newRaffleCost" />
+        </div>
+        <div class="new-raffle-field">
+          <label>Status</label>
+          <div class="new-raffle-status-chip">LIVE</div>
+        </div>
+      </div>
+
+      <div class="new-raffle-field">
+        <label for="newRaffleTitle">Raffle Name</label>
+        <input type="text" id="newRaffleTitle" placeholder="Optional - leave blank to use &quot;Raffle&quot;" />
+      </div>
+
+      <div class="new-raffle-notes-grid">
+        <div class="new-raffle-note-card">
+          <div class="new-raffle-note-header">
+            <h3>Admin Notes</h3>
+            <div class="new-raffle-note-actions">
+              <button type="button" class="new-raffle-clear">Clear</button>
+            </div>
+          </div>
+          <div class="new-raffle-toolbar">
+            <button type="button" class="note-tool new-raffle-tool" data-cmd="bold" title="Bold">B</button>
+            <button type="button" class="note-tool new-raffle-tool" data-cmd="italic" title="Italic">I</button>
+            <button type="button" class="note-tool new-raffle-tool" data-cmd="underline" title="Underline">U</button>
+            <button type="button" class="note-tool new-raffle-tool" data-cmd="insertUnorderedList" title="Bulleted list">Bullet List</button>
+            <button type="button" class="note-tool new-raffle-tool" data-cmd="insertOrderedList" title="Numbered list">1. List</button>
+            <button type="button" class="note-tool note-link new-raffle-tool" data-cmd="createLink" title="Insert link">Link</button>
+            <input type="color" class="note-color new-raffle-color" value="#f4f7ff" title="Text color" />
+          </div>
+          <div class="new-raffle-editor is-empty" contenteditable="true" data-note-key="raffle_notes_admin" data-placeholder="Admin notes for the new raffle."></div>
+        </div>
+
+        <div class="new-raffle-note-card">
+          <div class="new-raffle-note-header">
+            <h3>Public 1 Notes</h3>
+            <div class="new-raffle-note-actions">
+              <button type="button" class="new-raffle-clear">Clear</button>
+            </div>
+          </div>
+          <div class="new-raffle-toolbar">
+            <button type="button" class="note-tool new-raffle-tool" data-cmd="bold" title="Bold">B</button>
+            <button type="button" class="note-tool new-raffle-tool" data-cmd="italic" title="Italic">I</button>
+            <button type="button" class="note-tool new-raffle-tool" data-cmd="underline" title="Underline">U</button>
+            <button type="button" class="note-tool new-raffle-tool" data-cmd="insertUnorderedList" title="Bulleted list">Bullet List</button>
+            <button type="button" class="note-tool new-raffle-tool" data-cmd="insertOrderedList" title="Numbered list">1. List</button>
+            <button type="button" class="note-tool note-link new-raffle-tool" data-cmd="createLink" title="Insert link">Link</button>
+            <input type="color" class="note-color new-raffle-color" value="#f4f7ff" title="Text color" />
+          </div>
+          <div class="new-raffle-editor is-empty" contenteditable="true" data-note-key="raffle_notes" data-placeholder="Public 1 notes for the new raffle."></div>
+        </div>
+
+        <div class="new-raffle-note-card">
+          <div class="new-raffle-note-header">
+            <h3>Public 2 Notes</h3>
+            <div class="new-raffle-note-actions">
+              <button type="button" class="new-raffle-clear">Clear</button>
+            </div>
+          </div>
+          <div class="new-raffle-toolbar">
+            <button type="button" class="note-tool new-raffle-tool" data-cmd="bold" title="Bold">B</button>
+            <button type="button" class="note-tool new-raffle-tool" data-cmd="italic" title="Italic">I</button>
+            <button type="button" class="note-tool new-raffle-tool" data-cmd="underline" title="Underline">U</button>
+            <button type="button" class="note-tool new-raffle-tool" data-cmd="insertUnorderedList" title="Bulleted list">Bullet List</button>
+            <button type="button" class="note-tool new-raffle-tool" data-cmd="insertOrderedList" title="Numbered list">1. List</button>
+            <button type="button" class="note-tool note-link new-raffle-tool" data-cmd="createLink" title="Insert link">Link</button>
+            <input type="color" class="note-color new-raffle-color" value="#f4f7ff" title="Text color" />
+          </div>
+          <div class="new-raffle-editor is-empty" contenteditable="true" data-note-key="raffle_notes_public_2" data-placeholder="Public 2 notes for the new raffle."></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="new-raffle-actions">
+      <button type="button" class="new-raffle-secondary" id="newRaffleCancel">Cancel</button>
+      <button type="button" class="new-raffle-primary" id="newRaffleCreate">Create Raffle</button>
+    </div>
+  </div>
+</div>
 
 <div id="prize_template">
 <form id="prize_template_form">

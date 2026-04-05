@@ -49,6 +49,7 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - Notes-panel refinement follow-up on 2026-04-04: the notes area is now moving away from an always-open mini word processor. Current pass adds an explicit `Edit Notes` toggle, defaults the notes panel into a calmer read mode, hides the formatting toolbar until editing is opened, and keeps the save button visible only while editing or when unsaved changes exist. The edit toggle now uses a small paper-and-pen style icon treatment instead of plain text alone.
 - Notes-panel refinement follow-up on 2026-04-04: after live review, the editor-open header actions were still too chunky and duplicated the meaning of `Saved`. Current cleanup demotes the notes actions into lighter utility-style controls, keeps `Saved` as the status indicator, and only surfaces `Save All` as an actual action when there are unsaved edits across the note tabs.
 - Utility-band refinement follow-up on 2026-04-05: notes and import are being kept as matched sibling panels, but the import header is being toned down so the dropzone itself can reclaim visual focus. Current pass shortens both panel title bars in sync, cools the import accent away from loud orange, and softens the dropzone treatment so the center band feels more coordinated and less like two competing slabs.
+- New-raffle workflow follow-up on 2026-04-05: `Open New Raffle` is no longer just a browser prompt plus confirm. Current pass turns it into a proper setup modal with suggested raffle number, carried-forward drawing time and ticket cost, blank raffle name, status shown as `LIVE`, and all three note sections prefilled and editable in one place. Creating the raffle now submits exactly what is visible in that modal, so admins can leave notes alone, tweak them, or clear them before the new week starts.
 
 ## Known Facts
 - `SESSION.md` was introduced after an earlier crash because conversation state had been lost.
@@ -97,6 +98,7 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - whether the new `Edit Notes` open/close behavior makes the notes area feel calmer during normal tab switching
 - whether the lighter-weight `Edit Notes` / `Save All` utilities feel cleaner than the earlier chunky buttons
 - whether the toned-down import header still feels important enough without shouting orange
+- whether the new raffle-setup modal feels like a smoother weekly workflow than the old prompt/dropdown combo
 - then decide whether to keep polishing the notes/import workspace or move down into broader center/right layout work
 
 ## If Chat Dies, Resume By Doing This

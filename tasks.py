@@ -321,14 +321,14 @@ def open_new_raffle (request):
 
     new_raffle_info = {
         "raffle_guild_num": requested_number or 0,
-        "raffle_time": current_info.get("raffle_time", "Fill this in!"),
-        "raffle_ticket_cost": current_info.get("raffle_ticket_cost", "1000g"),
+        "raffle_time": request.params.get("raffle_time", current_info.get("raffle_time", "Fill this in!")),
+        "raffle_ticket_cost": request.params.get("raffle_ticket_cost", current_info.get("raffle_ticket_cost", "1000g")),
         "raffle_closed": 0,
-        "raffle_notes": "",
-        "raffle_title": "",
-        "raffle_status": "LIVE",
-        "raffle_notes_admin": "",
-        "raffle_notes_public_2": ""
+        "raffle_notes": request.params.get("raffle_notes", ""),
+        "raffle_title": request.params.get("raffle_title", ""),
+        "raffle_status": (request.params.get("raffle_status") or "LIVE").strip() or "LIVE",
+        "raffle_notes_admin": request.params.get("raffle_notes_admin", ""),
+        "raffle_notes_public_2": request.params.get("raffle_notes_public_2", "")
     }
 
     db.close_raffle_by_id(cur_id)
