@@ -25,8 +25,8 @@ ga4_context_payload = {
 window.dataLayer = window.dataLayer || [];
 function gtag(){ dataLayer.push(arguments); }
 
-var GA4_MEASUREMENT_ID = ${json.dumps(ga4_measurement_id)};
-var GA4_CONTEXT = ${json.dumps(ga4_context_payload)};
+var GA4_MEASUREMENT_ID = ${json.dumps(ga4_measurement_id) | n};
+var GA4_CONTEXT = ${json.dumps(ga4_context_payload) | n};
 
 gtag('js', new Date());
 gtag('config', GA4_MEASUREMENT_ID, {

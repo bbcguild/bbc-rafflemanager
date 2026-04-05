@@ -15,7 +15,7 @@ ga4_guild_slug = request.matchdict.get('guild', '')
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>BBC Raffle</title>
-<%include file="analytics_snippet.mako"/>
+<%include file="analytics_snippet.mako" args="ga4_site_area=ga4_site_area, ga4_raffle_view=ga4_raffle_view, ga4_raffle_number=ga4_raffle_number, ga4_guild_slug=ga4_guild_slug"/>
 
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.js"></script>
