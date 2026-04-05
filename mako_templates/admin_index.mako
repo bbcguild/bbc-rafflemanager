@@ -619,17 +619,6 @@ body.legacy-modal-open{
   border-color:rgba(109,145,218,.18);
   outline:none;
 }
-.action-btn-primary{
-  border-color:rgba(109,145,218,.24);
-  background:rgba(18,31,53,.92);
-  color:#f4f7ff;
-  box-shadow:inset 0 1px 0 rgba(173,199,244,.08);
-}
-.action-btn-primary:hover,
-.action-btn-primary:focus{
-  background:rgba(25,43,73,.98);
-  border-color:rgba(127,160,227,.3);
-}
 .tool-menu{
   position:relative;
   flex:0 0 auto;
@@ -1561,8 +1550,11 @@ border:1px solid rgba(140,170,230,.12);
 }
 
 .new-raffle-clear{
-  border:none;
-  background:transparent;
+  min-height:34px;
+  padding:0 12px;
+  border:1px solid rgba(140,170,230,.18);
+  border-radius:12px;
+  background:#101927;
   color:#dfe8fb;
   font-size:.84rem;
   font-weight:800;
@@ -3540,7 +3532,7 @@ document.addEventListener('DOMContentLoaded', function () {
   <div class="button-bar-left">
     <span class="button-bar-label">Admin Tools</span>
     <div class="tool-cluster">
-      <button type="button" class="action-btn action-btn-primary" onclick="$('#new_raffle_button').click()">Open New Raffle</button>
+      <button type="button" class="action-btn" onclick="$('#new_raffle_button').click()">Open New Raffle</button>
       <details class="tool-menu tool-menu-edit">
         <summary class="action-btn tool-menu-trigger">Edit Raffle <span class="tool-menu-caret">v</span></summary>
         <div class="tool-menu-panel">
@@ -3747,9 +3739,6 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="new-raffle-note-card">
           <div class="new-raffle-note-header">
             <h3>Admin Notes</h3>
-            <div class="new-raffle-note-actions">
-              <button type="button" class="new-raffle-clear">Clear</button>
-            </div>
           </div>
           <div class="new-raffle-toolbar">
             <button type="button" class="note-tool new-raffle-tool" data-cmd="bold" title="Bold">B</button>
@@ -3759,6 +3748,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <button type="button" class="note-tool new-raffle-tool" data-cmd="insertOrderedList" title="Numbered list">1. List</button>
             <button type="button" class="note-tool note-link new-raffle-tool" data-cmd="createLink" title="Insert link">Link</button>
             <input type="color" class="note-color new-raffle-color" value="#f4f7ff" title="Text color" />
+            <button type="button" class="new-raffle-clear">Clear</button>
           </div>
           <div class="new-raffle-editor is-empty" contenteditable="true" data-note-key="raffle_notes_admin" data-placeholder="Admin notes for the new raffle."></div>
         </div>
@@ -3766,9 +3756,6 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="new-raffle-note-card">
           <div class="new-raffle-note-header">
             <h3>Public 1 Notes</h3>
-            <div class="new-raffle-note-actions">
-              <button type="button" class="new-raffle-clear">Clear</button>
-            </div>
           </div>
           <div class="new-raffle-toolbar">
             <button type="button" class="note-tool new-raffle-tool" data-cmd="bold" title="Bold">B</button>
@@ -3778,6 +3765,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <button type="button" class="note-tool new-raffle-tool" data-cmd="insertOrderedList" title="Numbered list">1. List</button>
             <button type="button" class="note-tool note-link new-raffle-tool" data-cmd="createLink" title="Insert link">Link</button>
             <input type="color" class="note-color new-raffle-color" value="#f4f7ff" title="Text color" />
+            <button type="button" class="new-raffle-clear">Clear</button>
           </div>
           <div class="new-raffle-editor is-empty" contenteditable="true" data-note-key="raffle_notes" data-placeholder="Public 1 notes for the new raffle."></div>
         </div>
@@ -3785,9 +3773,6 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="new-raffle-note-card">
           <div class="new-raffle-note-header">
             <h3>Public 2 Notes</h3>
-            <div class="new-raffle-note-actions">
-              <button type="button" class="new-raffle-clear">Clear</button>
-            </div>
           </div>
           <div class="new-raffle-toolbar">
             <button type="button" class="note-tool new-raffle-tool" data-cmd="bold" title="Bold">B</button>
@@ -3797,6 +3782,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <button type="button" class="note-tool new-raffle-tool" data-cmd="insertOrderedList" title="Numbered list">1. List</button>
             <button type="button" class="note-tool note-link new-raffle-tool" data-cmd="createLink" title="Insert link">Link</button>
             <input type="color" class="note-color new-raffle-color" value="#f4f7ff" title="Text color" />
+            <button type="button" class="new-raffle-clear">Clear</button>
           </div>
           <div class="new-raffle-editor is-empty" contenteditable="true" data-note-key="raffle_notes_public_2" data-placeholder="Public 2 notes for the new raffle."></div>
         </div>
