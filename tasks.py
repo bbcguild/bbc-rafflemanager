@@ -1146,6 +1146,10 @@ def set_prize (request):
     prize_value_digits = re.sub(r"[^\d]", "", "" if raw_prize_value is None else str(raw_prize_value))
     data["prize_value"] = int(prize_value_digits) if prize_value_digits else None
 
+    raw_prize_winner = data.get("prize_winner", "")
+    if raw_prize_winner in (None, ""):
+        data["prize_winner"] = 0
+
     if isinstance(data["prize_winner"], str) and data["prize_winner"].startswith("P"):
         data["prize_winner"] = -int(data["prize_winner"][1:])
 
