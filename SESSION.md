@@ -42,6 +42,7 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - Status polish follow-up on 2026-04-04: after the regression repair, the right-side status control was still unclear as an interactive dropdown and the explicit `Status` label was colliding visually with it. Current polish removes the redundant label and adds a clearer down-caret to the control itself so the affordance reads more naturally.
 - Status polish follow-up on 2026-04-04: a final bug remained where the selected `CLOSED`/`ROLLING` state could inherit the wrong text color and the caret still failed to render reliably. Current fix moves the caret to a wrapper-owned affordance instead of relying on native select chrome and corrects the state-specific color mapping.
 - Status bug fix follow-up on 2026-04-04: the selected status text color could still lag behind the actual chosen value because the status-state class was only being refreshed when raffle data reloaded. Current fix updates the status styling immediately in the `change` handler so the closed control reflects the newly selected state without waiting for a refresh.
+- Legacy cleanup follow-up on 2026-04-04: confirmed that the old `bonus_tickets` feature is no longer referenced by any active template. The remaining request subscriber/backend helper in `tasks.py` has been removed so that dead path cannot keep confusing future cleanup work.
 
 ## Known Facts
 - `SESSION.md` was introduced after an earlier crash because conversation state had been lost.

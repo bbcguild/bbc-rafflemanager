@@ -1267,15 +1267,6 @@ def add_info (event):
         n = gget_guild_info(request.matchdict["guild"])
         request.guild = n
 
-def bonus_tickets (event):
-    request = event.request
-    if guild_bonus_five (request):
-        request.bonus_tickets = 5
-    elif guild_bonus_two (request):
-        request.bonus_tickets = 2
-    else:
-        request.bonus_tickets = 0
-
 def make_app ():
     # Initialize database if it doesn't exist (preserves existing databases)
     try:
@@ -1369,8 +1360,6 @@ def make_app ():
     # -- Prize manipulation
     g_route("roll_prize", "/{guild}/json/set/prize_roll/{prize_id}")
     g_route("finalise_prize", "/{guild}/json/set/prize_finalise/{prize_id}")
-
-    config.add_subscriber(bonus_tickets, 'pyramid.events.ContextFound')
 
     # Re-enable auth module - all Python 2/3 issues resolved
     # Include auth module at root level and also with guild prefix
