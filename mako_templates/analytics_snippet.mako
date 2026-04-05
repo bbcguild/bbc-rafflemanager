@@ -11,12 +11,28 @@ def ga4_safe(value):
         return ""
     return str(value)
 
+ga4_host_name = request.host.split(":")[0] if request.host else ""
+ga4_guild_slug_value = request.matchdict.get("guild", "") if request.matchdict else ""
+ga4_raffle_number_value = ""
+if request.matchdict and request.matchdict.get("raffle"):
+    ga4_raffle_number_value = request.matchdict.get("raffle", "")
+elif request.params.get("raffle_lookup"):
+    ga4_raffle_number_value = request.params.get("raffle_lookup", "")
+
+ga4_site_area_value = "public"
+ga4_raffle_view_value = "archive" if ga4_raffle_number_value else "current"
+
+if "login" in (request.path or "").lower():
+    ga4_site_area_value = "admin_auth"
+elif ga4_host_name.startswith("raffle-admin."):
+    ga4_site_area_value = "admin"
+
 ga4_context_payload = {
-    "site_area": ga4_safe(ga4_site_area),
-    "raffle_view": ga4_safe(ga4_raffle_view),
-    "raffle_number": ga4_safe(ga4_raffle_number),
-    "guild_slug": ga4_safe(ga4_guild_slug),
-    "host_name": ga4_safe(request.host.split(":")[0] if request.host else ""),
+    "site_area": ga4_safe(ga4_site_area_value),
+    "raffle_view": ga4_safe(ga4_raffle_view_value),
+    "raffle_number": ga4_safe(ga4_raffle_number_value),
+    "guild_slug": ga4_safe(ga4_guild_slug_value),
+    "host_name": ga4_safe(ga4_host_name),
 }
 %>
 % if ga4_measurement_id:

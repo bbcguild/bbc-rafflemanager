@@ -9,7 +9,7 @@ ga4_guild_slug = request.matchdict.get('guild', '')
 <head>
     <title>${title}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <%include file="analytics_snippet.mako" args="ga4_site_area=ga4_site_area, ga4_raffle_view=ga4_raffle_view, ga4_raffle_number=ga4_raffle_number, ga4_guild_slug=ga4_guild_slug"/>
+    <%include file="analytics_snippet.mako"/>
     <style>
         :root {
             --bg: #060a12;

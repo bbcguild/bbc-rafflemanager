@@ -3,6 +3,7 @@
 <head>
     <title>${title}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <%include file="/mako_templates/analytics_snippet.mako"/>
     <style>
         :root {
             --bg: #060a12;
