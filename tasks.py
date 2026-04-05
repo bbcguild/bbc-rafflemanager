@@ -350,7 +350,7 @@ def open_new_raffle (request):
     requested_number = (request.params.get("raffle_guild_num") or "").strip()
 
     if get_current_raffle_status() != "COMPLETE":
-        return json_error("Set the raffle status to CLOSED before opening a new raffle.")
+        return json_error('Set the raffle status to "COMPLETE" before opening a new raffle.')
 
     new_raffle_info = {
         "raffle_guild_num": requested_number or 0,
@@ -1109,7 +1109,7 @@ def unfinalise_prize (request):
     if request.matchdict and "prize_id" in request.matchdict:
         status = get_current_raffle_status()
         if status not in ("ROLLING", "COMPLETE"):
-            return json_error("Prizes can only be unlocked while the raffle is ROLLING or CLOSED.")
+            return json_error('Prizes can only be unlocked while the raffle is ROLLING or COMPLETE.')
         if not db.unfinalise_prize(request.matchdict["prize_id"]):
             return json_error("Unable to unlock this prize.")
         return json_ok()

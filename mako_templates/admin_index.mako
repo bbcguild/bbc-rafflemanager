@@ -1909,10 +1909,10 @@ div#paid_template{
   line-height:1;
 }
 .prize_finalise::before{
-  content:"\1F512";
+  content:"\1F513";
 }
 .prize_unlock::before{
-  content:"\1F513";
+  content:"\1F512";
 }
 .prize_roll::before{
   content:"\1F3B2";
@@ -2058,7 +2058,7 @@ function closeToolMenus() {
 function normalizeRaffleStatus(status) {
         var value = (status || "LIVE").toString().trim().toUpperCase()
         if (value === "CLOSED") {
-                return "ROLLING"
+                return "COMPLETE"
         }
         if (value !== "LIVE" && value !== "ROLLING" && value !== "COMPLETE") {
                 return "LIVE"
@@ -2724,7 +2724,7 @@ function maybePromptCompleteAfterFinalLock(result) {
         return
     }
 
-    if (window.confirm('All prizes are now locked. Change raffle status to "CLOSED" now?')) {
+    if (window.confirm('All prizes are now locked. Change raffle status to "COMPLETE" now?')) {
         $("#raffle_status").val("COMPLETE").trigger("change")
     }
 }
@@ -2777,6 +2777,7 @@ $("#raffle_status").val(normalizeRaffleStatus(result["raffle_status"]))
 }
 var get_prize_info = function (options) {
         options = options || {}
+        var restoreScrollY = options.preserveScroll ? window.pageYOffset : null
         // deal with prizes
         $.getJSON("json/get/prizes", function (result) {
                 $("#prize_info").empty()
@@ -2813,14 +2814,15 @@ var get_prize_info = function (options) {
                             .addClass("prize_unlock")
                         $("input[type='text'][name]", template).prop("disabled", true)
                     } else {
-                        $("#prize_finalise", template).attr({"id": dom_id + "finalise"})
+                        $("#prize_finalise", template).attr({"id": dom_id + "finalise", "title": "Lock winner"})
                         $("#prize_delete", template).attr({"id": dom_id + "delete"})
                         $("#prize_roll", template).attr({"id": dom_id + "roll"})
                     }
                     $("#prize_template_form", template).attr({"id": "prize_" + value["prize_id"] + "_form"})
                     $(".prize_id", template).val(value["prize_id"])
 
-                    $(".prize_delete", template).click(function () {
+                    $(".prize_delete", template).click(function (event) {
+                        event.preventDefault()
                         if (GLOBAL_PRIZE_ALERTED == false) {
                             GLOBAL_PRIZE_ALERTED = true
                             var r = confirm("Prize deletion is final and irreversible. You will only be shown this message once per session. Press OK to confirm deletion, or cancel to go back.")
@@ -2834,23 +2836,25 @@ var get_prize_info = function (options) {
                                 alert(actionErrorMessage(result))
                                 return
                             }
-                            get_prize_info()
+                            get_prize_info({ preserveScroll: true })
                             })
                         
                     })
-                    $(".prize_finalise", template).click(function () {
+                    $(".prize_finalise", template).click(function (event) {
+                            event.preventDefault()
                             $.getJSON("json/set/prize_finalise/" + value["prize_id"], function (result) {
                                 if (isActionError(result)) {
                                     alert(actionErrorMessage(result))
                                     return
                                 }
                                 maybePromptCompleteAfterFinalLock(result)
-                                get_prize_info()
+                                get_prize_info({ preserveScroll: true })
                                 })
                             })
-                    $(".prize_unlock", template).click(function () {
+                    $(".prize_unlock", template).click(function (event) {
+                            event.preventDefault()
                             var warning = normalizeRaffleStatus($("#raffle_status").val()) === "COMPLETE"
-                                ? "This raffle is already CLOSED. Unlocking will hide this winner again and let you edit it. Continue?"
+                                ? "This raffle is already COMPLETE. Unlocking will hide this winner again and let you edit it. Continue?"
                                 : "Unlock this prize so the winner can be changed? The finalized winner will no longer be shown publicly."
                             if (!window.confirm(warning)) {
                                 return
@@ -2860,24 +2864,26 @@ var get_prize_info = function (options) {
                                     alert(actionErrorMessage(result))
                                     return
                                 }
-                                get_prize_info()
+                                get_prize_info({ preserveScroll: true })
                                 })
                             })
-                    $(".prize_roll", template).click(function () {
+                    $(".prize_roll", template).click(function (event) {
+                            event.preventDefault()
                             $.getJSON("json/set/prize_roll/" + value["prize_id"], function (result) {
                                 if (isActionError(result)) {
                                     alert(actionErrorMessage(result))
                                     return
                                 }
-                                get_prize_info()
+                                get_prize_info({ preserveScroll: true })
                                 })
                             })
 
                     $("input[type='text'][name]", template).change(function () {
                             savePrizeForm($("#" + dom_id + "form"), {
-                                refreshAfterSave: true
+                                refreshAfterSave: true,
+                                refreshOptions: { preserveScroll: true }
                             }).fail(function () {
-                                get_prize_info()
+                                get_prize_info({ preserveScroll: true })
                             })
                             })
 
@@ -2887,6 +2893,8 @@ var get_prize_info = function (options) {
 
                 if (options.scrollToLast && lastPrizeCard && lastPrizeCard.length) {
                     lastPrizeCard[0].scrollIntoView({ behavior: "smooth", block: "nearest" })
+                } else if (restoreScrollY !== null) {
+                    window.scrollTo(0, restoreScrollY)
                 }
             })
 }
@@ -3323,6 +3331,10 @@ $(document).ready(function () {
             })
             $("#new_raffle_button").click(function (event) {
                     event.preventDefault()
+                    if (normalizeRaffleStatus($("#raffle_status").val()) !== "COMPLETE") {
+                        alert('Set the raffle status to "COMPLETE" before opening a new raffle.')
+                        return
+                    }
                     showNewRaffleModal()
                     })
             $("#ticket_list").height($(window).height()-20)
@@ -3979,7 +3991,7 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
     </div>
     <div class="prize-actions">
-        <a href="#" id="prize_finalise" class="prize_finalise prize-action" title="Finalize winner">L</a>
+        <a href="#" id="prize_finalise" class="prize_finalise prize-action" title="Lock winner">L</a>
         <a href="#" id="prize_roll" class="prize_roll prize-action" title="Roll winner">R</a>
         <a href="#" id="prize_delete" class="prize_delete prize-action" title="Delete prize">X</a>
     </div>

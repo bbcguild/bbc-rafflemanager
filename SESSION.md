@@ -54,6 +54,7 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - New-raffle workflow follow-up on 2026-04-05: first live polish moved each notes-section `Clear` action down into the formatting row so it is visible where the editor controls already live. The toolbar `Open New Raffle` trigger was also de-lit so it rests in the same normal/off state as the other admin controls until used.
 - Workflow-enforcement follow-up on 2026-04-05: prize actions and weekly rollover now have backend status rules instead of relying on admin memory. Rolling, entering/changing winning ticket numbers, and locking prizes now require raffle status `ROLLING`; opening a new raffle now requires the current raffle to already be `CLOSED`/`COMPLETE`. Finalized prizes are no longer permanently irreversible: they stay locked for normal use, keep a visible lock control, can be unlocked with confirmation, and expose an open-lock icon when reversible. After the final remaining prize is locked, the UI now prompts admins to switch raffle status to `CLOSED`.
 - Autosave bug follow-up on 2026-04-05: editing prize text/value while the winner field was blank could still trip the ROLLING-only guard because autosave treated blank winner state as a winner change. The backend now normalizes blank `prize_winner` values to `0` before the status-gate logic runs, so text/value edits no longer falsely require a rolling raffle.
+- Admin testing follow-up on 2026-04-05: live testing confirmed prize values and public prize display are working, but several workflow friction points surfaced. Current pass keeps prize-card autosave and action refreshes from bouncing the page to the top, blocks `Open New Raffle` before the setup modal opens unless status is already `COMPLETE`, normalizes lingering `CLOSED` wording/handling toward `COMPLETE`, and flips the prize lock iconography so open lock means unlocked while closed lock means locked.
 
 ## Known Facts
 - `SESSION.md` was introduced after an earlier crash because conversation state had been lost.
@@ -103,12 +104,12 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - `DECISIONS.md`
 
 ## Exact Next Step
-- Push and deploy commit `e778449` (`admin: normalize blank prize winners`).
+- Commit, push, and deploy the current admin workflow polish follow-up.
 - Then verify in-browser:
-- editing only prize text/value with a blank winner no longer throws the ROLLING-only error
-- existing prize values still persist through refresh
-- adding a third prize still does not wipe earlier cards
-- blank prize details still show the public fallback `Prize Details Soon`
+- editing prize fields or clicking prize actions no longer jumps the page to the top
+- `Open New Raffle` refuses immediately when status is not `COMPLETE`, before opening the modal
+- unlocked prize cards show an open-lock icon and finalized prize cards show a closed-lock icon
+- legacy/visible status copy consistently says `COMPLETE` instead of `CLOSED`
 
 ## If Chat Dies, Resume By Doing This
 1. Read `SESSION.md`.
