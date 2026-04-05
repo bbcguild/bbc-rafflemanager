@@ -2583,6 +2583,10 @@ $(document).ready(function () {
                     }
                 }
 
+                if (fieldId === "raffle_status") {
+                    applyAdminStatus($field.val())
+                }
+
                 $.ajax({
                     type: "POST",
                     url: "json/set/raffle",
