@@ -219,8 +219,17 @@ body{
   border:1px solid var(--line2);
 }
 
+.archive-nav-link.archive-nav-home{
+  background:rgba(90,129,214,.16);
+  border-color:rgba(137,176,255,.34);
+}
+
 .archive-nav-link:hover{
   background:rgba(255,255,255,.08);
+}
+
+.archive-nav-link.archive-nav-home:hover{
+  background:rgba(90,129,214,.24);
 }
 
 .archive-nav-disabled{
@@ -1106,6 +1115,56 @@ function updateRaffleStatusLine(timestampValue) {
     + " " + formatted.dayPeriod + " " + formatted.timeZoneName;
 
   $updated.text("Last Updated " + rendered);
+}
+
+function updateRaffleNav() {
+  var $nav = $("#raffle_nav_primary");
+  if (!$nav.length) return;
+
+  $nav.empty();
+
+  if (!currentDisplayedRaffleNum) {
+    return;
+  }
+
+  var effectiveDepth = currentDepth;
+  if (effectiveDepth === null) {
+    effectiveDepth = inferDepthFromLive(liveCurrentRaffleNum, currentDisplayedRaffleNum);
+  }
+
+  var prevNum = getPrevRaffleNum(currentDisplayedRaffleNum);
+  var nextNum = getNextRaffleNum(currentDisplayedRaffleNum);
+  var showHome = !!(liveCurrentRaffleNum && currentDisplayedRaffleNum && liveCurrentRaffleNum !== currentDisplayedRaffleNum);
+
+  if (prevNum && effectiveDepth !== null && effectiveDepth < MAX_HISTORY_DEPTH) {
+    $nav.append(
+      '<a class="archive-nav-link" href="' +
+      raffleLookupHref(prevNum, effectiveDepth + 1) +
+      '" aria-label="Previous archive">&#9194;</a>'
+    );
+  } else {
+    $nav.append('<span class="archive-nav-disabled" aria-hidden="true">&#9194;</span>');
+  }
+
+  if (showHome) {
+    $nav.append(
+      '<a class="archive-nav-link archive-nav-home" href="' +
+      raffleLookupHref(liveCurrentRaffleNum, 0) +
+      '" aria-label="Return to current raffle">&#8962;</a>'
+    );
+  }
+
+  $nav.append('<span class="archive-nav-label">Archives</span>');
+
+  if (nextNum && effectiveDepth !== null && effectiveDepth > 0) {
+    $nav.append(
+      '<a class="archive-nav-link" href="' +
+      raffleLookupHref(nextNum, effectiveDepth - 1) +
+      '" aria-label="Next archive">&#9193;</a>'
+    );
+  } else {
+    $nav.append('<span class="archive-nav-disabled" aria-hidden="true">&#9193;</span>');
+  }
 }
 
 function buildPrizeCards(result) {
