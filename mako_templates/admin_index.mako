@@ -125,18 +125,21 @@ body.legacy-modal-open{
 .admin-header::before{
   content:"";
   position:absolute;
-  inset:-8% auto -18% 42%;
-  width:min(500px,48vw);
+  top:50%;
+  right:-28px;
+  width:768px;
+  height:768px;
   background-image:
-    linear-gradient(90deg, rgba(7,12,22,0) 0%, rgba(7,12,22,.2) 18%, rgba(7,12,22,.35) 100%),
+    radial-gradient(circle at 34% 50%, rgba(7,12,22,0) 0%, rgba(7,12,22,.1) 38%, rgba(7,12,22,.34) 100%),
     url("/static/eso-ouroboros.png");
   background-repeat:no-repeat;
-  background-position:left center, center center;
-  background-size:100% 100%, contain;
-  opacity:.13;
+  background-position:center center, center center;
+  background-size:100% 100%, auto;
+  opacity:.12;
   filter:saturate(.52) brightness(.72);
   pointer-events:none;
   z-index:0;
+  transform:translateY(-50%);
 }
 .header-left{
   display:grid;
