@@ -892,29 +892,50 @@ body.legacy-modal-open{
 .note-save-group{
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:14px;
   margin-left:auto;
-  flex-wrap:wrap;
+  flex-wrap:nowrap;
   justify-content:flex-end;
 }
 
 .note-save-status{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
   color:rgba(244,247,255,.82);
   font-size:.8rem;
   font-weight:700;
   white-space:nowrap;
 }
 
+.note-save-status::before{
+  content:"";
+  width:8px;
+  height:8px;
+  border-radius:999px;
+  background:currentColor;
+  box-shadow:0 0 0 2px rgba(255,255,255,.08);
+}
+
 .note-action-btn{
-  min-height:32px;
-  padding:0 14px;
-  border:1px solid rgba(255,255,255,.18);
-  border-radius:12px;
-  background:rgba(10,20,38,.4);
+  min-height:28px;
+  padding:0;
+  border:none;
+  border-radius:0;
+  background:transparent;
   color:#f4f7ff;
-  font-size:.88rem;
-  font-weight:850;
+  font-size:.84rem;
+  font-weight:800;
   cursor:pointer;
+  opacity:.92;
+  transition:opacity .16s ease,color .16s ease;
+}
+
+.note-action-btn:hover,
+.note-action-btn:focus{
+  opacity:1;
+  color:#ffffff;
+  outline:none;
 }
 
 .note-edit-toggle{
@@ -954,8 +975,22 @@ body.legacy-modal-open{
 }
 
 .note-save-btn.is-dirty{
-  background:#f4f7ff;
-  color:#17376c;
+  color:#ffffff;
+}
+
+.note-save-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+}
+
+.note-save-btn::before{
+  content:"";
+  width:10px;
+  height:10px;
+  border-radius:999px;
+  background:currentColor;
+  box-shadow:0 0 0 2px rgba(255,255,255,.08);
 }
 
 .notes-editor-toolbar{
@@ -1738,6 +1773,7 @@ div#paid_template{
     width:100%;
     justify-content:flex-start;
     margin-left:0;
+    flex-wrap:wrap;
   }
 }
 </style>
@@ -1928,8 +1964,8 @@ function setNoteSaveState(isDirty, message) {
 
         if (saveBtn) {
                 saveBtn.classList.toggle("is-dirty", !!isDirty)
-                saveBtn.textContent = isDirty ? "Save Notes" : "Saved"
-                saveBtn.style.display = (NOTE_EDITOR_STATE.isEditing || !!isDirty) ? "" : "none"
+                saveBtn.textContent = "Save All"
+                saveBtn.style.display = !!isDirty ? "" : "none"
         }
         if (status) {
                 status.textContent = message || (isDirty ? "Unsaved changes" : "Saved")
@@ -1940,7 +1976,6 @@ function applyNotesEditorMode() {
         var panel = document.getElementById("notesPanel")
         var surface = getNotesEditorSurface()
         var toggle = document.getElementById("notesEditorToggle")
-        var saveBtn = document.getElementById("notesSaveBtn")
 
         if (!panel || !surface || !toggle) {
                 return
@@ -1949,10 +1984,6 @@ function applyNotesEditorMode() {
         panel.classList.toggle("is-read-mode", !NOTE_EDITOR_STATE.isEditing)
         surface.setAttribute("contenteditable", NOTE_EDITOR_STATE.isEditing ? "true" : "false")
         toggle.lastChild.textContent = NOTE_EDITOR_STATE.isEditing ? "Close Editor" : "Edit Notes"
-
-        if (saveBtn) {
-                saveBtn.style.display = (NOTE_EDITOR_STATE.isEditing || NOTE_EDITOR_STATE.dirty) ? "" : "none"
-        }
 }
 
 function setNotesEditingMode(isEditing) {
@@ -2044,7 +2075,7 @@ function saveNotes() {
                 complete: function () {
                         if (saveBtn) {
                                 saveBtn.disabled = false
-                                saveBtn.textContent = NOTE_EDITOR_STATE.dirty ? "Save Notes" : "Saved"
+                                saveBtn.textContent = "Save All"
                         }
                 },
                 xhrFields: {
@@ -3248,7 +3279,7 @@ document.addEventListener('DOMContentLoaded', function () {
         id="notesEditorSurface"
         class="notes-editor-surface is-empty"
         contenteditable="true"
-        data-placeholder="Write notes here, then click Save Notes."
+        data-placeholder="Write notes here, then click Save All."
       ></div>
     </div>
   </div>
