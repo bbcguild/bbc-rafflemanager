@@ -707,29 +707,16 @@ body.legacy-modal-open{
 }
 .status-tool{
   display:flex;
-  align-items:flex-end;
-  gap:8px;
-  padding-left:10px;
+  align-items:center;
+  gap:0;
+  padding-left:0;
   border-left:1px solid rgba(95,132,212,.12);
-}
-.status-tool-summary{
-  display:flex;
-  flex-direction:column;
-  gap:3px;
-  min-width:0;
-}
-.status-tool-heading{
-  color:var(--muted);
-  font-size:.72rem;
-  font-weight:800;
-  letter-spacing:.08em;
-  text-transform:uppercase;
 }
 .status-tool-select{
   min-width:208px;
   max-width:208px;
   padding-left:14px;
-  padding-right:34px;
+  padding-right:38px;
   font-weight:800;
   appearance:none;
   -webkit-appearance:none;
@@ -742,15 +729,15 @@ body.legacy-modal-open{
 }
 .status-tool-select.status-live{
   color:#8ff0ba;
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%238ff0ba' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M2 3.5l4 4 4-4' fill='none' stroke='%238ff0ba' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg>");
 }
 .status-tool-select.status-rolling{
   color:#8ff0ba;
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%238ff0ba' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M2 3.5l4 4 4-4' fill='none' stroke='%238ff0ba' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg>");
 }
 .status-tool-select.status-complete{
   color:#ff9d9d;
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%23ff9d9d' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M2 3.5l4 4 4-4' fill='none' stroke='%23ff9d9d' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg>");
 }
 .status-tool-select:focus{
   outline:none !important;
@@ -3030,9 +3017,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
   <div class="button-bar-right">
     <div class="status-tool">
-      <div class="status-tool-summary">
-        <span class="status-tool-heading">Status</span>
-      </div>
       <select id="raffle_status" class="ginfo_change_save tool-input status-tool-select" name="raffle_status">
         <option value="LIVE">&#128994; LIVE</option>
         <option value="ROLLING">&#127922; ROLLING</option>
