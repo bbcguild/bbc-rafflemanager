@@ -224,6 +224,21 @@ body{
   border-color:rgba(137,176,255,.34);
 }
 
+.archive-nav-home-icon{
+  width:14px;
+  height:14px;
+  display:block;
+}
+
+.archive-nav-home-icon path,
+.archive-nav-home-icon line{
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.9;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
 .archive-nav-link:hover{
   background:rgba(255,255,255,.08);
 }
@@ -1150,7 +1165,13 @@ function updateRaffleNav() {
     $nav.append(
       '<a class="archive-nav-link archive-nav-home" href="' +
       raffleLookupHref(liveCurrentRaffleNum, 0) +
-      '" aria-label="Return to current raffle">&#8962;</a>'
+      '" aria-label="Return to current raffle">' +
+      '<svg class="archive-nav-home-icon" viewBox="0 0 24 24" aria-hidden="true">' +
+      '<path d="M4.5 10.5 12 4l7.5 6.5"></path>' +
+      '<path d="M6.5 9.75V19h11V9.75"></path>' +
+      '<path d="M14.75 5.9V3.8h2.1v3.9"></path>' +
+      '<path d="M10 19v-4.6h4V19"></path>' +
+      '</svg></a>'
     );
   }
 

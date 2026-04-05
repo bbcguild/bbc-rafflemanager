@@ -58,6 +58,7 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - Admin testing follow-up on 2026-04-05: a second verification pass confirmed the scroll-jump fix and early new-raffle guard are working. Remaining gaps found during that pass were that unlocked prizes still leaked their ticket number on the public page, and the visible admin status dropdown still said `CLOSED`. Current follow-up fixes the public ticket display so only finalized prizes expose winner ticket numbers, changes the visible admin status label to `COMPLETE`, and gives the lock pill a clearer green-unlocked / red-locked state treatment.
 - Public entrants follow-up on 2026-04-05: when the raffle status was not `LIVE`, the public entrants table correctly exposed the extra `Range` column but populated it with the wrong numeric field instead of the computed ticket ranges. Root cause was the range renderer using a hard-coded index that matched the paid-ticket slot in non-barter rows. Current fix reads the appended trailing range field directly so `Range` shows the actual ticket spans again.
 - Archive navigation follow-up on 2026-04-05: added a dedicated public `Home` return control for archive browsing so users can jump back to the current raffle without stepping forward raffle-by-raffle. The control is styled in the same family as the existing archive arrows, appears only when viewing an older raffle, and uses a slight accent to distinguish the “return to current” action from previous/next archive movement.
+- Archive navigation icon follow-up on 2026-04-05: the first `Home` glyph read too abstractly, so the control is now moving to an inline SVG house outline with a roof, chimney, and door for clearer recognition while keeping the same pill/button footprint.
 
 ## Known Facts
 - `SESSION.md` was introduced after an earlier crash because conversation state had been lost.
@@ -107,11 +108,10 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - `DECISIONS.md`
 
 ## Exact Next Step
-- Commit, push, and deploy the archive `Home` navigation control.
+- Commit, push, and deploy the archive `Home` icon refinement.
 - Then verify in-browser:
-- archive view shows previous, `Home`, and next controls together
-- `Home` returns to the current/live raffle
-- `Home` does not appear when already on the current raffle
+- the new house icon reads clearly as `Home`
+- the icon still aligns cleanly with the archive arrow controls
 
 ## If Chat Dies, Resume By Doing This
 1. Read `SESSION.md`.
