@@ -34,6 +34,7 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - Admin shell redesign follow-up on 2026-04-04: after live review of the split trigger, the logo shell is being stripped back further so the BBC mark can visually float while only the caret keeps a pill treatment. This keeps the lookup/menu structure the user liked while removing the remaining unnecessary chunk around the trigger.
 - Admin shell redesign follow-up on 2026-04-04: the detached caret control is now being pushed even lighter by shrinking it into a tighter circular affordance with a dark neutral background instead of a bright blue mini-pill. If it still feels too visible after live review, the next experiment is removing the framing almost entirely.
 - Admin shell redesign follow-up on 2026-04-04: the default admin header now has a subtle Elder Scrolls Online ouroboros watermark layered into the right side of the header card. The intent is to give the everyday non-seasonal header some world flavor and purpose without forcing a tall “template hero” treatment or harming text readability.
+- Admin shell redesign follow-up on 2026-04-04: the first sourced ouroboros art was visually wrong for the site. The header watermark asset has now been swapped to the user-provided transparent ESO ouroboros file, with the existing subtle watermark treatment left in place so art choice can be judged before further opacity/placement tuning.
 
 ## Known Facts
 - `SESSION.md` was introduced after an earlier crash because conversation state had been lost.
