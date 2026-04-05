@@ -620,15 +620,15 @@ body.legacy-modal-open{
   outline:none;
 }
 .action-btn-primary{
-  border-color:rgba(216,146,42,.28);
-  background:linear-gradient(180deg,rgba(214,136,28,.92),rgba(181,112,22,.9));
-  color:#fff7eb;
-  box-shadow:inset 0 1px 0 rgba(255,235,198,.18);
+  border-color:rgba(109,145,218,.24);
+  background:rgba(18,31,53,.92);
+  color:#f4f7ff;
+  box-shadow:inset 0 1px 0 rgba(173,199,244,.08);
 }
 .action-btn-primary:hover,
 .action-btn-primary:focus{
-  background:linear-gradient(180deg,rgba(227,149,40,.96),rgba(190,119,26,.92));
-  border-color:rgba(230,175,83,.36);
+  background:rgba(25,43,73,.98);
+  border-color:rgba(127,160,227,.3);
 }
 .tool-menu{
   position:relative;
@@ -3027,31 +3027,6 @@ document.addEventListener('DOMContentLoaded', function () {
     <span class="button-bar-label">Admin Tools</span>
     <div class="tool-cluster">
       <button type="button" class="action-btn action-btn-primary" onclick="$('#new_raffle_button').click()">Open New Raffle</button>
-    </div>
-
-    <div class="tool-cluster">
-% if request.extended_tickets:
-      <details class="tool-menu">
-        <summary class="action-btn tool-menu-trigger">Import <span class="tool-menu-caret">v</span></summary>
-        <div class="tool-menu-panel">
-          <div class="tool-menu-actions">
-            <button type="button" class="tool-menu-action" onclick="$('#import_paid').click(); closeToolMenus();">Paid</button>
-            <button type="button" class="tool-menu-action" onclick="$('#import_barter').click(); closeToolMenus();">Barter</button>
-          </div>
-        </div>
-      </details>
-% endif
-
-      <details class="tool-menu">
-        <summary class="action-btn tool-menu-trigger">Re-Show <span class="tool-menu-caret">v</span></summary>
-        <div class="tool-menu-panel">
-          <div class="tool-menu-actions">
-            <button type="button" class="tool-menu-action" onclick="$('#reshow_import').click(); closeToolMenus();">Imports</button>
-            <button type="button" class="tool-menu-action" onclick="$('#reshow_confirm').click(); closeToolMenus();">Confirms</button>
-          </div>
-        </div>
-      </details>
-
       <details class="tool-menu tool-menu-edit">
         <summary class="action-btn tool-menu-trigger">Edit Raffle <span class="tool-menu-caret">v</span></summary>
         <div class="tool-menu-panel">
@@ -3073,6 +3048,30 @@ document.addEventListener('DOMContentLoaded', function () {
               <label for="raffle_cost">Ticket Cost</label>
               <input type="text" id="raffle_cost" class="ginfo_change_save tool-input" name="raffle_ticket_cost"/>
             </div>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <div class="tool-cluster">
+% if request.extended_tickets:
+      <details class="tool-menu">
+        <summary class="action-btn tool-menu-trigger">Import <span class="tool-menu-caret">v</span></summary>
+        <div class="tool-menu-panel">
+          <div class="tool-menu-actions">
+            <button type="button" class="tool-menu-action" onclick="$('#import_paid').click(); closeToolMenus();">Paid</button>
+            <button type="button" class="tool-menu-action" onclick="$('#import_barter').click(); closeToolMenus();">Barter</button>
+          </div>
+        </div>
+      </details>
+% endif
+
+      <details class="tool-menu">
+        <summary class="action-btn tool-menu-trigger">Re-Show <span class="tool-menu-caret">v</span></summary>
+        <div class="tool-menu-panel">
+          <div class="tool-menu-actions">
+            <button type="button" class="tool-menu-action" onclick="$('#reshow_import').click(); closeToolMenus();">Imports</button>
+            <button type="button" class="tool-menu-action" onclick="$('#reshow_confirm').click(); closeToolMenus();">Confirms</button>
           </div>
         </div>
       </details>
