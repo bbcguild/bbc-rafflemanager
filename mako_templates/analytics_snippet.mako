@@ -1,13 +1,22 @@
 <%
 import json
+from mako.runtime import Undefined
 
 ga4_measurement_id = (request.registry.settings.get("ga4_measurement_id") or "").strip()
+
+def ga4_safe(value):
+    if isinstance(value, Undefined):
+        return ""
+    if value is None:
+        return ""
+    return str(value)
+
 ga4_context_payload = {
-    "site_area": ga4_site_area,
-    "raffle_view": ga4_raffle_view,
-    "raffle_number": ga4_raffle_number,
-    "guild_slug": ga4_guild_slug,
-    "host_name": request.host.split(":")[0] if request.host else "",
+    "site_area": ga4_safe(ga4_site_area),
+    "raffle_view": ga4_safe(ga4_raffle_view),
+    "raffle_number": ga4_safe(ga4_raffle_number),
+    "guild_slug": ga4_safe(ga4_guild_slug),
+    "host_name": ga4_safe(request.host.split(":")[0] if request.host else ""),
 }
 %>
 % if ga4_measurement_id:
