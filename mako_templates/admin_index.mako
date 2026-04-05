@@ -707,8 +707,8 @@ body.legacy-modal-open{
 }
 .status-tool{
   display:flex;
-  align-items:center;
-  gap:10px;
+  align-items:flex-end;
+  gap:8px;
   padding-left:10px;
   border-left:1px solid rgba(95,132,212,.12);
 }
@@ -725,55 +725,35 @@ body.legacy-modal-open{
   letter-spacing:.08em;
   text-transform:uppercase;
 }
-.status-tool-indicator{
-  display:flex;
-  align-items:center;
-  gap:7px;
-  font-size:.86rem;
-  font-weight:800;
-}
-.status-tool-dot,
-.status-tool-dice{
-  width:12px;
-  height:12px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  flex:0 0 auto;
-}
-.status-tool-dot{
-  border-radius:50%;
-  background:#2bff9d;
-  box-shadow:0 0 8px rgba(43,255,157,.75);
-}
-.status-tool-dice{
-  display:none;
-  font-size:.85rem;
-  line-height:1;
-}
-.status-tool-indicator.status-live{
-  color:#eefff5;
-}
-.status-tool-indicator.status-rolling{
-  color:#ffe3c2;
-}
-.status-tool-indicator.status-complete{
-  color:#ffd6d6;
-}
-.status-tool-indicator.status-rolling .status-tool-dot{
-  display:none;
-}
-.status-tool-indicator.status-rolling .status-tool-dice{
-  display:inline-flex;
-  color:#c97a1f;
-}
-.status-tool-indicator.status-complete .status-tool-dot{
-  background:#ff5e66;
-  box-shadow:0 0 8px rgba(255,94,102,.65);
-}
 .status-tool-select{
-  min-width:148px;
-  max-width:148px;
+  min-width:208px;
+  max-width:208px;
+  padding-left:42px;
+  padding-right:34px;
+  font-weight:800;
+  appearance:none;
+  -webkit-appearance:none;
+  background-repeat:no-repeat,no-repeat;
+  background-position:left 14px center,right 14px center;
+  background-size:16px 16px, 12px 12px;
+}
+.status-tool-select.status-live{
+  color:#8ff0ba;
+  background-image:
+    radial-gradient(circle at center, #5cff9f 0 45%, rgba(92,255,159,.25) 60%, rgba(92,255,159,0) 74%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%238ff0ba' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+}
+.status-tool-select.status-rolling{
+  color:#8ff0ba;
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><text x='12' y='17' text-anchor='middle' font-size='16'>🎲</text></svg>"),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%238ff0ba' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+}
+.status-tool-select.status-complete{
+  color:#ff9d9d;
+  background-image:
+    radial-gradient(circle at center, #ff5e66 0 45%, rgba(255,94,102,.25) 60%, rgba(255,94,102,0) 74%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%23ff9d9d' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg>");
 }
 .admin-form-hidden{
   display:none !important;
@@ -1681,17 +1661,7 @@ function normalizeRaffleStatus(status) {
 
 function applyAdminStatus(status) {
         var normalizedStatus = normalizeRaffleStatus(status)
-        var statusFlag = $("#adminStatusFlag")
-        var statusLabel = $("#adminStatusLabel")
         var statusSelect = $("#raffle_status")
-
-        if (statusFlag.length) {
-                statusFlag.removeClass("status-live status-rolling status-complete")
-                statusFlag.addClass("status-" + normalizedStatus.toLowerCase())
-        }
-        if (statusLabel.length) {
-                statusLabel.text(normalizedStatus)
-        }
         statusSelect.removeClass("status-live status-rolling status-complete")
         statusSelect.addClass("status-" + normalizedStatus.toLowerCase())
 }
@@ -3046,11 +3016,6 @@ document.addEventListener('DOMContentLoaded', function () {
     <div class="status-tool">
       <div class="status-tool-summary">
         <span class="status-tool-heading">Status</span>
-        <span class="status-tool-indicator status-live" id="adminStatusFlag">
-          <span class="status-tool-dot"></span>
-          <span class="status-tool-dice">d</span>
-          <span id="adminStatusLabel">LIVE</span>
-        </span>
       </div>
       <select id="raffle_status" class="ginfo_change_save tool-input status-tool-select" name="raffle_status">
         <option value="LIVE">LIVE</option>
