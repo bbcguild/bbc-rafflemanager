@@ -46,6 +46,7 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - Tool-strip refinement follow-up on 2026-04-04: with the workflow pieces now stable enough again, the admin tools strip is being restyled to feel more like a true toolbar and less like a row of chunky pills. This pass tightens the label treatment, slightly squares off the controls, calms the fill/border styling, and gives the status control cleaner spacing so the strip reads more intentional without changing the agreed workflow model.
 - Tool-strip refinement follow-up on 2026-04-04: pushed the toolbar further away from loose pill buttons and toward grouped control clusters. `Open New Raffle` is now the one clearly emphasized action, while `Import`, `Re-Show`, and `Edit Raffle` sit inside a shared quieter control group. As part of that QoL cleanup, the `Edit Raffle` popover now puts `Raffle Name` first because that is the field admins actually update during the week.
 - Tool-strip refinement follow-up on 2026-04-04: user feedback on the first grouped-cluster pass was that the orange `Open New Raffle` emphasis felt too loud and the clustering logic was off. Current adjustment pairs `Open New Raffle` with `Edit Raffle`, keeps `Import` with `Re-Show`, and tones the primary styling back into the shared blue admin palette so the toolbar will coexist better with future seasonal themes.
+- Notes-panel refinement follow-up on 2026-04-04: the notes area is now moving away from an always-open mini word processor. Current pass adds an explicit `Edit Notes` toggle, defaults the notes panel into a calmer read mode, hides the formatting toolbar until editing is opened, and keeps the save button visible only while editing or when unsaved changes exist. The edit toggle now uses a small paper-and-pen style icon treatment instead of plain text alone.
 
 ## Known Facts
 - `SESSION.md` was introduced after an earlier crash because conversation state had been lost.
@@ -91,7 +92,8 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - whether the new cluster pairings feel more logical (`Open New Raffle` + `Edit Raffle`, `Import` + `Re-Show`)
 - whether `Open New Raffle` now has the right level of emphasis without the loud orange
 - whether the reordered `Edit Raffle` panel feels better with `Raffle Name` at the top
-- then decide whether to keep pushing the toolbar language or move down into broader center/right layout polish
+- whether the new `Edit Notes` open/close behavior makes the notes area feel calmer during normal tab switching
+- then decide whether to keep polishing the notes/import workspace or move down into broader center/right layout work
 
 ## If Chat Dies, Resume By Doing This
 1. Read `SESSION.md`.

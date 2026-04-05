@@ -853,6 +853,10 @@ body.legacy-modal-open{
   gap:12px;
 }
 
+.notes-panel.is-read-mode .utility-panel-body{
+  gap:0;
+}
+
 .notes-header-shell{
   display:flex;
   align-items:center;
@@ -890,6 +894,8 @@ body.legacy-modal-open{
   align-items:center;
   gap:10px;
   margin-left:auto;
+  flex-wrap:wrap;
+  justify-content:flex-end;
 }
 
 .note-save-status{
@@ -899,16 +905,52 @@ body.legacy-modal-open{
   white-space:nowrap;
 }
 
-.note-save-btn{
+.note-action-btn{
   min-height:32px;
   padding:0 14px;
   border:1px solid rgba(255,255,255,.18);
-  border-radius:999px;
+  border-radius:12px;
   background:rgba(10,20,38,.4);
   color:#f4f7ff;
   font-size:.88rem;
   font-weight:850;
   cursor:pointer;
+}
+
+.note-edit-toggle{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+}
+
+.note-action-icon{
+  position:relative;
+  width:14px;
+  height:14px;
+  flex:0 0 14px;
+}
+
+.note-action-icon::before{
+  content:"";
+  position:absolute;
+  inset:1px 3px 1px 1px;
+  border:1.5px solid currentColor;
+  border-radius:2px;
+  opacity:.86;
+}
+
+.note-action-icon::after{
+  content:"";
+  position:absolute;
+  right:0;
+  top:1px;
+  width:8px;
+  height:2px;
+  background:currentColor;
+  border-radius:999px;
+  transform:rotate(-42deg);
+  transform-origin:right center;
+  box-shadow:0 3px 0 -0.5px currentColor;
 }
 
 .note-save-btn.is-dirty{
@@ -920,6 +962,10 @@ body.legacy-modal-open{
   display:flex;
   flex-wrap:wrap;
   gap:8px;
+}
+
+.notes-panel.is-read-mode .notes-editor-toolbar{
+  display:none;
 }
 
 .note-tool{
@@ -976,9 +1022,21 @@ body.legacy-modal-open{
   outline:none;
 }
 
+.notes-panel.is-read-mode .notes-editor-surface{
+  min-height:112px;
+  padding:14px 16px;
+  background:rgba(8,15,28,.42);
+  border-color:rgba(140,170,230,.12);
+  cursor:default;
+}
+
 .notes-editor-surface.is-empty::before{
   content:attr(data-placeholder);
   color:#8194b4;
+}
+
+.notes-panel.is-read-mode .notes-editor-surface.is-empty::before{
+  content:"No notes in this tab yet.";
 }
 
 .notes-editor-surface a{
@@ -1672,6 +1730,15 @@ div#paid_template{
     padding-left:0;
     border-left:none;
   }
+  .notes-header-shell{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+  .note-save-group{
+    width:100%;
+    justify-content:flex-start;
+    margin-left:0;
+  }
 }
 </style>
 
@@ -1835,7 +1902,8 @@ var NOTE_EDITOR_STATE = {
                 raffle_notes: "",
                 raffle_notes_public_2: ""
         },
-        dirty: false
+        dirty: false,
+        isEditing: false
 }
 
 function getNotesEditorSurface() {
@@ -1861,9 +1929,41 @@ function setNoteSaveState(isDirty, message) {
         if (saveBtn) {
                 saveBtn.classList.toggle("is-dirty", !!isDirty)
                 saveBtn.textContent = isDirty ? "Save Notes" : "Saved"
+                saveBtn.style.display = (NOTE_EDITOR_STATE.isEditing || !!isDirty) ? "" : "none"
         }
         if (status) {
                 status.textContent = message || (isDirty ? "Unsaved changes" : "Saved")
+        }
+}
+
+function applyNotesEditorMode() {
+        var panel = document.getElementById("notesPanel")
+        var surface = getNotesEditorSurface()
+        var toggle = document.getElementById("notesEditorToggle")
+        var saveBtn = document.getElementById("notesSaveBtn")
+
+        if (!panel || !surface || !toggle) {
+                return
+        }
+
+        panel.classList.toggle("is-read-mode", !NOTE_EDITOR_STATE.isEditing)
+        surface.setAttribute("contenteditable", NOTE_EDITOR_STATE.isEditing ? "true" : "false")
+        toggle.lastChild.textContent = NOTE_EDITOR_STATE.isEditing ? "Close Editor" : "Edit Notes"
+
+        if (saveBtn) {
+                saveBtn.style.display = (NOTE_EDITOR_STATE.isEditing || NOTE_EDITOR_STATE.dirty) ? "" : "none"
+        }
+}
+
+function setNotesEditingMode(isEditing) {
+        NOTE_EDITOR_STATE.isEditing = !!isEditing
+        applyNotesEditorMode()
+
+        if (NOTE_EDITOR_STATE.isEditing) {
+                var surface = getNotesEditorSurface()
+                if (surface) {
+                        surface.focus()
+                }
         }
 }
 
@@ -1908,6 +2008,7 @@ function loadNoteDraftsFromRaffle(result) {
 
         loadNoteTab(NOTE_EDITOR_STATE.activeKey || "raffle_notes_admin")
         setNoteSaveState(false, "Saved")
+        applyNotesEditorMode()
 }
 
 function execNoteCommand(command, value) {
@@ -1985,6 +2086,10 @@ $(document).on("click", ".note-tool", function () {
         }
 
         execNoteCommand(cmd)
+})
+
+$(document).on("click", "#notesEditorToggle", function () {
+        setNotesEditingMode(!NOTE_EDITOR_STATE.isEditing)
 })
 
 $(document).on("input", "#notesEditorSurface", function () {
@@ -3114,7 +3219,7 @@ document.addEventListener('DOMContentLoaded', function () {
 </div>
 
 <section class="admin-utility-band">
-  <div class="utility-panel notes-panel">
+  <div class="utility-panel notes-panel is-read-mode" id="notesPanel">
     <div class="utility-panel-title">
       <div class="notes-header-shell">
         <div class="note-tab-strip">
@@ -3123,8 +3228,9 @@ document.addEventListener('DOMContentLoaded', function () {
           <button type="button" class="note-tab" data-note-key="raffle_notes_public_2">PUBLIC 2</button>
         </div>
         <div class="note-save-group">
+          <button type="button" class="note-action-btn note-edit-toggle" id="notesEditorToggle"><span class="note-action-icon" aria-hidden="true"></span><span>Edit Notes</span></button>
           <span class="note-save-status" id="notesSaveStatus">Saved</span>
-          <button type="button" class="note-save-btn" id="notesSaveBtn">Saved</button>
+          <button type="button" class="note-action-btn note-save-btn" id="notesSaveBtn" style="display:none;">Saved</button>
         </div>
       </div>
     </div>
