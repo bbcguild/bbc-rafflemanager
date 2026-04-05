@@ -818,22 +818,22 @@ body.legacy-modal-open{
 }
 
 .utility-panel-title{
-  min-height:42px;
-  padding:0 18px;
+  min-height:38px;
+  padding:8px 14px;
   display:flex;
   align-items:center;
   color:#f4f7ff;
-  font-size:1rem;
-  font-weight:850;
+  font-size:.94rem;
+  font-weight:820;
   letter-spacing:.02em;
 }
 
 .notes-panel .utility-panel-title{
-  background:linear-gradient(90deg,#1773c8,#1a4f8d);
+  background:linear-gradient(90deg,#1a6abb,#19487d);
 }
 
 .upload-panel .utility-panel-title{
-  background:linear-gradient(90deg,#c97a1f,#a25e11);
+  background:linear-gradient(90deg,#7f5b25,#5d431d);
 }
 
 .utility-panel-body{
@@ -844,7 +844,7 @@ body.legacy-modal-open{
 }
 
 .notes-panel .utility-panel-title{
-  padding:10px 14px;
+  padding:8px 14px;
   display:block;
 }
 
@@ -1366,14 +1366,14 @@ border:1px solid rgba(140,170,230,.12);
   box-sizing:border-box;
   min-height:150px;
   margin:0;
-  border:4px dotted rgba(70,118,208,.6);
+  border:4px dotted rgba(96,129,184,.42);
   border-radius:20px;
-  background:linear-gradient(180deg,rgba(6,14,28,.96),rgba(4,11,23,.96));
+  background:linear-gradient(180deg,rgba(8,15,28,.86),rgba(5,11,22,.96));
   display:flex;
   align-items:center;
   justify-content:center;
   padding:14px;
-  box-shadow:inset 0 0 0 1px rgba(22,40,78,.55);
+  box-shadow:inset 0 0 0 1px rgba(30,51,90,.34);
 }
 
 #dropzone_uploader .dz-message{
@@ -1394,7 +1394,7 @@ border:1px solid rgba(140,170,230,.12);
 #dropzone_uploader .dz-message span{
   display:block;
   margin-top:6px;
-  color:#8ea0bf;
+  color:#99aac5;
   font-size:.92rem;
 }
 
