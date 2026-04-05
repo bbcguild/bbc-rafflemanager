@@ -4,12 +4,13 @@ Use this file as the source of truth for the active work session. If chat dies, 
 
 ## Current Goal
 - Continue the raffle manager modernization with focus on the admin UI.
-- Most immediate active area: `mako_templates/admin_index.mako`.
-- Current unresolved theme: admin layout polish around the center prize cards, the right-side ticket table, and outer page gutter alignment.
+- Most immediate active area: prize-card save behavior and rollout follow-through after the latest autosave bug fix.
+- Current unresolved theme: confirm the blank-winner autosave fix on the live admin flow, then resume remaining admin polish from real browser feedback.
 
 ## Current Status
-- Repo state at restart recovery: clean working tree when this crash-resistant workflow was set up on 2026-04-04.
-- The project was recently in a heavy admin/public UI iteration cycle, mostly on 2026-04-04.
+- Working tree is currently clean.
+- Local branch is ahead of `origin/main` by one commit: `e778449` (`admin: normalize blank prize winners`).
+- The project was recently in a heavy admin/public UI iteration cycle, mostly on 2026-04-04 through 2026-04-05.
 - This file is now intentionally structured for crash recovery, not just narrative notes.
 
 ## What Changed Recently
@@ -52,6 +53,7 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - New-raffle workflow follow-up on 2026-04-05: `Open New Raffle` is no longer just a browser prompt plus confirm. Current pass turns it into a proper setup modal with suggested raffle number, carried-forward drawing time and ticket cost, blank raffle name, status shown as `LIVE`, and all three note sections prefilled and editable in one place. Creating the raffle now submits exactly what is visible in that modal, so admins can leave notes alone, tweak them, or clear them before the new week starts.
 - New-raffle workflow follow-up on 2026-04-05: first live polish moved each notes-section `Clear` action down into the formatting row so it is visible where the editor controls already live. The toolbar `Open New Raffle` trigger was also de-lit so it rests in the same normal/off state as the other admin controls until used.
 - Workflow-enforcement follow-up on 2026-04-05: prize actions and weekly rollover now have backend status rules instead of relying on admin memory. Rolling, entering/changing winning ticket numbers, and locking prizes now require raffle status `ROLLING`; opening a new raffle now requires the current raffle to already be `CLOSED`/`COMPLETE`. Finalized prizes are no longer permanently irreversible: they stay locked for normal use, keep a visible lock control, can be unlocked with confirmation, and expose an open-lock icon when reversible. After the final remaining prize is locked, the UI now prompts admins to switch raffle status to `CLOSED`.
+- Autosave bug follow-up on 2026-04-05: editing prize text/value while the winner field was blank could still trip the ROLLING-only guard because autosave treated blank winner state as a winner change. The backend now normalizes blank `prize_winner` values to `0` before the status-gate logic runs, so text/value edits no longer falsely require a rolling raffle.
 
 ## Known Facts
 - `SESSION.md` was introduced after an earlier crash because conversation state had been lost.
@@ -101,17 +103,12 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - `DECISIONS.md`
 
 ## Exact Next Step
-- Commit/deploy the active prize-card repair pass if browser checks look sane.
-- This pass includes:
-- additive `Prize Value` schema/backend wiring with nullable numeric storage
-- admin prize placeholder cleanup (`Prize Details Soon` instead of stored filler text)
-- public fallback display of `Prize Details Soon` when prize details are blank
-- prize-card save flush before adding a new card so existing edits are not reset
-- autofill styling for prize inputs so browser suggestions do not turn the inputs bright white
-- then verify in-browser:
-- existing prize values persist through refresh
-- adding a third prize no longer wipes the first two
-- blank prize details show the new fallback on the public side
+- Push and deploy commit `e778449` (`admin: normalize blank prize winners`).
+- Then verify in-browser:
+- editing only prize text/value with a blank winner no longer throws the ROLLING-only error
+- existing prize values still persist through refresh
+- adding a third prize still does not wipe earlier cards
+- blank prize details still show the public fallback `Prize Details Soon`
 
 ## If Chat Dies, Resume By Doing This
 1. Read `SESSION.md`.
