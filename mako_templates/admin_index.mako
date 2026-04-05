@@ -569,6 +569,18 @@ body.legacy-modal-open{
   white-space:nowrap;
   margin-right:2px;
 }
+.button-bar-left,
+.button-bar-right{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+  flex-wrap:wrap;
+}
+.button-bar-right{
+  margin-left:auto;
+  justify-content:flex-end;
+}
 .action-btn{
   min-height:34px;
   min-width:0;
@@ -585,6 +597,186 @@ body.legacy-modal-open{
   box-shadow:none;
   cursor:pointer;
   flex:0 0 auto;
+}
+.tool-menu{
+  position:relative;
+  flex:0 0 auto;
+}
+.tool-menu > summary{
+  list-style:none;
+}
+.tool-menu > summary::-webkit-details-marker{
+  display:none;
+}
+.tool-menu-trigger{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.tool-menu-caret{
+  font-size:.72rem;
+  color:#9fb3d9;
+}
+.tool-menu[open] > .tool-menu-trigger{
+  background:rgba(22,38,66,.98);
+  border-color:rgba(109,145,218,.28);
+}
+.tool-menu-panel{
+  position:absolute;
+  top:calc(100% + 10px);
+  left:0;
+  min-width:230px;
+  padding:10px;
+  border-radius:18px;
+  border:1px solid rgba(95,132,212,.22);
+  background:linear-gradient(180deg,rgba(18,29,50,.99),rgba(9,17,31,.99));
+  box-shadow:var(--shadow);
+  z-index:35;
+}
+.tool-menu-panel::before{
+  content:"";
+  position:absolute;
+  top:-7px;
+  left:26px;
+  width:14px;
+  height:14px;
+  background:linear-gradient(180deg,rgba(18,29,50,.99),rgba(12,21,37,.99));
+  border-top:1px solid rgba(95,132,212,.22);
+  border-left:1px solid rgba(95,132,212,.22);
+  transform:rotate(45deg);
+}
+.tool-menu-actions{
+  display:grid;
+  gap:8px;
+}
+.tool-menu-action{
+  width:100%;
+  min-height:38px;
+  padding:0 12px;
+  display:flex;
+  align-items:center;
+  border-radius:12px;
+  border:1px solid rgba(95,132,212,.16);
+  background:rgba(11,20,36,.9);
+  color:#f4f7ff;
+  font-size:.88rem;
+  font-weight:700;
+  text-align:left;
+  cursor:pointer;
+}
+.tool-menu-action:hover,
+.tool-menu-action:focus{
+  background:rgba(22,38,66,.98);
+  outline:none;
+}
+.tool-menu-edit .tool-menu-panel{
+  min-width:300px;
+  padding:12px;
+}
+.tool-panel-title{
+  color:#f4f7ff;
+  font-size:.94rem;
+  font-weight:800;
+  letter-spacing:.02em;
+  margin-bottom:10px;
+}
+.tool-form-grid{
+  display:grid;
+  gap:10px;
+}
+.tool-field{
+  display:grid;
+  gap:6px;
+}
+.tool-field label{
+  color:#b8c7e4;
+  font-size:.76rem;
+  font-weight:700;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+.tool-input{
+  min-height:38px;
+  padding:0 12px;
+  border-radius:12px;
+  border:1px solid rgba(95,132,212,.18);
+  background:#0f1622;
+  color:#edf3ff;
+  font-size:.9rem;
+  font-weight:600;
+}
+.status-tool{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding-left:10px;
+  border-left:1px solid rgba(95,132,212,.12);
+}
+.status-tool-summary{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  min-width:0;
+}
+.status-tool-heading{
+  color:var(--muted);
+  font-size:.72rem;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.status-tool-indicator{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  font-size:.86rem;
+  font-weight:800;
+}
+.status-tool-dot,
+.status-tool-dice{
+  width:12px;
+  height:12px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 auto;
+}
+.status-tool-dot{
+  border-radius:50%;
+  background:#2bff9d;
+  box-shadow:0 0 8px rgba(43,255,157,.75);
+}
+.status-tool-dice{
+  display:none;
+  font-size:.85rem;
+  line-height:1;
+}
+.status-tool-indicator.status-live{
+  color:#eefff5;
+}
+.status-tool-indicator.status-rolling{
+  color:#ffe3c2;
+}
+.status-tool-indicator.status-complete{
+  color:#ffd6d6;
+}
+.status-tool-indicator.status-rolling .status-tool-dot{
+  display:none;
+}
+.status-tool-indicator.status-rolling .status-tool-dice{
+  display:inline-flex;
+  color:#c97a1f;
+}
+.status-tool-indicator.status-complete .status-tool-dot{
+  background:#ff5e66;
+  box-shadow:0 0 8px rgba(255,94,102,.65);
+}
+.status-tool-select{
+  min-width:148px;
+  max-width:148px;
+}
+.admin-form-hidden{
+  display:none !important;
 }
 
 .admin-utility-band{
@@ -797,7 +989,7 @@ body.legacy-modal-open{
 #main_table{
   width:100%;
   display:grid;
-  grid-template-columns:240px minmax(0,1fr) minmax(430px, 480px);
+  grid-template-columns:minmax(0,1fr) minmax(430px, 480px);
   gap:12px;
   align-items:start;
   border-collapse:separate;
@@ -810,7 +1002,7 @@ body.legacy-modal-open{
 }
 
 #column_guildinfo{
-  display:block;
+  display:none;
   vertical-align:top;
   min-width:0;
   width:auto;
@@ -1387,11 +1579,16 @@ div#paid_template{
   .search-wrap{
     min-width:0;
   }
+  .button-bar-right{
+    width:100%;
+    margin-left:0;
+    justify-content:flex-start;
+  }
 }
 
 @media (max-width:1450px){
   #main_table{
-    grid-template-columns:220px minmax(0,1fr) minmax(400px, 440px);
+    grid-template-columns:minmax(0,1fr) minmax(400px, 440px);
   }
 }
 
@@ -1432,6 +1629,10 @@ div#paid_template{
   .utility-panel{
     min-height:180px;
   }
+  .status-tool{
+    padding-left:0;
+    border-left:none;
+  }
 }
 </style>
 
@@ -1459,6 +1660,12 @@ var openRaffleLookup = function () {
 
         window.open("/${request.matchdict['guild']}/lookup?raffle_lookup=" + encodeURIComponent(raffleCode), "_blank")
         return false
+}
+
+function closeToolMenus() {
+        document.querySelectorAll(".tool-menu[open]").forEach(function (menu) {
+                menu.removeAttribute("open")
+        })
 }
 
 function normalizeRaffleStatus(status) {
@@ -2637,7 +2844,16 @@ document.addEventListener('DOMContentLoaded', function () {
         document.addEventListener('keydown', function (event) {
                 if (event.key === 'Escape') {
                         setMenuOpen(false)
+                        closeToolMenus()
                 }
+        })
+
+        document.addEventListener('click', function (event) {
+                document.querySelectorAll('.tool-menu[open]').forEach(function (details) {
+                        if (!details.contains(event.target)) {
+                                details.removeAttribute('open')
+                        }
+                })
         })
 })
 </script>
@@ -2772,14 +2988,100 @@ document.addEventListener('DOMContentLoaded', function () {
   </div>
 </section>
 
+<form id="ginfo_form">
 <section class="button-bar">
-  <span class="button-bar-label">Admin Tools</span>
-  <button type="button" class="action-btn" onclick="$('#new_raffle_button').click()">Open New Raffle</button>
-  <button type="button" class="action-btn" onclick="$('#reshow_import').click()">Re-Show Imports</button>
-  <button type="button" class="action-btn" onclick="$('#reshow_confirm').click()">Re-Show Confirms</button>
-  <button type="button" class="action-btn" onclick="$('#import_paid').click()">Import Paid</button>
-  <button type="button" class="action-btn" onclick="$('#import_barter').click()">Import Barter</button>
+  <div class="button-bar-left">
+    <span class="button-bar-label">Admin Tools</span>
+    <button type="button" class="action-btn" onclick="$('#new_raffle_button').click()">Open New Raffle</button>
+
+% if request.extended_tickets:
+    <details class="tool-menu">
+      <summary class="action-btn tool-menu-trigger">Import <span class="tool-menu-caret">v</span></summary>
+      <div class="tool-menu-panel">
+        <div class="tool-menu-actions">
+          <button type="button" class="tool-menu-action" onclick="$('#import_paid').click(); closeToolMenus();">Paid</button>
+          <button type="button" class="tool-menu-action" onclick="$('#import_barter').click(); closeToolMenus();">Barter</button>
+        </div>
+      </div>
+    </details>
+% endif
+
+    <details class="tool-menu">
+      <summary class="action-btn tool-menu-trigger">Re-Show <span class="tool-menu-caret">v</span></summary>
+      <div class="tool-menu-panel">
+        <div class="tool-menu-actions">
+          <button type="button" class="tool-menu-action" onclick="$('#reshow_import').click(); closeToolMenus();">Imports</button>
+          <button type="button" class="tool-menu-action" onclick="$('#reshow_confirm').click(); closeToolMenus();">Confirms</button>
+        </div>
+      </div>
+    </details>
+
+    <details class="tool-menu tool-menu-edit">
+      <summary class="action-btn tool-menu-trigger">Edit Raffle <span class="tool-menu-caret">v</span></summary>
+      <div class="tool-menu-panel">
+        <div class="tool-panel-title">Raffle Setup</div>
+        <div class="tool-form-grid">
+          <div class="tool-field">
+            <label for="raffle_subheader">Raffle Number</label>
+            <input type="text" id="raffle_subheader" class="ginfo_change_save tool-input" name="raffle_guild_num"/>
+          </div>
+          <div class="tool-field">
+            <label for="raffle_time">Drawing Time</label>
+            <input type="text" id="raffle_time" class="ginfo_change_save tool-input" name="raffle_time"/>
+          </div>
+          <div class="tool-field">
+            <label for="raffle_cost">Ticket Cost</label>
+            <input type="text" id="raffle_cost" class="ginfo_change_save tool-input" name="raffle_ticket_cost"/>
+          </div>
+          <div class="tool-field">
+            <label for="raffle_title">Raffle Title</label>
+            <input type="text" id="raffle_title" class="ginfo_change_save tool-input" name="raffle_title"/>
+          </div>
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <div class="button-bar-right">
+    <div class="status-tool">
+      <div class="status-tool-summary">
+        <span class="status-tool-heading">Status</span>
+        <span class="status-tool-indicator status-live" id="adminStatusFlag">
+          <span class="status-tool-dot"></span>
+          <span class="status-tool-dice">d</span>
+          <span id="adminStatusLabel">LIVE</span>
+        </span>
+      </div>
+      <select id="raffle_status" class="ginfo_change_save tool-input status-tool-select" name="raffle_status">
+        <option value="LIVE">LIVE</option>
+        <option value="ROLLING">ROLLING</option>
+        <option value="COMPLETE">CLOSED</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="admin-form-hidden">
+    <span id="guild_header" class="legacy-summary-hide"></span>
+    <textarea id="raffle_notes" name="raffle_notes" class="hidden-note-field"></textarea>
+    <textarea id="raffle_notes_admin" name="raffle_notes_admin" class="hidden-note-field"></textarea>
+    <textarea id="raffle_notes_public_2" name="raffle_notes_public_2" class="hidden-note-field"></textarea>
+    <span id="raffle_sold" class="legacy-summary-hide"></span>
+    <span id="raffle_participants" class="legacy-summary-hide"></span>
+    <span id="raffle_updated" class="legacy-summary-hide"></span>
+  </div>
 </section>
+</form>
+
+<div class="admin-form-hidden">
+  <input type="button" value="Open new raffle" id="new_raffle_button" class="hidden-original-action" />
+  <input type="submit" value="Manually refresh" id="manual_refresh" class="hidden-original-action" />
+  <input type="submit" value="Re-Show Import Pane" id="reshow_import" class="hidden-original-action" />
+  <input type="submit" value="Re-Show Confirmations Pane" id="reshow_confirm" class="hidden-original-action" />
+% if request.extended_tickets:
+  <input type="submit" value="Import barter tickets" id="import_barter" class="hidden-original-action" />
+  <input type="submit" value="Import paid tickets" id="import_paid" class="hidden-original-action" />
+% endif
+</div>
 
 <section class="admin-utility-band">
   <div class="utility-panel notes-panel">
@@ -2833,66 +3135,7 @@ document.addEventListener('DOMContentLoaded', function () {
     <tr>
         
         <td id="column_guildinfo">
-    <div id="left" class="column">
-            <form id="ginfo_form">
-            <span id="guild_header" class="legacy-summary-hide"></span>
-
-            <label class="settings-block-label" for="raffle_status">Status</label>
-            <select id="raffle_status" class="ginfo_change_save" name="raffle_status">
-                <option value="LIVE">LIVE</option>
-                <option value="ROLLING">ROLLING</option>
-                <option value="COMPLETE">CLOSED</option>
-            </select>
-
-            <label class="settings-block-label" for="raffle_subheader">Raffle Number</label>
-            <input type="text" id="raffle_subheader" class="ginfo_change_save" name="raffle_guild_num"/>
-
-            <label class="settings-block-label" for="raffle_time">Drawing Time</label>
-            <input type="text" id="raffle_time" class="ginfo_change_save" name="raffle_time"/>
-
-            <label class="settings-block-label" for="raffle_cost">Ticket Cost</label>
-            <input type="text" id="raffle_cost" class="ginfo_change_save" name="raffle_ticket_cost"/>
-
-            <label class="settings-block-label" for="raffle_title">Raffle Title</label>
-<input type="text" id="raffle_title" class="ginfo_change_save" name="raffle_title"/>
-            <textarea id="raffle_notes" name="raffle_notes" class="hidden-note-field"></textarea>
-            <textarea id="raffle_notes_admin" name="raffle_notes_admin" class="hidden-note-field"></textarea>
-            <textarea id="raffle_notes_public_2" name="raffle_notes_public_2" class="hidden-note-field"></textarea>
-
-            <span id="raffle_sold" class="legacy-summary-hide"></span>
-            <span id="raffle_participants" class="legacy-summary-hide"></span>
-            <span id="raffle_updated" class="legacy-summary-hide"></span>
-
-            % if request.bonus_tickets == 5:
-            <br />
-            <br />
-            <span id="bonus_tickets">
-                For every 5 tickets purchased, you get 1 bonus ticket!
-            </span>
-            % elif request.bonus_tickets == 2:
-            <br />
-            <br />
-            <span id="bonus_tickets">
-                For every 2 tickets purchased, you get 1 bonus ticket!
-            </span>
-            % endif
-            <br />
-            <br />
-            </form>
-
-            <input type="button" value="Open new raffle" id="new_raffle_button" class="hidden-original-action" />
-            <input type="submit" value="Manually refresh" id="manual_refresh" class="hidden-original-action" />
-            <input type="submit" value="Re-Show Import Pane" id="reshow_import" class="hidden-original-action" />
-            <input type="submit" value="Re-Show Confirmations Pane" id="reshow_confirm" class="hidden-original-action" />
-            <br />
-            <br />
-% if request.extended_tickets:
-            <input type="submit" value="Import barter tickets" id="import_barter" class="hidden-original-action" />
-            <input type="submit" value="Import paid tickets" id="import_paid" class="hidden-original-action" />
-            <br />
-            <br />
-% endif
-    </div>
+    <div id="left" class="column admin-form-hidden"></div>
         </td>
         <td id="column_prizeinfo">
     <div id="center" class="column">

@@ -36,6 +36,7 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - Admin shell redesign follow-up on 2026-04-04: the default admin header now has a subtle Elder Scrolls Online ouroboros watermark layered into the right side of the header card. The intent is to give the everyday non-seasonal header some world flavor and purpose without forcing a tall “template hero” treatment or harming text readability.
 - Admin shell redesign follow-up on 2026-04-04: the first sourced ouroboros art was visually wrong for the site. The header watermark asset has now been swapped to the user-provided transparent ESO ouroboros file, with the existing subtle watermark treatment left in place so art choice can be judged before further opacity/placement tuning.
 - Admin shell redesign follow-up on 2026-04-04: experimenting with the header watermark at the art's original/native size instead of scaling it to fit. The goal of this pass is to see whether a cropped portion of the ouroboros feels more atmospheric and less “logo stamp” than the fully contained version.
+- Admin workflow/layout follow-up on 2026-04-04: the old left-side setup strip beside the prize cards is being retired as a permanent column. `Status` is moving into the right side of the tool strip so it stays visible during crunch time, while the rarely changed raffle setup fields move into an `Edit Raffle` popover from the tool strip. `Import` and `Re-Show` are also being grouped into toolbar dropdowns so the page reclaims width without hiding the stuff admins touch constantly.
 
 ## Known Facts
 - `SESSION.md` was introduced after an earlier crash because conversation state had been lost.
@@ -75,11 +76,12 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - `DECISIONS.md`
 
 ## Exact Next Step
-- Verify the newest compact-header/topbar pass in-browser on the admin page.
-- If the overall direction is approved, keep refining the top shell:
-- verify the new split logo/caret trigger and expanded dropdown structure in-browser
-- refine the connected panel styling and icon treatment if needed
-- then continue into broader admin layout/gutter polish below the header
+- Verify the new toolbar/status/edit-raffle model in-browser on the admin page.
+- Specifically check:
+- whether the old left strip can now disappear without hurting workflow
+- whether `Status` feels right on the far right of the tool strip
+- whether `Edit Raffle`, `Import`, and `Re-Show` feel fast enough as toolbar popovers
+- then continue into deeper layout polish once the admin workflow structure is approved
 
 ## If Chat Dies, Resume By Doing This
 1. Read `SESSION.md`.
