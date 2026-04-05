@@ -1895,7 +1895,7 @@ div#paid_template{
   border:1px solid rgba(80,120,210,.24);
   border-radius:18px;
   background:rgba(11,20,40,.92);
-  color:#7f2ed3;
+  color:#d8e3ff;
   font-size:0;
   font-weight:900;
   text-decoration:none;
@@ -1911,8 +1911,18 @@ div#paid_template{
 .prize_finalise::before{
   content:"\1F513";
 }
+.prize_finalise{
+  background:rgba(44,108,72,.92);
+  border-color:rgba(124,212,153,.42);
+  color:#e8fff0;
+}
 .prize_unlock::before{
   content:"\1F512";
+}
+.prize_unlock{
+  background:rgba(116,40,48,.92);
+  border-color:rgba(223,121,128,.4);
+  color:#ffe6e8;
 }
 .prize_roll::before{
   content:"\1F3B2";
@@ -1923,7 +1933,7 @@ div#paid_template{
 
 .prize-action:hover,
 .prize-action:focus{
-  color:#b15dff;
+  color:#ffffff;
   outline:none;
 }
 
@@ -3758,7 +3768,7 @@ document.addEventListener('DOMContentLoaded', function () {
         <select id="raffle_status" class="ginfo_change_save tool-input status-tool-select" name="raffle_status">
           <option value="LIVE">&#128994; LIVE</option>
           <option value="ROLLING">&#127922; ROLLING</option>
-          <option value="COMPLETE">&#128308; CLOSED</option>
+          <option value="COMPLETE">&#128308; COMPLETE</option>
         </select>
       </div>
     </div>

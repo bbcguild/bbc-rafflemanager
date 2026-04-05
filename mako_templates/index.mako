@@ -981,7 +981,7 @@ function isArchiveDisplay() {
 function normalizeRaffleStatus(status) {
   var value = (status || "LIVE").toString().trim().toUpperCase();
   if (value === "CLOSED") {
-    return "ROLLING";
+    return "COMPLETE";
   }
   if (value !== "LIVE" && value !== "ROLLING" && value !== "COMPLETE") {
     return "LIVE";
@@ -1122,7 +1122,10 @@ function buildPrizeCards(result) {
 
     var metaText = value["prize_text2"] || "";
     var prizeText = value["prize_text_display"] || value["prize_text"] || "Prize Details Soon";
-    var ticketText = value["prize_winner"] || "TBD";
+    var ticketText = "TBD";
+    if (value["prize_finalised"] != 0) {
+      ticketText = value["prize_winner"] || "TBD";
+    }
     if (String(ticketText) === "0") {
       ticketText = "TBD";
     }

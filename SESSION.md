@@ -55,6 +55,7 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - Workflow-enforcement follow-up on 2026-04-05: prize actions and weekly rollover now have backend status rules instead of relying on admin memory. Rolling, entering/changing winning ticket numbers, and locking prizes now require raffle status `ROLLING`; opening a new raffle now requires the current raffle to already be `CLOSED`/`COMPLETE`. Finalized prizes are no longer permanently irreversible: they stay locked for normal use, keep a visible lock control, can be unlocked with confirmation, and expose an open-lock icon when reversible. After the final remaining prize is locked, the UI now prompts admins to switch raffle status to `CLOSED`.
 - Autosave bug follow-up on 2026-04-05: editing prize text/value while the winner field was blank could still trip the ROLLING-only guard because autosave treated blank winner state as a winner change. The backend now normalizes blank `prize_winner` values to `0` before the status-gate logic runs, so text/value edits no longer falsely require a rolling raffle.
 - Admin testing follow-up on 2026-04-05: live testing confirmed prize values and public prize display are working, but several workflow friction points surfaced. Current pass keeps prize-card autosave and action refreshes from bouncing the page to the top, blocks `Open New Raffle` before the setup modal opens unless status is already `COMPLETE`, normalizes lingering `CLOSED` wording/handling toward `COMPLETE`, and flips the prize lock iconography so open lock means unlocked while closed lock means locked.
+- Admin testing follow-up on 2026-04-05: a second verification pass confirmed the scroll-jump fix and early new-raffle guard are working. Remaining gaps found during that pass were that unlocked prizes still leaked their ticket number on the public page, and the visible admin status dropdown still said `CLOSED`. Current follow-up fixes the public ticket display so only finalized prizes expose winner ticket numbers, changes the visible admin status label to `COMPLETE`, and gives the lock pill a clearer green-unlocked / red-locked state treatment.
 
 ## Known Facts
 - `SESSION.md` was introduced after an earlier crash because conversation state had been lost.
@@ -104,12 +105,11 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - `DECISIONS.md`
 
 ## Exact Next Step
-- Commit, push, and deploy the current admin workflow polish follow-up.
+- Commit, push, and deploy the current public-prize/status-label follow-up.
 - Then verify in-browser:
-- editing prize fields or clicking prize actions no longer jumps the page to the top
-- `Open New Raffle` refuses immediately when status is not `COMPLETE`, before opening the modal
-- unlocked prize cards show an open-lock icon and finalized prize cards show a closed-lock icon
-- legacy/visible status copy consistently says `COMPLETE` instead of `CLOSED`
+- unlocking a prize reverts the public ticket number back to `TBD`
+- the admin status dropdown visibly says `COMPLETE`
+- the lock pill colors feel appropriately readable and noticeable in both states
 
 ## If Chat Dies, Resume By Doing This
 1. Read `SESSION.md`.
