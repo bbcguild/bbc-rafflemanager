@@ -549,6 +549,15 @@ def finalise_prize (cur, prize_id):
 
     cur.execute("UPDATE prizes SET prize_finalised=1 WHERE prize_id=?", (prize_id, ))
 
+@with_cursor_boolean
+def unfinalise_prize (cur, prize_id):
+    cur.execute("SELECT * FROM prizes WHERE prize_id=?", (prize_id, ))
+    res = cur.fetchone()
+    if not res:
+        return False
+
+    cur.execute("UPDATE prizes SET prize_finalised=0 WHERE prize_id=?", (prize_id, ))
+
 @with_cursor
 def get_prize (cur, prize_id):
     cur.execute("SELECT * FROM prizes WHERE prize_id=?", (prize_id, ))

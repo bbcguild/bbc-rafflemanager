@@ -272,6 +272,34 @@ def parse_keys (cur, new, keys, builder):
 
     return n
 
+def normalize_raffle_status_value(status):
+    value = (status or "LIVE").strip().upper()
+    if value == "CLOSED":
+        value = "COMPLETE"
+    if value not in ("LIVE", "ROLLING", "COMPLETE"):
+        value = "LIVE"
+    return value
+
+def get_current_raffle_status():
+    info = db.get_cur_raffle_info()
+    if not info:
+        return "LIVE"
+    return normalize_raffle_status_value(info.get("raffle_status"))
+
+def json_error(message):
+    return {"ok": False, "error": message}
+
+def json_ok(**kwargs):
+    payload = {"ok": True}
+    payload.update(kwargs)
+    return payload
+
+def all_current_prizes_finalised():
+    prizes = db.get_all_prizes()
+    if not prizes:
+        return False
+    return all((dict(p).get("prize_finalised") or 0) != 0 for p in prizes)
+
 # Admin only
 @view_config(route_name="set_current_raffle_info", renderer="json", permission="akaviri")
 def set_current_raffle_info (request):
@@ -319,6 +347,9 @@ def open_new_raffle (request):
     current_info = dict(current_info) if current_info else {}
     requested_number = (request.params.get("raffle_guild_num") or "").strip()
 
+    if get_current_raffle_status() != "COMPLETE":
+        return json_error("Set the raffle status to CLOSED before opening a new raffle.")
+
     new_raffle_info = {
         "raffle_guild_num": requested_number or 0,
         "raffle_time": request.params.get("raffle_time", current_info.get("raffle_time", "Fill this in!")),
@@ -334,9 +365,9 @@ def open_new_raffle (request):
     db.close_raffle_by_id(cur_id)
     
     if db.create_new_raffle(new_raffle_info):
-        return True
+        return json_ok()
 
-    return False
+    return json_error("Unable to create the new raffle.")
 
 # For everyone!
 @view_config(route_name="get_all_tickets", renderer="json")
@@ -1041,6 +1072,9 @@ def add_new_prize (request):
 @view_config(route_name="delete_prize", renderer="json", permission="akaviri")
 def delete_prize (request):
     if request.matchdict and "prize_id" in request.matchdict:
+        prize = db.get_prize(request.matchdict["prize_id"])
+        if prize and dict(prize).get("prize_finalised"):
+            return json_error("Unlock this prize before deleting it.")
         return db.delete_prize(request.matchdict["prize_id"])
 
     return False
@@ -1048,9 +1082,25 @@ def delete_prize (request):
 @view_config(route_name="finalise_prize", renderer="json", permission="akaviri")
 def finalise_prize (request):
     if request.matchdict and "prize_id" in request.matchdict:
-        return db.finalise_prize(request.matchdict["prize_id"])
+        if get_current_raffle_status() != "ROLLING":
+            return json_error("Set raffle status to ROLLING before locking in winners.")
+        if not db.finalise_prize(request.matchdict["prize_id"]):
+            return json_error("Choose a winning ticket before locking this prize.")
+        return json_ok(all_finalised=all_current_prizes_finalised())
 
-    return False
+    return json_error("Missing prize id.")
+
+@view_config(route_name="unfinalise_prize", renderer="json", permission="akaviri")
+def unfinalise_prize (request):
+    if request.matchdict and "prize_id" in request.matchdict:
+        status = get_current_raffle_status()
+        if status not in ("ROLLING", "COMPLETE"):
+            return json_error("Prizes can only be unlocked while the raffle is ROLLING or CLOSED.")
+        if not db.unfinalise_prize(request.matchdict["prize_id"]):
+            return json_error("Unable to unlock this prize.")
+        return json_ok()
+
+    return json_error("Missing prize id.")
 
 # Okay, I lied, maybe this might be needed
 @view_config(route_name="get_prize", renderer="json")
@@ -1064,36 +1114,58 @@ def get_prize (request):
 @view_config(route_name="set_prize", renderer="json", permission="akaviri")
 def set_prize (request):
     if "prize_id" not in request.params:
-        return False
+        return json_error("Missing prize id.")
 
     p_id = request.params["prize_id"]
+    current_prize = db.get_prize(p_id)
+    if not current_prize:
+        return json_error("Prize not found.")
 
-    data = parse_keys(db.get_prize(p_id), request.params, ["prize_text", "prize_text2", "prize_winner"], objects.Prize)
+    current_prize = dict(current_prize)
+    if current_prize.get("prize_finalised"):
+        return json_error("Unlock this prize before editing it.")
 
-    if data["prize_winner"].startswith("P"):
+    data = parse_keys(current_prize, request.params, ["prize_text", "prize_text2", "prize_winner"], objects.Prize)
+
+    if isinstance(data["prize_winner"], str) and data["prize_winner"].startswith("P"):
         data["prize_winner"] = -int(data["prize_winner"][1:])
 
-    return db.set_prize(data)
+    if str(data.get("prize_winner", "")) != str(current_prize.get("prize_winner", "")):
+        if get_current_raffle_status() != "ROLLING":
+            return json_error("Set raffle status to ROLLING before entering or changing winning ticket numbers.")
+
+    if db.set_prize(data):
+        return json_ok()
+
+    return json_error("Unable to update prize.")
 
 # This is for rolling stuff
 @view_config(route_name="roll_prize", renderer="json", permission="akaviri")
 def roll_prize (request):
     if "prize_id" not in request.matchdict:
-        return False
+        return json_error("Missing prize id.")
+
+    if get_current_raffle_status() != "ROLLING":
+        return json_error("Set raffle status to ROLLING before rolling winners.")
 
     p_id = request.matchdict["prize_id"]
 
     o = dict(db.get_prize(p_id))
+    if o.get("prize_finalised"):
+        return json_error("Unlock this prize before rolling it again.")
 
     t = make_ticket_list(request)
+    if not t:
+        return json_error("There are no tickets to roll from.")
 
     roll = random.randint(1, len(t))
 
     o["prize_winner"] = roll
 
-    db.set_prize(o)
+    if not db.set_prize(o):
+        return json_error("Unable to roll a winner for this prize.")
 
-    return True
+    return json_ok()
 
     #return {"name": t[roll-1][1], "ticket": roll}
 
@@ -1360,6 +1432,7 @@ def make_app ():
     # -- Prize manipulation
     g_route("roll_prize", "/{guild}/json/set/prize_roll/{prize_id}")
     g_route("finalise_prize", "/{guild}/json/set/prize_finalise/{prize_id}")
+    g_route("unfinalise_prize", "/{guild}/json/set/prize_unfinalise/{prize_id}")
 
     # Re-enable auth module - all Python 2/3 issues resolved
     # Include auth module at root level and also with guild prefix

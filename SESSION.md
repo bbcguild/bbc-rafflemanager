@@ -51,6 +51,7 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - Utility-band refinement follow-up on 2026-04-05: notes and import are being kept as matched sibling panels, but the import header is being toned down so the dropzone itself can reclaim visual focus. Current pass shortens both panel title bars in sync, cools the import accent away from loud orange, and softens the dropzone treatment so the center band feels more coordinated and less like two competing slabs.
 - New-raffle workflow follow-up on 2026-04-05: `Open New Raffle` is no longer just a browser prompt plus confirm. Current pass turns it into a proper setup modal with suggested raffle number, carried-forward drawing time and ticket cost, blank raffle name, status shown as `LIVE`, and all three note sections prefilled and editable in one place. Creating the raffle now submits exactly what is visible in that modal, so admins can leave notes alone, tweak them, or clear them before the new week starts.
 - New-raffle workflow follow-up on 2026-04-05: first live polish moved each notes-section `Clear` action down into the formatting row so it is visible where the editor controls already live. The toolbar `Open New Raffle` trigger was also de-lit so it rests in the same normal/off state as the other admin controls until used.
+- Workflow-enforcement follow-up on 2026-04-05: prize actions and weekly rollover now have backend status rules instead of relying on admin memory. Rolling, entering/changing winning ticket numbers, and locking prizes now require raffle status `ROLLING`; opening a new raffle now requires the current raffle to already be `CLOSED`/`COMPLETE`. Finalized prizes are no longer permanently irreversible: they stay locked for normal use, keep a visible lock control, can be unlocked with confirmation, and expose an open-lock icon when reversible. After the final remaining prize is locked, the UI now prompts admins to switch raffle status to `CLOSED`.
 
 ## Known Facts
 - `SESSION.md` was introduced after an earlier crash because conversation state had been lost.
@@ -101,6 +102,7 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - whether the toned-down import header still feels important enough without shouting orange
 - whether the new raffle-setup modal feels like a smoother weekly workflow than the old prompt/dropdown combo
 - whether the relocated `Clear` control is now easier to find in the notes editors
+- whether the new status enforcement and reversible lock/unlock flow feel right in practice
 - then decide whether to keep polishing the notes/import workspace or move down into broader center/right layout work
 
 ## If Chat Dies, Resume By Doing This

@@ -1900,6 +1900,9 @@ div#paid_template{
 .prize_finalise::before{
   content:"\1F512";
 }
+.prize_unlock::before{
+  content:"\1F513";
+}
 .prize_roll::before{
   content:"\1F3B2";
 }
@@ -1911,6 +1914,11 @@ div#paid_template{
 .prize-action:focus{
   color:#b15dff;
   outline:none;
+}
+
+.prize input[disabled]{
+  opacity:.7;
+  cursor:not-allowed;
 }
 
 @media (max-width:1200px){
@@ -2409,7 +2417,11 @@ $(document).on("click", "#newRaffleCreate", function () {
                 url: "json/set/open_raffle",
                 data: payload,
                 success: function (result) {
-                        if (!result) {
+                        if (isActionError(result)) {
+                                alert(actionErrorMessage(result))
+                                return
+                        }
+                        if (!result || result.ok !== true) {
                                 alert("Unable to create the new raffle.")
                                 return
                         }
@@ -2600,6 +2612,28 @@ function collectNewRafflePayload() {
     return payload
 }
 
+function isActionError(result) {
+    return result && typeof result === "object" && result.ok === false
+}
+
+function actionErrorMessage(result, fallbackMessage) {
+    return (result && result.error) || fallbackMessage || "That action could not be completed."
+}
+
+function maybePromptCompleteAfterFinalLock(result) {
+    if (!result || result.ok !== true || !result.all_finalised) {
+        return
+    }
+
+    if (normalizeRaffleStatus($("#raffle_status").val()) === "COMPLETE") {
+        return
+    }
+
+    if (window.confirm('All prizes are now locked. Change raffle status to "CLOSED" now?')) {
+        $("#raffle_status").val("COMPLETE").trigger("change")
+    }
+}
+
 function confirmDangerousFieldChange(fieldId, oldValue, newValue) {
     if (oldValue === newValue) {
         return true
@@ -2674,9 +2708,13 @@ var get_prize_info = function (options) {
                     var prizeValueField = $("#prize_value", template).attr({"id": dom_id + "value"})[0]
                     formatPrizeValueField(prizeValueField)
                     if (value["prize_finalised"] != 0) {
-                        $("#prize_finalise", template).remove()
                         $("#prize_delete", template).remove()
                         $("#prize_roll", template).remove()
+                        $("#prize_finalise", template)
+                            .attr({"id": dom_id + "finalise", "title": "Unlock winner"})
+                            .removeClass("prize_finalise")
+                            .addClass("prize_unlock")
+                        $("input[type='text'][name]", template).prop("disabled", true)
                     } else {
                         $("#prize_finalise", template).attr({"id": dom_id + "finalise"})
                         $("#prize_delete", template).attr({"id": dom_id + "delete"})
@@ -2695,17 +2733,45 @@ var get_prize_info = function (options) {
                         }
 
                         $.getJSON("json/set/prize_delete/" + value["prize_id"], function (result) {
+                            if (isActionError(result)) {
+                                alert(actionErrorMessage(result))
+                                return
+                            }
                             get_prize_info()
                             })
                         
                     })
                     $(".prize_finalise", template).click(function () {
                             $.getJSON("json/set/prize_finalise/" + value["prize_id"], function (result) {
+                                if (isActionError(result)) {
+                                    alert(actionErrorMessage(result))
+                                    return
+                                }
+                                maybePromptCompleteAfterFinalLock(result)
+                                get_prize_info()
+                                })
+                            })
+                    $(".prize_unlock", template).click(function () {
+                            var warning = normalizeRaffleStatus($("#raffle_status").val()) === "COMPLETE"
+                                ? "This raffle is already CLOSED. Unlocking will hide this winner again and let you edit it. Continue?"
+                                : "Unlock this prize so the winner can be changed? The finalized winner will no longer be shown publicly."
+                            if (!window.confirm(warning)) {
+                                return
+                            }
+                            $.getJSON("json/set/prize_unfinalise/" + value["prize_id"], function (result) {
+                                if (isActionError(result)) {
+                                    alert(actionErrorMessage(result))
+                                    return
+                                }
                                 get_prize_info()
                                 })
                             })
                     $(".prize_roll", template).click(function () {
                             $.getJSON("json/set/prize_roll/" + value["prize_id"], function (result) {
+                                if (isActionError(result)) {
+                                    alert(actionErrorMessage(result))
+                                    return
+                                }
                                 get_prize_info()
                                 })
                             })
@@ -2716,6 +2782,11 @@ var get_prize_info = function (options) {
                                 url: "json/set/prize",
                                 data: $("#" + dom_id + "form").serialize(),
                                 success: function (result) {
+                                    if (isActionError(result)) {
+                                        alert(actionErrorMessage(result))
+                                        get_prize_info()
+                                        return
+                                    }
                                     get_prize_info()
                                 },
                                 xhrFields: {
