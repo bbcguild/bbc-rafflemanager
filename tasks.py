@@ -18,6 +18,7 @@ import hashlib
 import csv
 import io
 import operator
+import re
 
 from waitress import serve
 from pyramid.config import Configurator
@@ -1040,6 +1041,18 @@ def get_all_prizes (request):
     prizes = [dict(x) for x in prizes]
 
     for p in prizes:
+        raw_prize_text = (p.get("prize_text") or "").strip()
+        p["prize_text_display"] = raw_prize_text or "Prize Details Soon"
+
+        raw_prize_value = p.get("prize_value")
+        if raw_prize_value in (None, ""):
+            p["prize_value_display"] = ""
+        else:
+            try:
+                p["prize_value_display"] = f"{int(raw_prize_value):,}"
+            except (TypeError, ValueError):
+                p["prize_value_display"] = str(raw_prize_value)
+
         winner = p["prize_winner"]
         if winner != 0 and winner != "":
             if winner > 0:
@@ -1125,7 +1138,12 @@ def set_prize (request):
     if current_prize.get("prize_finalised"):
         return json_error("Unlock this prize before editing it.")
 
-    data = parse_keys(current_prize, request.params, ["prize_text", "prize_text2", "prize_winner"], objects.Prize)
+    data = parse_keys(current_prize, request.params, ["prize_text", "prize_text2", "prize_winner", "prize_value"], objects.Prize)
+    data["prize_text"] = (data.get("prize_text") or "").strip()
+
+    raw_prize_value = request.params.get("prize_value", data.get("prize_value"))
+    prize_value_digits = re.sub(r"[^\d]", "", "" if raw_prize_value is None else str(raw_prize_value))
+    data["prize_value"] = int(prize_value_digits) if prize_value_digits else None
 
     if isinstance(data["prize_winner"], str) and data["prize_winner"].startswith("P"):
         data["prize_winner"] = -int(data["prize_winner"][1:])

@@ -41,7 +41,8 @@ CREATE TABLE prizes (
     prize_text TEXT,                -- text related to the prize
     prize_text2 TEXT,               -- prize number (this is sorted)
     prize_winner INTEGER,           -- references the "winning" ticket, not won unless finalised
-    prize_finalised INTEGER         -- boolean value, true if prize is officially won
+    prize_finalised INTEGER,        -- boolean value, true if prize is officially won
+    prize_value INTEGER             -- optional numeric value for the prize
 );
 
 CREATE TABLE auth_users (

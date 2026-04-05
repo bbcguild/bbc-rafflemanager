@@ -1121,12 +1121,12 @@ function buildPrizeCards(result) {
     }
 
     var metaText = value["prize_text2"] || "";
-    var prizeText = value["prize_text"] || "";
+    var prizeText = value["prize_text_display"] || value["prize_text"] || "Prize Details Soon";
     var ticketText = value["prize_winner"] || "TBD";
     if (String(ticketText) === "0") {
       ticketText = "TBD";
     }
-    var prizeValueText = value["prize_value"] || "TBD";
+    var prizeValueText = value["prize_value_display"] || "";
 
     var card = ''
       + '<div class="prize">'

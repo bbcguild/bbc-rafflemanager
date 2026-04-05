@@ -28,6 +28,23 @@ def ensure_raffle_columns(conn):
 
     conn.commit()
 
+def ensure_prize_columns(conn):
+    """Backfill newer prize columns on older databases."""
+    expected_columns = {
+        "prize_value": "ALTER TABLE prizes ADD COLUMN prize_value INTEGER",
+    }
+
+    cursor = conn.cursor()
+    cursor.execute("PRAGMA table_info(prizes)")
+    existing_columns = {row[1] for row in cursor.fetchall()}
+
+    for column_name, statement in expected_columns.items():
+        if column_name not in existing_columns:
+            print(f"Applying prize schema migration: add column {column_name}")
+            cursor.execute(statement)
+
+    conn.commit()
+
 def init_database():
     """Initialize the database if it doesn't exist.
     
@@ -141,6 +158,7 @@ def init_database():
             if result:
                 print("Database schema is valid, skipping initialization")
                 ensure_raffle_columns(conn)
+                ensure_prize_columns(conn)
                 conn.close()
                 return db_path
             else:
@@ -202,6 +220,7 @@ def init_database():
                     tables = cursor.fetchall()
                     print(f"Copied database tables: {[t[0] for t in tables]}")
                     ensure_raffle_columns(conn)
+                    ensure_prize_columns(conn)
                     conn.close()
                     return db_path
                 else:
@@ -230,6 +249,7 @@ def init_database():
             conn.executescript(schema_sql)
             print("Schema applied successfully")
             ensure_raffle_columns(conn)
+            ensure_prize_columns(conn)
             
             # Verify schema was applied
             cursor = conn.cursor()

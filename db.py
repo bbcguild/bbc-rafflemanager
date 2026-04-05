@@ -524,7 +524,15 @@ def add_new_prize (cur, guild_id):
     if not cur_id:
         return False
 
-    cur.execute("INSERT INTO prizes VALUES (null, ?, 'Put prize here.', '?', 0, 0)", (cur_id, ))
+    cur.execute(
+        """
+        INSERT INTO prizes
+            (prize_raffle, prize_text, prize_text2, prize_winner, prize_finalised, prize_value)
+        VALUES
+            (?, '', '?', 0, 0, NULL)
+        """,
+        (cur_id, )
+    )
 
 @with_cursor_boolean
 def delete_prize (cur, prize_id):
@@ -580,4 +588,24 @@ def set_prize (cur, guild_id, prize_info):
     if p["prize_id"] is None:
         return False
     
-    cur.execute("UPDATE prizes SET prize_raffle=?, prize_text=?, prize_text2=?, prize_winner=?, prize_finalised=? WHERE prize_id=?", (p["prize_raffle"], p["prize_text"], p["prize_text2"], p["prize_winner"], p["prize_finalised"], p["prize_id"]))
+    cur.execute(
+        """
+        UPDATE prizes
+           SET prize_raffle=?,
+               prize_text=?,
+               prize_text2=?,
+               prize_winner=?,
+               prize_finalised=?,
+               prize_value=?
+         WHERE prize_id=?
+        """,
+        (
+            p["prize_raffle"],
+            p["prize_text"],
+            p["prize_text2"],
+            p["prize_winner"],
+            p["prize_finalised"],
+            p.get("prize_value"),
+            p["prize_id"]
+        )
+    )

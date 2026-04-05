@@ -78,6 +78,16 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - `notes/transcripts/` for raw saved chat dumps when available.
 - `RECOVERY_PROCESS.md` for the operating procedure.
 - Update and commit recovery notes regularly instead of leaving them local-only for long stretches.
+- The eventual source-of-truth data will be the copied production SQLite DB from the old live raffle site, not the throwaway data currently in this test environment.
+- DB cleanup/audit should happen near launch cutover, not now, so we do not waste effort cleaning data that may diverge again if the old site has to stay live longer.
+- `Prize Value` should be a real persisted DB field if implemented, and the schema change should be additive/migration-safe so the production DB can absorb it cleanly later.
+- Old raffle/prize history should be preserved, not wiped, unless a later audit proves specific rows are broken and safe to remove.
+- Old blank `Prize Value` rows should stay blank/null rather than being backfilled with fake values.
+- Duplicate raffle numbers across different guilds are acceptable; duplicate raffle codes within the same guild are probably undesirable long-term, but we should audit the real DB before enforcing uniqueness.
+- Historical `2620b` / `2620c` style raffle codes are treated as emergency recovery artifacts, not a preferred workflow to optimize around.
+- Archived raffles often contain winner ticket numbers without finalized prizes; whether to bulk-finalize those old archives is a later cleanup decision, not something to do during active feature work.
+- `Prize Value` should be implemented now as a nullable numeric DB field, not fake-filled for old rows and not bundled with broader historical DB cleanup.
+- `NULL` is the correct blank-state for `Prize Value`; `0` would incorrectly mean "this prize is worth zero."
 
 ## What We Ruled Out
 - Relying on chat history alone is not safe enough.
@@ -91,19 +101,17 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - `DECISIONS.md`
 
 ## Exact Next Step
-- Verify the bolder grouped-toolbar pass in-browser on the admin page.
-- Specifically check:
-- whether the clustered toolbar feels more like a control rail and less like floating pills
-- whether the new cluster pairings feel more logical (`Open New Raffle` + `Edit Raffle`, `Import` + `Re-Show`)
-- whether `Open New Raffle` now has the right level of emphasis without the loud orange
-- whether the reordered `Edit Raffle` panel feels better with `Raffle Name` at the top
-- whether the new `Edit Notes` open/close behavior makes the notes area feel calmer during normal tab switching
-- whether the lighter-weight `Edit Notes` / `Save All` utilities feel cleaner than the earlier chunky buttons
-- whether the toned-down import header still feels important enough without shouting orange
-- whether the new raffle-setup modal feels like a smoother weekly workflow than the old prompt/dropdown combo
-- whether the relocated `Clear` control is now easier to find in the notes editors
-- whether the new status enforcement and reversible lock/unlock flow feel right in practice
-- then decide whether to keep polishing the notes/import workspace or move down into broader center/right layout work
+- Commit/deploy the active prize-card repair pass if browser checks look sane.
+- This pass includes:
+- additive `Prize Value` schema/backend wiring with nullable numeric storage
+- admin prize placeholder cleanup (`Prize Details Soon` instead of stored filler text)
+- public fallback display of `Prize Details Soon` when prize details are blank
+- prize-card save flush before adding a new card so existing edits are not reset
+- autofill styling for prize inputs so browser suggestions do not turn the inputs bright white
+- then verify in-browser:
+- existing prize values persist through refresh
+- adding a third prize no longer wipes the first two
+- blank prize details show the new fallback on the public side
 
 ## If Chat Dies, Resume By Doing This
 1. Read `SESSION.md`.
@@ -128,9 +136,15 @@ Use this file as the source of truth for the active work session. If chat dies, 
 
 ## Open Questions
 - Is `Prize Value` now important enough to wire through schema/backend next, or should it stay visual until layout work is done?
+- If `Prize Value` is added now, should it be stored as a nullable numeric column so future `Total Prize Value` math stays possible?
 - Is `FREE` truly obsolete across the whole app?
 - Are there still visible admin layout issues in the right gutter or ticket panel on the target screen size?
 - Do we want to commit this recovery scaffolding immediately after setup?
+- At cutover time, should we audit and possibly clean:
+- duplicate same-guild raffle codes
+- multiple open raffles in one guild
+- obviously broken/empty recovery raffles
+- old archive rows with winner numbers but unfinalized prizes
 - Browser-level verification still needed:
 - confirm `raffle.bbcguild.com` redirects to `raffles.bbcguild.com`
 - confirm `tickets.bbcguild.com` redirects to `raffles.bbcguild.com`

@@ -1772,6 +1772,17 @@ div#paid_template{
   border-color:rgba(140,170,230,.28);
 }
 
+.prize input:-webkit-autofill,
+.prize input:-webkit-autofill:hover,
+.prize input:-webkit-autofill:focus{
+  -webkit-text-fill-color:#eef3ff;
+  -webkit-box-shadow:0 0 0 1000px #0f1622 inset;
+  box-shadow:0 0 0 1000px #0f1622 inset;
+  transition:background-color 9999s ease-out 0s;
+  caret-color:#eef3ff;
+  border-color:rgba(80,120,210,.22);
+}
+
 .prize_number{
   width:100%;
   min-height:112px;
@@ -2138,6 +2149,81 @@ function formatPrizeValueField(field) {
         field.value = normalizePrizeValue(field.value)
 }
 
+function serializePrizeForm($form) {
+        if (!$form || !$form.length) {
+                return ""
+        }
+
+        var data = $form.serializeArray()
+        for (var i = 0; i < data.length; i++) {
+                if (data[i].name === "prize_value") {
+                        data[i].value = String(data[i].value == null ? "" : data[i].value).replace(/[^\d]/g, "")
+                }
+        }
+
+        return $.param(data)
+}
+
+function savePrizeForm($form, options) {
+        options = options || {}
+        if (!$form || !$form.length) {
+                return $.Deferred().resolve().promise()
+        }
+
+        var deferred = $.Deferred()
+
+        $.ajax({
+                type: "POST",
+                url: "json/set/prize",
+                data: serializePrizeForm($form),
+                success: function (result) {
+                        if (isActionError(result)) {
+                                if (!options.silent) {
+                                        alert(actionErrorMessage(result))
+                                }
+                                deferred.reject(result)
+                                return
+                        }
+
+                        if (options.refreshAfterSave) {
+                                get_prize_info(options.refreshOptions || {})
+                        }
+
+                        deferred.resolve(result)
+                },
+                error: function () {
+                        var result = { ok: false, error: "Unable to save this prize." }
+                        if (!options.silent) {
+                                alert(result.error)
+                        }
+                        deferred.reject(result)
+                },
+                xhrFields: {
+                        withCredentials: true
+                }
+        })
+
+        return deferred.promise()
+}
+
+function saveAllVisiblePrizeForms() {
+        var requests = []
+
+        $("#prize_info form").each(function () {
+                var $form = $(this)
+                if ($form.find(".prize_unlock").length) {
+                        return
+                }
+                requests.push(savePrizeForm($form, { silent: true }))
+        })
+
+        if (requests.length === 0) {
+                return $.Deferred().resolve().promise()
+        }
+
+        return $.when.apply($, requests)
+}
+
 function syncLegacyModalState() {
         var anyVisible = $("#import_template:visible, #confirm_template:visible, #barter_template:visible, #paid_template:visible, #new_raffle_modal:visible").length > 0
         $("#legacy_modal_backdrop").toggle(anyVisible)
@@ -2319,11 +2405,20 @@ function saveNotes() {
 }
 
 function addPrizeCard() {
-        $.getJSON("json/set/prize_add", function (result) {
-                if (result) {
-                        get_prize_info({ scrollToLast: true })
-                }
-        })
+        saveAllVisiblePrizeForms()
+                .done(function () {
+                        $.getJSON("json/set/prize_add", function (result) {
+                                if (result) {
+                                        get_prize_info({ scrollToLast: true })
+                                }
+                        })
+                })
+                .fail(function (result) {
+                        if (isActionError(result)) {
+                                alert(actionErrorMessage(result))
+                                get_prize_info()
+                        }
+                })
         return false
 }
 
@@ -2704,8 +2799,10 @@ var get_prize_info = function (options) {
                     $("#prize_winner_name", template).attr({"id": dom_id + "winner_name"}).text(pname)
 
                     // at least the prize details are here
-                    $("#prize_item", template).attr({"id": dom_id + "item"}).val(value["prize_text"])
-                    var prizeValueField = $("#prize_value", template).attr({"id": dom_id + "value"})[0]
+                    $("#prize_item", template).attr({"id": dom_id + "item"}).val(value["prize_text"] || "")
+                    var prizeValueField = $("#prize_value", template)
+                        .attr({"id": dom_id + "value"})
+                        .val(value["prize_value"] == null ? "" : value["prize_value"])[0]
                     formatPrizeValueField(prizeValueField)
                     if (value["prize_finalised"] != 0) {
                         $("#prize_delete", template).remove()
@@ -2777,23 +2874,11 @@ var get_prize_info = function (options) {
                             })
 
                     $("input[type='text'][name]", template).change(function () {
-                            $.ajax({
-                                type: "POST",
-                                url: "json/set/prize",
-                                data: $("#" + dom_id + "form").serialize(),
-                                success: function (result) {
-                                    if (isActionError(result)) {
-                                        alert(actionErrorMessage(result))
-                                        get_prize_info()
-                                        return
-                                    }
-                                    get_prize_info()
-                                },
-                                xhrFields: {
-                                    withCredentials: true
-                                },
-                                })
-
+                            savePrizeForm($("#" + dom_id + "form"), {
+                                refreshAfterSave: true
+                            }).fail(function () {
+                                get_prize_info()
+                            })
                             })
 
                     $("#prize_info").append(template)
@@ -3876,12 +3961,12 @@ document.addEventListener('DOMContentLoaded', function () {
     <div class="prize-main">
         <div class="prize-top-row">
             <div class="prize-field">
-                <input type="text" id="prize_item" class="prize_item" name="prize_text" placeholder="Prize" />
+                <input type="text" id="prize_item" class="prize_item" name="prize_text" placeholder="Prize Details Soon" />
             </div>
         </div>
         <div class="prize-middle-row">
             <div class="prize-field">
-                <input type="text" id="prize_value" class="prize_value" placeholder="Prize Value" />
+                <input type="text" id="prize_value" class="prize_value" name="prize_value" placeholder="Prize Value" />
             </div>
         </div>
         <div class="prize-bottom-row">
