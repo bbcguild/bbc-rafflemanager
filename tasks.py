@@ -285,6 +285,7 @@ def get_current_raffle_status():
     info = db.get_cur_raffle_info()
     if not info:
         return "LIVE"
+    info = dict(info)
     return normalize_raffle_status_value(info.get("raffle_status"))
 
 def json_error(message):
