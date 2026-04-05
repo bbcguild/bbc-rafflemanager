@@ -56,6 +56,7 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - Autosave bug follow-up on 2026-04-05: editing prize text/value while the winner field was blank could still trip the ROLLING-only guard because autosave treated blank winner state as a winner change. The backend now normalizes blank `prize_winner` values to `0` before the status-gate logic runs, so text/value edits no longer falsely require a rolling raffle.
 - Admin testing follow-up on 2026-04-05: live testing confirmed prize values and public prize display are working, but several workflow friction points surfaced. Current pass keeps prize-card autosave and action refreshes from bouncing the page to the top, blocks `Open New Raffle` before the setup modal opens unless status is already `COMPLETE`, normalizes lingering `CLOSED` wording/handling toward `COMPLETE`, and flips the prize lock iconography so open lock means unlocked while closed lock means locked.
 - Admin testing follow-up on 2026-04-05: a second verification pass confirmed the scroll-jump fix and early new-raffle guard are working. Remaining gaps found during that pass were that unlocked prizes still leaked their ticket number on the public page, and the visible admin status dropdown still said `CLOSED`. Current follow-up fixes the public ticket display so only finalized prizes expose winner ticket numbers, changes the visible admin status label to `COMPLETE`, and gives the lock pill a clearer green-unlocked / red-locked state treatment.
+- Public entrants follow-up on 2026-04-05: when the raffle status was not `LIVE`, the public entrants table correctly exposed the extra `Range` column but populated it with the wrong numeric field instead of the computed ticket ranges. Root cause was the range renderer using a hard-coded index that matched the paid-ticket slot in non-barter rows. Current fix reads the appended trailing range field directly so `Range` shows the actual ticket spans again.
 
 ## Known Facts
 - `SESSION.md` was introduced after an earlier crash because conversation state had been lost.
@@ -105,11 +106,9 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - `DECISIONS.md`
 
 ## Exact Next Step
-- Commit, push, and deploy the current public-prize/status-label follow-up.
+- Commit, push, and deploy the public entrants range fix.
 - Then verify in-browser:
-- unlocking a prize reverts the public ticket number back to `TBD`
-- the admin status dropdown visibly says `COMPLETE`
-- the lock pill colors feel appropriately readable and noticeable in both states
+- when status is `ROLLING` or `COMPLETE`, the public `Range` column shows actual ticket spans instead of duplicating totals or paid-ticket counts
 
 ## If Chat Dies, Resume By Doing This
 1. Read `SESSION.md`.

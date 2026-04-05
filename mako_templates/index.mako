@@ -863,8 +863,10 @@ function getEntrantsColumns() {
       label: "Range",
       className: "range",
       value: function(row) {
-        var rangeIndex = currentEntrantsMode === "barter-range" ? 5 : 3;
-        return row[rangeIndex] || "";
+        if (!Array.isArray(row) || row.length === 0) {
+          return "";
+        }
+        return row[row.length - 1] || "";
       }
     });
   }
