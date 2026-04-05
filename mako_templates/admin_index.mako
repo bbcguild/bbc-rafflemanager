@@ -712,32 +712,45 @@ body.legacy-modal-open{
   padding-left:0;
   border-left:1px solid rgba(95,132,212,.12);
 }
+.status-select-shell{
+  position:relative;
+  display:flex;
+  align-items:center;
+}
+.status-select-shell::after{
+  content:"";
+  position:absolute;
+  right:14px;
+  top:50%;
+  width:10px;
+  height:10px;
+  border-right:2px solid currentColor;
+  border-bottom:2px solid currentColor;
+  transform:translateY(-65%) rotate(45deg);
+  pointer-events:none;
+  opacity:.92;
+}
 .status-tool-select{
   min-width:208px;
   max-width:208px;
   padding-left:14px;
-  padding-right:38px;
+  padding-right:40px;
   font-weight:800;
   appearance:none;
   -webkit-appearance:none;
   -moz-appearance:none;
-  background-repeat:no-repeat;
-  background-position:right 14px center;
-  background-size:12px 12px;
+  background-image:none !important;
   border:1px solid rgba(140,170,230,.12) !important;
   box-shadow:none !important;
 }
 .status-tool-select.status-live{
   color:#8ff0ba;
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M2 3.5l4 4 4-4' fill='none' stroke='%238ff0ba' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg>");
 }
 .status-tool-select.status-rolling{
-  color:#8ff0ba;
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M2 3.5l4 4 4-4' fill='none' stroke='%238ff0ba' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  color:#f2b36b;
 }
 .status-tool-select.status-complete{
   color:#ff9d9d;
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M2 3.5l4 4 4-4' fill='none' stroke='%23ff9d9d' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg>");
 }
 .status-tool-select:focus{
   outline:none !important;
@@ -3017,11 +3030,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
   <div class="button-bar-right">
     <div class="status-tool">
-      <select id="raffle_status" class="ginfo_change_save tool-input status-tool-select" name="raffle_status">
-        <option value="LIVE">&#128994; LIVE</option>
-        <option value="ROLLING">&#127922; ROLLING</option>
-        <option value="COMPLETE">&#128308; CLOSED</option>
-      </select>
+      <div class="status-select-shell">
+        <select id="raffle_status" class="ginfo_change_save tool-input status-tool-select" name="raffle_status">
+          <option value="LIVE">&#128994; LIVE</option>
+          <option value="ROLLING">&#127922; ROLLING</option>
+          <option value="COMPLETE">&#128308; CLOSED</option>
+        </select>
+      </div>
     </div>
   </div>
 
