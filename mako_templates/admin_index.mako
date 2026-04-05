@@ -553,12 +553,12 @@ body.legacy-modal-open{
   gap:14px;
   margin-bottom:14px;
   width:100%;
-  padding:12px 16px;
+  padding:10px 14px;
   align-items:center;
   background:
     linear-gradient(180deg,rgba(15,27,48,.98),rgba(8,17,31,.98));
   border:1px solid var(--line);
-  border-radius:22px;
+  border-radius:18px;
   box-shadow:var(--shadow);
 }
 .button-bar-label{
@@ -585,14 +585,24 @@ body.legacy-modal-open{
   margin-left:auto;
   justify-content:flex-end;
 }
+.tool-cluster{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  min-width:0;
+  padding:4px;
+  border-radius:14px;
+  border:1px solid rgba(95,132,212,.12);
+  background:rgba(10,18,31,.58);
+}
 .action-btn{
-  min-height:36px;
+  min-height:38px;
   min-width:0;
   padding:0 14px;
-  border-radius:10px;
-  border:1px solid rgba(95,132,212,.16);
-  background:rgba(12,21,37,.82);
-  color:#f4f7ff;
+  border-radius:8px;
+  border:1px solid transparent;
+  background:transparent;
+  color:#dfe8fb;
   font-size:.88rem;
   font-weight:700;
   white-space:nowrap;
@@ -605,9 +615,20 @@ body.legacy-modal-open{
 }
 .action-btn:hover,
 .action-btn:focus{
-  background:rgba(22,38,66,.96);
-  border-color:rgba(109,145,218,.26);
+  background:rgba(22,38,66,.92);
+  border-color:rgba(109,145,218,.18);
   outline:none;
+}
+.action-btn-primary{
+  border-color:rgba(216,146,42,.28);
+  background:linear-gradient(180deg,rgba(214,136,28,.92),rgba(181,112,22,.9));
+  color:#fff7eb;
+  box-shadow:inset 0 1px 0 rgba(255,235,198,.18);
+}
+.action-btn-primary:hover,
+.action-btn-primary:focus{
+  background:linear-gradient(180deg,rgba(227,149,40,.96),rgba(190,119,26,.92));
+  border-color:rgba(230,175,83,.36);
 }
 .tool-menu{
   position:relative;
@@ -631,7 +652,7 @@ body.legacy-modal-open{
 }
 .tool-menu[open] > .tool-menu-trigger{
   background:rgba(22,38,66,.98);
-  border-color:rgba(109,145,218,.28);
+  border-color:rgba(109,145,218,.18);
 }
 .tool-menu-panel{
   position:absolute;
@@ -1593,6 +1614,9 @@ div#paid_template{
   .button-bar-label{
     border-right:none;
     padding-right:0;
+  }
+  .tool-cluster{
+    width:100%;
   }
   .button-bar-right{
     width:100%;
@@ -3001,54 +3025,58 @@ document.addEventListener('DOMContentLoaded', function () {
 <section class="button-bar">
   <div class="button-bar-left">
     <span class="button-bar-label">Admin Tools</span>
-    <button type="button" class="action-btn" onclick="$('#new_raffle_button').click()">Open New Raffle</button>
+    <div class="tool-cluster">
+      <button type="button" class="action-btn action-btn-primary" onclick="$('#new_raffle_button').click()">Open New Raffle</button>
+    </div>
 
+    <div class="tool-cluster">
 % if request.extended_tickets:
-    <details class="tool-menu">
-      <summary class="action-btn tool-menu-trigger">Import <span class="tool-menu-caret">v</span></summary>
-      <div class="tool-menu-panel">
-        <div class="tool-menu-actions">
-          <button type="button" class="tool-menu-action" onclick="$('#import_paid').click(); closeToolMenus();">Paid</button>
-          <button type="button" class="tool-menu-action" onclick="$('#import_barter').click(); closeToolMenus();">Barter</button>
+      <details class="tool-menu">
+        <summary class="action-btn tool-menu-trigger">Import <span class="tool-menu-caret">v</span></summary>
+        <div class="tool-menu-panel">
+          <div class="tool-menu-actions">
+            <button type="button" class="tool-menu-action" onclick="$('#import_paid').click(); closeToolMenus();">Paid</button>
+            <button type="button" class="tool-menu-action" onclick="$('#import_barter').click(); closeToolMenus();">Barter</button>
+          </div>
         </div>
-      </div>
-    </details>
+      </details>
 % endif
 
-    <details class="tool-menu">
-      <summary class="action-btn tool-menu-trigger">Re-Show <span class="tool-menu-caret">v</span></summary>
-      <div class="tool-menu-panel">
-        <div class="tool-menu-actions">
-          <button type="button" class="tool-menu-action" onclick="$('#reshow_import').click(); closeToolMenus();">Imports</button>
-          <button type="button" class="tool-menu-action" onclick="$('#reshow_confirm').click(); closeToolMenus();">Confirms</button>
+      <details class="tool-menu">
+        <summary class="action-btn tool-menu-trigger">Re-Show <span class="tool-menu-caret">v</span></summary>
+        <div class="tool-menu-panel">
+          <div class="tool-menu-actions">
+            <button type="button" class="tool-menu-action" onclick="$('#reshow_import').click(); closeToolMenus();">Imports</button>
+            <button type="button" class="tool-menu-action" onclick="$('#reshow_confirm').click(); closeToolMenus();">Confirms</button>
+          </div>
         </div>
-      </div>
-    </details>
+      </details>
 
-    <details class="tool-menu tool-menu-edit">
-      <summary class="action-btn tool-menu-trigger">Edit Raffle <span class="tool-menu-caret">v</span></summary>
-      <div class="tool-menu-panel">
-        <div class="tool-panel-title">Raffle Setup</div>
-        <div class="tool-form-grid">
-          <div class="tool-field">
-            <label for="raffle_subheader">Raffle Number</label>
-            <input type="text" id="raffle_subheader" class="ginfo_change_save tool-input" name="raffle_guild_num"/>
-          </div>
-          <div class="tool-field">
-            <label for="raffle_time">Drawing Time</label>
-            <input type="text" id="raffle_time" class="ginfo_change_save tool-input" name="raffle_time"/>
-          </div>
-          <div class="tool-field">
-            <label for="raffle_cost">Ticket Cost</label>
-            <input type="text" id="raffle_cost" class="ginfo_change_save tool-input" name="raffle_ticket_cost"/>
-          </div>
-          <div class="tool-field">
-            <label for="raffle_title">Raffle Title</label>
-            <input type="text" id="raffle_title" class="ginfo_change_save tool-input" name="raffle_title"/>
+      <details class="tool-menu tool-menu-edit">
+        <summary class="action-btn tool-menu-trigger">Edit Raffle <span class="tool-menu-caret">v</span></summary>
+        <div class="tool-menu-panel">
+          <div class="tool-panel-title">Raffle Setup</div>
+          <div class="tool-form-grid">
+            <div class="tool-field">
+              <label for="raffle_title">Raffle Name</label>
+              <input type="text" id="raffle_title" class="ginfo_change_save tool-input" name="raffle_title"/>
+            </div>
+            <div class="tool-field">
+              <label for="raffle_subheader">Raffle Number</label>
+              <input type="text" id="raffle_subheader" class="ginfo_change_save tool-input" name="raffle_guild_num"/>
+            </div>
+            <div class="tool-field">
+              <label for="raffle_time">Drawing Time</label>
+              <input type="text" id="raffle_time" class="ginfo_change_save tool-input" name="raffle_time"/>
+            </div>
+            <div class="tool-field">
+              <label for="raffle_cost">Ticket Cost</label>
+              <input type="text" id="raffle_cost" class="ginfo_change_save tool-input" name="raffle_ticket_cost"/>
+            </div>
           </div>
         </div>
-      </div>
-    </details>
+      </details>
+    </div>
   </div>
 
   <div class="button-bar-right">

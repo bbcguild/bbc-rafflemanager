@@ -44,6 +44,7 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - Status bug fix follow-up on 2026-04-04: the selected status text color could still lag behind the actual chosen value because the status-state class was only being refreshed when raffle data reloaded. Current fix updates the status styling immediately in the `change` handler so the closed control reflects the newly selected state without waiting for a refresh.
 - Legacy cleanup follow-up on 2026-04-04: confirmed that the old `bonus_tickets` feature is no longer referenced by any active template. The remaining request subscriber/backend helper in `tasks.py` has been removed so that dead path cannot keep confusing future cleanup work.
 - Tool-strip refinement follow-up on 2026-04-04: with the workflow pieces now stable enough again, the admin tools strip is being restyled to feel more like a true toolbar and less like a row of chunky pills. This pass tightens the label treatment, slightly squares off the controls, calms the fill/border styling, and gives the status control cleaner spacing so the strip reads more intentional without changing the agreed workflow model.
+- Tool-strip refinement follow-up on 2026-04-04: pushed the toolbar further away from loose pill buttons and toward grouped control clusters. `Open New Raffle` is now the one clearly emphasized action, while `Import`, `Re-Show`, and `Edit Raffle` sit inside a shared quieter control group. As part of that QoL cleanup, the `Edit Raffle` popover now puts `Raffle Name` first because that is the field admins actually update during the week.
 
 ## Known Facts
 - `SESSION.md` was introduced after an earlier crash because conversation state had been lost.
@@ -83,12 +84,12 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - `DECISIONS.md`
 
 ## Exact Next Step
-- Verify the new toolbar/status/edit-raffle model in-browser on the admin page.
+- Verify the bolder grouped-toolbar pass in-browser on the admin page.
 - Specifically check:
-- whether the old left strip can now disappear without hurting workflow
-- whether `Status` feels right on the far right of the tool strip
-- whether `Edit Raffle`, `Import`, and `Re-Show` feel fast enough as toolbar popovers
-- then continue into deeper layout polish once the admin workflow structure is approved
+- whether the clustered toolbar feels more like a control rail and less like floating pills
+- whether `Open New Raffle` now has the right level of emphasis
+- whether the reordered `Edit Raffle` panel feels better with `Raffle Name` at the top
+- then decide whether to keep pushing the toolbar language or move down into broader center/right layout polish
 
 ## If Chat Dies, Resume By Doing This
 1. Read `SESSION.md`.
