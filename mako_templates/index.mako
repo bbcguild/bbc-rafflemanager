@@ -1,6 +1,10 @@
 <%
 initial_lookup_raffle = (request.matchdict.get('raffle') or request.params.get('raffle_lookup') or '').strip()
 initial_display_raffle = initial_lookup_raffle if initial_lookup_raffle else '2613'
+ga4_site_area = 'public'
+ga4_raffle_view = 'archive' if initial_lookup_raffle else 'current'
+ga4_raffle_number = initial_lookup_raffle
+ga4_guild_slug = request.matchdict.get('guild', '')
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -11,6 +15,7 @@ initial_display_raffle = initial_lookup_raffle if initial_lookup_raffle else '26
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>BBC Raffle</title>
+<%include file="analytics_snippet.mako"/>
 
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.js"></script>

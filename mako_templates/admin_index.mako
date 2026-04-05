@@ -1,6 +1,13 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>   
+<%
+ga4_site_area = 'admin'
+ga4_raffle_view = 'current'
+ga4_raffle_number = ''
+ga4_guild_slug = request.matchdict.get('guild', '')
+%>
+<%include file="analytics_snippet.mako"/>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.js"></script>
 <link rel="stylesheet" media="screen" href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css">

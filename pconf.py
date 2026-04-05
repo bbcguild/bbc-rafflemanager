@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import os
+
 settings = {
         # Base Pyramid
 "reload_all": True, 
@@ -14,4 +16,5 @@ settings = {
 "sqlalchemy.url": "sqlite:///raffle.db",
         # Mako - use relative path from project root
 "mako.directories": "mako_templates",
+"ga4_measurement_id": os.getenv("GA4_MEASUREMENT_ID", "").strip(),
 }
