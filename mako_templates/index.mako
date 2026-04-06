@@ -478,31 +478,30 @@ body{
   pointer-events:none;
 }
 .prize.prize-style-featured{
-  border-width:2px;
+  border-width:1px;
   border-color:rgba(125,148,192,.26);
-  box-shadow:inset 0 3px 0 rgba(130,205,255,.3);
+  box-shadow:inset 0 0 0 1px rgba(125,148,192,.16), inset 0 3px 0 rgba(130,205,255,.26);
 }
 .prize.prize-style-featured::before{
   background:linear-gradient(180deg,rgba(130,205,255,.82),rgba(130,205,255,.18));
 }
 .prize.prize-style-grand{
-  border-width:2px;
+  border-width:1px;
   border-color:rgba(205,166,92,.34);
-  box-shadow:inset 0 4px 0 rgba(223,186,97,.52), 0 6px 18px rgba(0,0,0,.14);
+  box-shadow:inset 0 0 0 1px rgba(205,166,92,.18), inset 0 4px 0 rgba(223,186,97,.44), 0 6px 18px rgba(0,0,0,.14);
 }
 .prize.prize-style-grand::before{
   background:linear-gradient(180deg,rgba(223,186,97,.9),rgba(223,186,97,.18));
 }
 .prize.prize-style-jackpot{
-  border-width:2px;
+  border-width:1px;
   border-color:rgba(193,227,255,.52);
   background:
-    radial-gradient(circle at left center, rgba(184,223,255,.22), transparent 33%),
-    linear-gradient(90deg, rgba(184,223,255,.16), rgba(184,223,255,.05) 22%, transparent 44%),
+    radial-gradient(circle at left center, rgba(154,211,255,.15), transparent 28%),
+    linear-gradient(90deg, rgba(154,211,255,.09), rgba(154,211,255,.03) 18%, transparent 36%),
     radial-gradient(circle at top right, rgba(122,204,255,.18), transparent 38%),
-    linear-gradient(90deg, rgba(193,227,255,.1), transparent 28%),
     linear-gradient(180deg,rgba(12,26,45,.98),rgba(7,14,28,.99));
-  box-shadow:0 0 0 1px rgba(193,227,255,.18), 0 16px 34px rgba(0,0,0,.28), inset 0 0 30px rgba(122,204,255,.1);
+  box-shadow:inset 0 0 0 1px rgba(193,227,255,.16), 0 16px 34px rgba(0,0,0,.28), inset 0 0 22px rgba(122,204,255,.07);
 }
 .prize.prize-style-jackpot::before{
   width:6px;
