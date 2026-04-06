@@ -73,6 +73,25 @@ PRIZE_STYLE_ALIASES = {
 }
 
 
+def safe_ticket_int(value):
+    if value is None:
+        return 0
+    if isinstance(value, bool):
+        return int(value)
+    if isinstance(value, int):
+        return value
+    if isinstance(value, float):
+        return int(value)
+    text = str(value).strip()
+    if not text:
+        return 0
+    text = text.replace(",", "")
+    try:
+        return int(text)
+    except Exception:
+        return 0
+
+
 def normalize_prize_style(raw_style):
     style = (raw_style or "standard")
     if not isinstance(style, str):
@@ -417,26 +436,26 @@ def make_all_tickets (request, extended=False):
     build = []
 
     for i in data:
-        if i["ticket_count"] != 0 or i["ticket_barter"] != 0:
+        ticket_count = safe_ticket_int(i.get("ticket_count"))
+        ticket_barter = safe_ticket_int(i.get("ticket_barter"))
+        if ticket_count != 0 or ticket_barter != 0:
+            i["ticket_count"] = ticket_count
+            i["ticket_barter"] = ticket_barter
             build.append(i)
 
     data = sorted(build, key=lambda x: x["ticket_user_name"].lower())
 
     for i in range(len(data)):
         d = data[i]
-
-        try:
-            barter_val = int(d["ticket_barter"])
-        except:
-            barter_val = 0
-
-        total = d["ticket_count"] + barter_val
+        ticket_count = safe_ticket_int(d.get("ticket_count"))
+        barter_val = safe_ticket_int(d.get("ticket_barter"))
+        total = ticket_count + barter_val
 
         if total == 0:
             continue
 
         if extended:
-            new = [i+1, d["ticket_user_name"], total, d["ticket_count"], barter_val]
+            new = [i+1, d["ticket_user_name"], total, ticket_count, barter_val]
         else:
             new = [i+1, d["ticket_user_name"], total]
 
@@ -451,22 +470,20 @@ def export_csv (request):
     build = []
 
     for i in data:
-        try:
-            barter_val = int(i["ticket_barter"])
-        except:
-            barter_val = 0
-        if i["ticket_count"] != 0 or barter_val != 0:
+        ticket_count = safe_ticket_int(i.get("ticket_count"))
+        barter_val = safe_ticket_int(i.get("ticket_barter"))
+        if ticket_count != 0 or barter_val != 0:
+            i["ticket_count"] = ticket_count
+            i["ticket_barter"] = barter_val
             i["ticket_user_name"] = i["ticket_user_name"].replace('"', "'")
             build.append(i)
 
     f = io.StringIO()
     writer = csv.writer(f, delimiter="\t", quotechar="'", quoting=csv.QUOTE_MINIMAL)
     for i in sorted(build, key=operator.itemgetter("ticket_user_name")):
-        try:
-            barter_val = int(i["ticket_barter"])
-        except:
-            barter_val = 0
-        total = i["ticket_count"] + barter_val
+        ticket_count = safe_ticket_int(i.get("ticket_count"))
+        barter_val = safe_ticket_int(i.get("ticket_barter"))
+        total = ticket_count + barter_val
         writer.writerow([i["ticket_user_name"], "note", total])
 
     f.seek(0)
@@ -597,8 +614,8 @@ def make_ticket_list (request):
     for user in data:
         cu = gdata.prefix + user["ticket_user_name"]
 
-        count = user["ticket_count"]
-        barter = user["ticket_barter"]
+        count = safe_ticket_int(user.get("ticket_count"))
+        barter = safe_ticket_int(user.get("ticket_barter"))
 
         total = count + barter
 
