@@ -1809,6 +1809,16 @@ div#paid_template{
   gap:6px;
 }
 
+.prize-style-label{
+  display:block;
+  font-size:.68rem;
+  font-weight:900;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:#8fa6cf;
+  text-align:center;
+}
+
 .prize_style{
   width:100%;
   min-height:32px;
@@ -1854,22 +1864,22 @@ div#paid_template{
 
 .prize-shell.prize-style-featured{
   border-width:2px;
-  border-color:rgba(125,148,192,.28);
-  box-shadow:inset 0 3px 0 rgba(223,186,97,.46);
+  border-color:rgba(125,148,192,.26);
+  box-shadow:inset 0 3px 0 rgba(130,205,255,.3);
 }
 
 .prize-shell.prize-style-featured::before{
-  background:linear-gradient(180deg,rgba(223,186,97,.85),rgba(223,186,97,.18));
+  background:linear-gradient(180deg,rgba(130,205,255,.82),rgba(130,205,255,.18));
 }
 
 .prize-shell.prize-style-grand{
   border-width:2px;
-  border-color:rgba(163,196,241,.34);
-  box-shadow:inset 0 4px 0 rgba(130,205,255,.44), 0 6px 18px rgba(0,0,0,.14);
+  border-color:rgba(205,166,92,.34);
+  box-shadow:inset 0 4px 0 rgba(223,186,97,.52), 0 6px 18px rgba(0,0,0,.14);
 }
 
 .prize-shell.prize-style-grand::before{
-  background:linear-gradient(180deg,rgba(130,205,255,.92),rgba(130,205,255,.2));
+  background:linear-gradient(180deg,rgba(223,186,97,.9),rgba(223,186,97,.18));
 }
 
 .prize-shell.prize-style-jackpot{
@@ -1948,15 +1958,15 @@ div#paid_template{
 }
 
 .prize-shell.prize-style-featured .prize-badge{
-  border-color:rgba(223,186,97,.28);
-  background:rgba(188,142,47,.09);
-  color:#e7d6a6;
+  border-color:rgba(130,205,255,.24);
+  background:rgba(39,102,174,.09);
+  color:#cae6ff;
 }
 
 .prize-shell.prize-style-grand .prize-badge{
-  border-color:rgba(130,205,255,.28);
-  background:rgba(39,102,174,.12);
-  color:#d3ebff;
+  border-color:rgba(223,186,97,.3);
+  background:rgba(188,142,47,.1);
+  color:#f1deb0;
 }
 
 .prize-shell.prize-style-jackpot .prize-badge{
@@ -2324,7 +2334,7 @@ function applyPrizeStyleState(template, prizeStyle) {
         } else if (style === "grand") {
                 badge.text("Grand Prize")
         } else if (style === "featured") {
-                badge.text("Featured Prize")
+                badge.text("Featured")
         } else {
                 badge.text("")
         }
@@ -4148,6 +4158,7 @@ document.addEventListener('DOMContentLoaded', function () {
     <div class="prize-field prize-number-panel">
         <input type="text" class="prize_number" id="prize_number" name="prize_text2" placeholder="#" />
         <div class="prize-style-control">
+            <span class="prize-style-label">Spotlight</span>
             <select id="prize_style" class="prize_style" name="prize_style">
                 <option value="jackpot">Jackpot</option>
                 <option value="grand">Grand Prize</option>

@@ -479,19 +479,19 @@ body{
 }
 .prize.prize-style-featured{
   border-width:2px;
-  border-color:rgba(125,148,192,.28);
-  box-shadow:inset 0 3px 0 rgba(223,186,97,.46);
+  border-color:rgba(125,148,192,.26);
+  box-shadow:inset 0 3px 0 rgba(130,205,255,.3);
 }
 .prize.prize-style-featured::before{
-  background:linear-gradient(180deg,rgba(223,186,97,.85),rgba(223,186,97,.18));
+  background:linear-gradient(180deg,rgba(130,205,255,.82),rgba(130,205,255,.18));
 }
 .prize.prize-style-grand{
   border-width:2px;
-  border-color:rgba(163,196,241,.34);
-  box-shadow:inset 0 4px 0 rgba(130,205,255,.44), 0 6px 18px rgba(0,0,0,.14);
+  border-color:rgba(205,166,92,.34);
+  box-shadow:inset 0 4px 0 rgba(223,186,97,.52), 0 6px 18px rgba(0,0,0,.14);
 }
 .prize.prize-style-grand::before{
-  background:linear-gradient(180deg,rgba(130,205,255,.92),rgba(130,205,255,.2));
+  background:linear-gradient(180deg,rgba(223,186,97,.9),rgba(223,186,97,.18));
 }
 .prize.prize-style-jackpot{
   border-width:2px;
@@ -545,14 +545,14 @@ body{
   display:inline-flex;
 }
 .prize.prize-style-featured .pbadge{
-  border-color:rgba(223,186,97,.28);
-  background:rgba(188,142,47,.09);
-  color:#e7d6a6;
+  border-color:rgba(130,205,255,.24);
+  background:rgba(39,102,174,.09);
+  color:#cae6ff;
 }
 .prize.prize-style-grand .pbadge{
-  border-color:rgba(130,205,255,.28);
-  background:rgba(39,102,174,.12);
-  color:#d3ebff;
+  border-color:rgba(223,186,97,.3);
+  background:rgba(188,142,47,.1);
+  color:#f1deb0;
 }
 .prize.prize-style-jackpot .pbadge{
   border-color:rgba(216,236,255,.44);
@@ -1301,7 +1301,7 @@ function buildPrizeCards(result) {
     } else if (prizeStyle === "grand") {
       badgeText = "Grand Prize";
     } else if (prizeStyle === "featured") {
-      badgeText = "Featured Prize";
+      badgeText = "Featured";
     }
     if (value["prize_finalised"] != 0) {
       ticketText = value["prize_winner"] || "TBD";
