@@ -579,7 +579,7 @@ def clone_last_prize(cur, guild_id):
     if not source:
         return False
 
-    cur.execute(
+        cur.execute(
         """
         INSERT INTO prizes
             (prize_raffle, prize_text, prize_text2, prize_winner, prize_finalised, prize_value, prize_style)
@@ -589,7 +589,7 @@ def clone_last_prize(cur, guild_id):
         (
             cur_id,
             source["prize_text"] or "",
-            source["prize_text2"] or "",
+            "",
             source["prize_value"],
             source["prize_style"] if "prize_style" in source.keys() else "standard",
         )

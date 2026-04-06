@@ -1883,17 +1883,17 @@ div#paid_template{
 
 .prize-shell{
   display:grid;
-  grid-template-columns:94px minmax(0,1fr) 68px;
-  gap:14px;
+  grid-template-columns:94px minmax(0,1fr) 76px;
+  gap:16px;
   align-items:stretch;
   width:100%;
   box-sizing:border-box;
-  padding:10px;
+  padding:10px 14px 10px 10px;
   border:1px solid rgba(80,120,210,.18);
   border-radius:0;
   background:linear-gradient(180deg,rgba(9,18,35,.96),rgba(8,15,28,.98));
   position:relative;
-  overflow:hidden;
+  overflow:visible;
   box-shadow:inset 0 0 0 1px rgba(80,120,210,.16);
 }
 
@@ -3373,7 +3373,7 @@ var get_ticket_table = function () {
                         height: "auto",
                         rowHeaders: false,
                         colHeaders: ["#", "Name", "Total", "Paid", "Bar", "Range"],
-                        colWidths: [36, 138, 50, 50, 50, 104],
+                        colWidths: [36, 138, 50, 50, 50, 150],
                         contextMenu: false,
                         enterMoves: {row: 0, col: 1},
                         columnSorting: true,
@@ -3445,7 +3445,7 @@ var get_ticket_table = function () {
                         height: "auto",
                         rowHeaders: false,
                         colHeaders: ["#", "Name", "Total", "Range"],
-                        colWidths: [54, 156, 54, 104],
+                        colWidths: [54, 156, 54, 150],
                         contextMenu: false,
                         enterMoves: {row: 0, col: 1},
                         columnSorting: true,
