@@ -253,6 +253,37 @@ def create_new_raffle (cur, guild_id, raffle_info=None):
         )
     )
 
+@with_cursor
+def get_prizes_by_raffle_id(cur, raffle_id):
+    ensure_prize_columns(cur)
+    cur.execute("SELECT * FROM prizes WHERE prize_raffle=? ORDER BY prize_id", (raffle_id,))
+    return cur.fetchall()
+
+@with_cursor_boolean
+def clone_prizes_to_raffle(cur, guild_id, source_raffle_id, target_raffle_id):
+    ensure_prize_columns(cur)
+    cur.execute("SELECT * FROM prizes WHERE prize_raffle=? ORDER BY prize_id", (source_raffle_id,))
+    prizes = cur.fetchall()
+    if not prizes:
+        return True
+
+    for prize in prizes:
+        cur.execute(
+            """
+            INSERT INTO prizes
+                (prize_raffle, prize_text, prize_text2, prize_winner, prize_finalised, prize_value, prize_style)
+            VALUES
+                (?, ?, ?, 0, 0, ?, ?)
+            """,
+            (
+                target_raffle_id,
+                prize["prize_text"] or "",
+                prize["prize_text2"] or "",
+                prize["prize_value"],
+                prize["prize_style"] if "prize_style" in prize.keys() else "standard",
+            )
+        )
+
 gcri = get_cur_raffle_id
 
 @with_cursor_row("timestamp")
@@ -510,6 +541,7 @@ def fix_dupes (cur):
 
 @with_cursor
 def get_all_prizes (cur, guild_id):
+    ensure_prize_columns(cur)
     cur_id = gcri()
     if not cur_id:
         return False
@@ -520,6 +552,7 @@ def get_all_prizes (cur, guild_id):
 
 @with_cursor_boolean
 def add_new_prize (cur, guild_id):
+    ensure_prize_columns(cur)
     cur_id = gcri()
     if not cur_id:
         return False
@@ -536,11 +569,13 @@ def add_new_prize (cur, guild_id):
 
 @with_cursor_boolean
 def delete_prize (cur, prize_id):
+    ensure_prize_columns(cur)
     # no going-backsies!
     cur.execute("DELETE FROM prizes WHERE prize_id=?", (prize_id, ))
 
 @with_cursor_boolean
 def finalise_prize (cur, prize_id):
+    ensure_prize_columns(cur)
     # no going-backsies!
     cur.execute("SELECT * FROM prizes WHERE prize_id=?", (prize_id, ))
     res = cur.fetchone()
@@ -559,6 +594,7 @@ def finalise_prize (cur, prize_id):
 
 @with_cursor_boolean
 def unfinalise_prize (cur, prize_id):
+    ensure_prize_columns(cur)
     cur.execute("SELECT * FROM prizes WHERE prize_id=?", (prize_id, ))
     res = cur.fetchone()
     if not res:
@@ -568,12 +604,14 @@ def unfinalise_prize (cur, prize_id):
 
 @with_cursor
 def get_prize (cur, prize_id):
+    ensure_prize_columns(cur)
     cur.execute("SELECT * FROM prizes WHERE prize_id=?", (prize_id, ))
 
     return cur.fetchone()
 
 @with_cursor_boolean
 def set_prize (cur, guild_id, prize_info):
+    ensure_prize_columns(cur)
     p = prize_info
 
     # it will ALWAYS have a prize id, if not FAIL
@@ -611,3 +649,13 @@ def set_prize (cur, guild_id, prize_info):
             p["prize_id"]
         )
     )
+
+def ensure_prize_columns(cur):
+    cur.execute("PRAGMA table_info(prizes)")
+    existing_columns = {row[1] for row in cur.fetchall()}
+
+    if "prize_value" not in existing_columns:
+        cur.execute("ALTER TABLE prizes ADD COLUMN prize_value INTEGER")
+
+    if "prize_style" not in existing_columns:
+        cur.execute("ALTER TABLE prizes ADD COLUMN prize_style TEXT DEFAULT 'standard'")

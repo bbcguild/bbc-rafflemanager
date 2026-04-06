@@ -1528,6 +1528,45 @@ border:1px solid rgba(140,170,230,.12);
   box-shadow:0 0 0 2px rgba(255,255,255,.08);
 }
 
+.new-raffle-options{
+  display:grid;
+  gap:10px;
+  padding:14px 16px;
+  border:1px solid rgba(95,132,212,.16);
+  border-radius:16px;
+  background:linear-gradient(180deg,rgba(14,24,41,.92),rgba(9,17,31,.96));
+}
+
+.new-raffle-option{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+}
+
+.new-raffle-option input[type="checkbox"]{
+  margin-top:2px;
+  width:18px;
+  height:18px;
+  accent-color:#4fa0ff;
+}
+
+.new-raffle-option-copy{
+  display:grid;
+  gap:4px;
+}
+
+.new-raffle-option-title{
+  color:#eef3ff;
+  font-size:.92rem;
+  font-weight:800;
+}
+
+.new-raffle-option-help{
+  color:#9eb0d1;
+  font-size:.82rem;
+  line-height:1.45;
+}
+
 .new-raffle-notes-grid{
   display:grid;
   gap:14px;
@@ -2851,6 +2890,7 @@ function populateNewRaffleModal() {
     $("#newRaffleTime").val($("#raffle_time").val() || CURRENT_RAFFLE_INFO.raffle_time || "")
     $("#newRaffleCost").val($("#raffle_cost").val() || CURRENT_RAFFLE_INFO.raffle_cost || "")
     $("#newRaffleTitle").val("")
+    $("#newRaffleClonePrizes").prop("checked", false)
 
     document.querySelectorAll(".new-raffle-editor").forEach(function (surface) {
         var noteKey = surface.getAttribute("data-note-key")
@@ -2886,7 +2926,8 @@ function collectNewRafflePayload() {
         raffle_time: normalizeFieldValue($("#newRaffleTime").val()),
         raffle_ticket_cost: normalizeFieldValue($("#newRaffleCost").val()),
         raffle_title: normalizeFieldValue($("#newRaffleTitle").val()),
-        raffle_status: "LIVE"
+        raffle_status: "LIVE",
+        clone_prizes: $("#newRaffleClonePrizes").is(":checked") ? "1" : "0"
     }
 
     document.querySelectorAll(".new-raffle-editor").forEach(function (surface) {
@@ -4098,6 +4139,16 @@ document.addEventListener('DOMContentLoaded', function () {
       <div class="new-raffle-field">
         <label for="newRaffleTitle">Raffle Name</label>
         <input type="text" id="newRaffleTitle" placeholder="Optional - leave blank to use &quot;Raffle&quot;" />
+      </div>
+
+      <div class="new-raffle-options">
+        <label class="new-raffle-option" for="newRaffleClonePrizes">
+          <input type="checkbox" id="newRaffleClonePrizes" />
+          <span class="new-raffle-option-copy">
+            <span class="new-raffle-option-title">Clone Prize Cards To New Raffle</span>
+            <span class="new-raffle-option-help">Copies all current prize cards into the new week, including their spotlight tier. Winner/ticket lock state is reset for the new raffle.</span>
+          </span>
+        </label>
       </div>
 
       <div class="new-raffle-notes-grid">

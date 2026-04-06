@@ -365,6 +365,7 @@ def open_new_raffle (request):
     current_info = db.get_cur_raffle_info()
     current_info = dict(current_info) if current_info else {}
     requested_number = (request.params.get("raffle_guild_num") or "").strip()
+    clone_prizes = str(request.params.get("clone_prizes", "")).strip().lower() in ("1", "true", "yes", "on")
 
     if get_current_raffle_status() != "COMPLETE":
         return json_error('Set the raffle status to "COMPLETE" before opening a new raffle.')
@@ -384,6 +385,10 @@ def open_new_raffle (request):
     db.close_raffle_by_id(cur_id)
     
     if db.create_new_raffle(new_raffle_info):
+        new_raffle_id = db.get_cur_raffle_id()
+        if clone_prizes and cur_id and new_raffle_id:
+            if not db.clone_prizes_to_raffle(source_raffle_id=cur_id, target_raffle_id=new_raffle_id):
+                return json_error("New raffle created, but prize cards could not be cloned.")
         return json_ok()
 
     return json_error("Unable to create the new raffle.")
