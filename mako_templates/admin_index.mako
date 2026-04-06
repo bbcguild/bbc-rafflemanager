@@ -1120,7 +1120,7 @@ body.legacy-modal-open{
   display:block;
   vertical-align:top;
   min-width:0;
-  width:auto;
+  width:auto !important;
   overflow:hidden;
   height:auto !important;
 }
@@ -1129,8 +1129,8 @@ body.legacy-modal-open{
   display:block;
   vertical-align:top;
   min-width:0;
-  width:100%;
-  max-width:640px;
+  width:100% !important;
+  max-width:640px !important;
   height:auto !important;
 }
 
@@ -1162,6 +1162,13 @@ body.legacy-modal-open{
   min-width:0;
   overflow:visible;
   height:auto !important;
+}
+
+.prize.prize-shell{
+  width:100% !important;
+  max-width:none !important;
+  margin-left:0 !important;
+  margin-right:0 !important;
 }
 
 #ticket_info{
