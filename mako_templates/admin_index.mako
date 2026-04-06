@@ -1852,6 +1852,7 @@ div#paid_template{
   display:grid;
   grid-template-rows:auto auto;
   gap:10px;
+  align-content:start;
 }
 
 .prize-style-control{
@@ -1892,7 +1893,7 @@ div#paid_template{
   display:grid;
   grid-template-columns:84px minmax(0,1fr) 58px;
   gap:12px;
-  align-items:stretch;
+  align-items:start;
   width:100%;
   box-sizing:border-box;
   padding:10px;
@@ -1954,6 +1955,7 @@ div#paid_template{
   grid-template-rows:auto auto auto;
   gap:12px;
   min-width:0;
+  align-content:start;
 }
 
 .prize-top-row,
@@ -2078,13 +2080,14 @@ div#paid_template{
 .prize-actions{
   display:flex;
   flex-direction:column;
-  gap:12px;
+  gap:10px;
   border-left:1px solid rgba(80,120,210,.26);
-  padding-left:14px;
+  padding-left:12px;
+  align-self:start;
 }
 
 .prize-action{
-  min-height:54px;
+  min-height:48px;
   border:1px solid rgba(80,120,210,.24);
   border-radius:18px;
   background:rgba(11,20,40,.92);
@@ -2096,6 +2099,12 @@ div#paid_template{
   align-items:center;
   justify-content:center;
   position:relative;
+}
+
+.prize_winner{
+  font-size:1.05em !important;
+  padding-left:12px !important;
+  padding-right:12px !important;
 }
 .prize-action::before{
   font-size:1.35rem;
