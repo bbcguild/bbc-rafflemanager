@@ -1852,19 +1852,20 @@ div#paid_template{
 }
 
 .prize-shell.prize-style-featured{
-  border-color:rgba(205,166,92,.42);
+  border-color:rgba(122,143,188,.22);
   background:
-    linear-gradient(180deg,rgba(35,28,14,.18),rgba(8,15,28,.98)),
+    linear-gradient(180deg,rgba(31,27,17,.14),rgba(8,15,28,.98)),
     linear-gradient(180deg,rgba(9,18,35,.96),rgba(8,15,28,.98));
-  box-shadow:inset 0 0 0 1px rgba(255,218,132,.08);
+  box-shadow:inset 0 3px 0 rgba(223,186,97,.62);
 }
 
 .prize-shell.prize-style-flagship{
-  border-color:rgba(104,189,255,.44);
+  border-color:rgba(130,205,255,.58);
   background:
-    radial-gradient(circle at top right, rgba(93,172,255,.22), transparent 42%),
+    radial-gradient(circle at top right, rgba(93,172,255,.32), transparent 42%),
+    linear-gradient(90deg, rgba(130,205,255,.08), transparent 28%),
     linear-gradient(180deg,rgba(12,26,45,.98),rgba(7,14,28,.99));
-  box-shadow:0 0 0 1px rgba(130,205,255,.12), 0 10px 24px rgba(0,0,0,.22);
+  box-shadow:0 0 0 1px rgba(130,205,255,.18), 0 14px 30px rgba(0,0,0,.26), inset 0 0 24px rgba(69,140,219,.12);
 }
 
 .prize-main{
@@ -1936,6 +1937,11 @@ div#paid_template{
   border-color:rgba(130,205,255,.4);
   background:rgba(39,102,174,.18);
   color:#d9f1ff;
+}
+
+.prize-shell.prize-style-flagship .prize_item,
+.prize-shell.prize-style-flagship .prize_value{
+  border-color:rgba(130,205,255,.26);
 }
 
 .prize-winner-display{
@@ -2282,12 +2288,15 @@ function applyPrizeStyleState(template, prizeStyle) {
         if (style === "featured") {
                 badge.text("Featured Prize")
         } else if (style === "flagship") {
-                badge.text("Flagship Prize")
+                badge.text("Premier Prize")
         } else {
                 badge.text("")
         }
 
-        $("#prize_style", template).val(style)
+        var select = $("#prize_style", template)
+        select.find("option").prop("selected", false)
+        select.find('option[value="' + style + '"]').prop("selected", true)
+        select.val(style)
 }
 
 function savePrizeForm($form, options) {
@@ -4107,7 +4116,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <select id="prize_style" class="prize_style" name="prize_style">
                 <option value="standard">Standard</option>
                 <option value="featured">Featured</option>
-                <option value="flagship">Flagship</option>
+                <option value="flagship">Premier</option>
             </select>
         </div>
     </div>

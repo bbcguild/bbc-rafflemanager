@@ -468,18 +468,19 @@ body{
   width:100%;
 }
 .prize.prize-style-featured{
-  border-color:rgba(208,171,96,.42);
+  border-color:rgba(122,143,188,.22);
   background:
-    linear-gradient(180deg,rgba(43,32,12,.18),rgba(8,14,24,.98)),
+    linear-gradient(180deg,rgba(31,27,17,.14),rgba(8,14,24,.98)),
     linear-gradient(180deg,rgba(11,19,35,.96),rgba(8,14,24,.98));
-  box-shadow:inset 0 0 0 1px rgba(255,220,143,.08);
+  box-shadow:inset 0 3px 0 rgba(223,186,97,.62);
 }
 .prize.prize-style-flagship{
-  border-color:rgba(104,189,255,.44);
+  border-color:rgba(130,205,255,.58);
   background:
-    radial-gradient(circle at top right, rgba(93,172,255,.22), transparent 42%),
+    radial-gradient(circle at top right, rgba(93,172,255,.32), transparent 42%),
+    linear-gradient(90deg, rgba(130,205,255,.08), transparent 28%),
     linear-gradient(180deg,rgba(12,26,45,.98),rgba(7,14,28,.99));
-  box-shadow:0 0 0 1px rgba(130,205,255,.12), 0 12px 28px rgba(0,0,0,.22);
+  box-shadow:0 0 0 1px rgba(130,205,255,.18), 0 14px 30px rgba(0,0,0,.26), inset 0 0 24px rgba(69,140,219,.12);
 }
 .num{
   display:flex;
@@ -1272,7 +1273,7 @@ function buildPrizeCards(result) {
     if (prizeStyle === "featured") {
       badgeText = "Featured Prize";
     } else if (prizeStyle === "flagship") {
-      badgeText = "Flagship Prize";
+      badgeText = "Premier Prize";
     }
     if (value["prize_finalised"] != 0) {
       ticketText = value["prize_winner"] || "TBD";
