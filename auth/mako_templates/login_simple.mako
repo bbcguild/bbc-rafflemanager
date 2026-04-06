@@ -1,9 +1,15 @@
+<%
+ga4_site_area = 'admin_auth'
+ga4_raffle_view = 'current'
+ga4_raffle_number = ''
+ga4_guild_slug = request.matchdict.get('guild', '')
+%>
 <!DOCTYPE html>
 <html>
 <head>
     <title>${title}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <%include file="/mako_templates/analytics_snippet.mako"/>
+    <%include file="analytics_snippet.mako"/>
     <style>
         :root {
             --bg: #060a12;
