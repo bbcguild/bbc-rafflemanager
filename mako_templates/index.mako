@@ -468,6 +468,7 @@ body{
   width:100%;
   position:relative;
   overflow:hidden;
+  box-shadow:inset 0 0 0 1px rgba(80,120,210,.16);
 }
 .prize::before{
   content:"";
@@ -497,11 +498,11 @@ body{
   border-width:1px;
   border-color:rgba(193,227,255,.52);
   background:
-    radial-gradient(circle at 88% 24%, rgba(154,211,255,.20), transparent 22%),
-    radial-gradient(circle at right center, rgba(154,211,255,.12), transparent 30%),
-    linear-gradient(270deg, rgba(154,211,255,.08), rgba(154,211,255,.03) 16%, transparent 40%),
+    radial-gradient(circle at 88% 24%, rgba(154,211,255,.14), transparent 22%),
+    radial-gradient(circle at right center, rgba(154,211,255,.085), transparent 30%),
+    linear-gradient(270deg, rgba(154,211,255,.055), rgba(154,211,255,.02) 16%, transparent 40%),
     linear-gradient(180deg,rgba(12,26,45,.98),rgba(7,14,28,.99));
-  box-shadow:inset 0 0 0 1px rgba(193,227,255,.16), 0 16px 34px rgba(0,0,0,.28), inset 0 0 22px rgba(122,204,255,.07);
+  box-shadow:inset 0 0 0 1px rgba(193,227,255,.16), 0 16px 34px rgba(0,0,0,.28), inset 0 0 22px rgba(122,204,255,.05);
 }
 .prize.prize-style-jackpot::before{
   width:6px;
