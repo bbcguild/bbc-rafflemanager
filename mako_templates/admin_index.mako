@@ -2120,6 +2120,10 @@ div#paid_template{
 .prize_roll::before{
   content:"\1F3B2";
 }
+.prize_clone::before{
+  content:"\29C9";
+  font-size:1.1rem;
+}
 .prize_delete::before{
   content:"\1F5D1";
 }
@@ -3085,6 +3089,7 @@ var get_prize_info = function (options) {
                         $("#prize_delete", template).attr({"id": dom_id + "delete"})
                         $("#prize_roll", template).attr({"id": dom_id + "roll"})
                     }
+                    $("#prize_clone", template).attr({"id": dom_id + "clone"})
                     $("#prize_template_form", template).attr({"id": "prize_" + value["prize_id"] + "_form"})
                     $(".prize_id", template).val(value["prize_id"])
 
@@ -3142,6 +3147,25 @@ var get_prize_info = function (options) {
                                     return
                                 }
                                 get_prize_info({ preserveScroll: true })
+                                })
+                            })
+                    $(".prize_clone", template).click(function (event) {
+                            event.preventDefault()
+                            savePrizeForm($("#" + dom_id + "form"), { silent: true })
+                                .done(function () {
+                                    $.getJSON("json/set/prize_clone_below/" + value["prize_id"], function (result) {
+                                        if (isActionError(result)) {
+                                            alert(actionErrorMessage(result))
+                                            return
+                                        }
+                                        get_prize_info({ preserveScroll: true })
+                                    })
+                                })
+                                .fail(function (result) {
+                                    if (isActionError(result)) {
+                                        alert(actionErrorMessage(result))
+                                        get_prize_info({ preserveScroll: true })
+                                    }
                                 })
                             })
 
@@ -4291,6 +4315,7 @@ document.addEventListener('DOMContentLoaded', function () {
     <div class="prize-actions">
         <a href="#" id="prize_finalise" class="prize_finalise prize-action" title="Lock winner">L</a>
         <a href="#" id="prize_roll" class="prize_roll prize-action" title="Roll winner">R</a>
+        <a href="#" id="prize_clone" class="prize_clone prize-action" title="Duplicate prize below">C</a>
         <a href="#" id="prize_delete" class="prize_delete prize-action" title="Delete prize">X</a>
     </div>
 </div>

@@ -256,24 +256,24 @@ def create_new_raffle (cur, guild_id, raffle_info=None):
 @with_cursor
 def get_prizes_by_raffle_id(cur, raffle_id):
     ensure_prize_columns(cur)
-    cur.execute("SELECT * FROM prizes WHERE prize_raffle=? ORDER BY prize_id", (raffle_id,))
+    cur.execute("SELECT * FROM prizes WHERE prize_raffle=? ORDER BY prize_sort, prize_id", (raffle_id,))
     return cur.fetchall()
 
 @with_cursor_boolean
 def clone_prizes_to_raffle(cur, guild_id, source_raffle_id, target_raffle_id):
     ensure_prize_columns(cur)
-    cur.execute("SELECT * FROM prizes WHERE prize_raffle=? ORDER BY prize_id", (source_raffle_id,))
+    cur.execute("SELECT * FROM prizes WHERE prize_raffle=? ORDER BY prize_sort, prize_id", (source_raffle_id,))
     prizes = cur.fetchall()
     if not prizes:
         return True
 
-    for prize in prizes:
+    for index, prize in enumerate(prizes, start=1):
         cur.execute(
             """
             INSERT INTO prizes
-                (prize_raffle, prize_text, prize_text2, prize_winner, prize_finalised, prize_value, prize_style)
+                (prize_raffle, prize_text, prize_text2, prize_winner, prize_finalised, prize_value, prize_style, prize_sort)
             VALUES
-                (?, ?, ?, 0, 0, ?, ?)
+                (?, ?, ?, 0, 0, ?, ?, ?)
             """,
             (
                 target_raffle_id,
@@ -281,6 +281,7 @@ def clone_prizes_to_raffle(cur, guild_id, source_raffle_id, target_raffle_id):
                 prize["prize_text2"] or "",
                 prize["prize_value"],
                 prize["prize_style"] if "prize_style" in prize.keys() else "standard",
+                index,
             )
         )
 
@@ -546,7 +547,7 @@ def get_all_prizes (cur, guild_id):
     if not cur_id:
         return False
 
-    cur.execute("SELECT * FROM prizes WHERE prize_raffle=?", (cur_id, ))
+    cur.execute("SELECT * FROM prizes WHERE prize_raffle=? ORDER BY prize_sort, prize_id", (cur_id, ))
 
     return cur.fetchall()
 
@@ -557,14 +558,17 @@ def add_new_prize (cur, guild_id):
     if not cur_id:
         return False
 
+    cur.execute("SELECT COALESCE(MAX(prize_sort), 0) AS max_sort FROM prizes WHERE prize_raffle=?", (cur_id,))
+    next_sort = (cur.fetchone()["max_sort"] or 0) + 1
+
     cur.execute(
         """
         INSERT INTO prizes
-            (prize_raffle, prize_text, prize_text2, prize_winner, prize_finalised, prize_value, prize_style)
+            (prize_raffle, prize_text, prize_text2, prize_winner, prize_finalised, prize_value, prize_style, prize_sort)
         VALUES
-            (?, '', '?', 0, 0, NULL, 'standard')
+            (?, '', '?', 0, 0, NULL, 'standard', ?)
         """,
-        (cur_id, )
+        (cur_id, next_sort)
     )
 
 @with_cursor_boolean
@@ -574,17 +578,20 @@ def clone_last_prize(cur, guild_id):
     if not cur_id:
         return False
 
-    cur.execute("SELECT * FROM prizes WHERE prize_raffle=? ORDER BY prize_id DESC LIMIT 1", (cur_id,))
+    cur.execute("SELECT * FROM prizes WHERE prize_raffle=? ORDER BY prize_sort DESC, prize_id DESC LIMIT 1", (cur_id,))
     source = cur.fetchone()
     if not source:
         return False
 
+    cur.execute("SELECT COALESCE(MAX(prize_sort), 0) AS max_sort FROM prizes WHERE prize_raffle=?", (cur_id,))
+    next_sort = (cur.fetchone()["max_sort"] or 0) + 1
+
     cur.execute(
         """
         INSERT INTO prizes
-            (prize_raffle, prize_text, prize_text2, prize_winner, prize_finalised, prize_value, prize_style)
+            (prize_raffle, prize_text, prize_text2, prize_winner, prize_finalised, prize_value, prize_style, prize_sort)
         VALUES
-            (?, ?, ?, 0, 0, ?, ?)
+            (?, ?, ?, 0, 0, ?, ?, ?)
         """,
         (
             cur_id,
@@ -592,6 +599,38 @@ def clone_last_prize(cur, guild_id):
             "",
             source["prize_value"],
             source["prize_style"] if "prize_style" in source.keys() else "standard",
+            next_sort,
+        )
+    )
+
+@with_cursor_boolean
+def clone_prize_below(cur, guild_id, prize_id):
+    ensure_prize_columns(cur)
+    cur_id = gcri()
+    if not cur_id:
+        return False
+
+    cur.execute("SELECT * FROM prizes WHERE prize_id=? AND prize_raffle=?", (prize_id, cur_id))
+    source = cur.fetchone()
+    if not source:
+        return False
+
+    source_sort = source["prize_sort"] or 0
+    cur.execute("UPDATE prizes SET prize_sort = prize_sort + 1 WHERE prize_raffle=? AND prize_sort > ?", (cur_id, source_sort))
+    cur.execute(
+        """
+        INSERT INTO prizes
+            (prize_raffle, prize_text, prize_text2, prize_winner, prize_finalised, prize_value, prize_style, prize_sort)
+        VALUES
+            (?, ?, ?, 0, 0, ?, ?, ?)
+        """,
+        (
+            cur_id,
+            source["prize_text"] or "",
+            "",
+            source["prize_value"],
+            source["prize_style"] if "prize_style" in source.keys() else "standard",
+            source_sort + 1,
         )
     )
 
@@ -687,3 +726,18 @@ def ensure_prize_columns(cur):
 
     if "prize_style" not in existing_columns:
         cur.execute("ALTER TABLE prizes ADD COLUMN prize_style TEXT DEFAULT 'standard'")
+
+    if "prize_sort" not in existing_columns:
+        cur.execute("ALTER TABLE prizes ADD COLUMN prize_sort INTEGER DEFAULT 0")
+
+    cur.execute("SELECT prize_id, prize_raffle FROM prizes WHERE COALESCE(prize_sort, 0)=0 ORDER BY prize_raffle, prize_id")
+    rows = cur.fetchall()
+    if rows:
+        next_sort_by_raffle = {}
+        for row in rows:
+            raffle_id = row["prize_raffle"]
+            if raffle_id not in next_sort_by_raffle:
+                cur.execute("SELECT COALESCE(MAX(prize_sort), 0) AS max_sort FROM prizes WHERE prize_raffle=?", (raffle_id,))
+                next_sort_by_raffle[raffle_id] = cur.fetchone()["max_sort"] or 0
+            next_sort_by_raffle[raffle_id] += 1
+            cur.execute("UPDATE prizes SET prize_sort=? WHERE prize_id=?", (next_sort_by_raffle[raffle_id], row["prize_id"]))

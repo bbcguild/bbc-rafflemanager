@@ -33,6 +33,7 @@ def ensure_prize_columns(conn):
     expected_columns = {
         "prize_value": "ALTER TABLE prizes ADD COLUMN prize_value INTEGER",
         "prize_style": "ALTER TABLE prizes ADD COLUMN prize_style TEXT DEFAULT 'standard'",
+        "prize_sort": "ALTER TABLE prizes ADD COLUMN prize_sort INTEGER DEFAULT 0",
     }
 
     cursor = conn.cursor()
@@ -43,6 +44,18 @@ def ensure_prize_columns(conn):
         if column_name not in existing_columns:
             print(f"Applying prize schema migration: add column {column_name}")
             cursor.execute(statement)
+
+    cursor.execute("SELECT prize_id, prize_raffle FROM prizes WHERE COALESCE(prize_sort, 0)=0 ORDER BY prize_raffle, prize_id")
+    rows = cursor.fetchall()
+    if rows:
+        next_sort_by_raffle = {}
+        for row in rows:
+            raffle_id = row[1]
+            if raffle_id not in next_sort_by_raffle:
+                cursor.execute("SELECT COALESCE(MAX(prize_sort), 0) FROM prizes WHERE prize_raffle=?", (raffle_id,))
+                next_sort_by_raffle[raffle_id] = cursor.fetchone()[0] or 0
+            next_sort_by_raffle[raffle_id] += 1
+            cursor.execute("UPDATE prizes SET prize_sort=? WHERE prize_id=?", (next_sort_by_raffle[raffle_id], row[0]))
 
     conn.commit()
 

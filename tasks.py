@@ -1129,6 +1129,15 @@ def clone_last_prize (request):
         return json_error("There is no prize card to clone yet.")
     return json_ok()
 
+@view_config(route_name="clone_prize_below", renderer="json", permission="akaviri")
+def clone_prize_below (request):
+    prize_id = request.matchdict.get("prize_id")
+    if not prize_id:
+        return json_error("Missing prize id.")
+    if not db.clone_prize_below(prize_id=prize_id):
+        return json_error("Unable to duplicate that prize card.")
+    return json_ok()
+
 # Delete a prize entry
 @view_config(route_name="delete_prize", renderer="json", permission="akaviri")
 def delete_prize (request):
@@ -1495,6 +1504,7 @@ def make_app ():
     g_route("get_all_prizes", "/{guild}/json/get/prizes")
     g_route("add_new_prize", "/{guild}/json/set/prize_add")
     g_route("clone_last_prize", "/{guild}/json/set/prize_clone_last")
+    g_route("clone_prize_below", "/{guild}/json/set/prize_clone_below/{prize_id}")
     g_route("delete_prize", "/{guild}/json/set/prize_delete/{prize_id}")
     g_route("get_prize", "/{guild}/json/get/prize/{prize_id}")
     g_route("set_prize", "/{guild}/json/set/prize")
