@@ -1096,7 +1096,7 @@ body.legacy-modal-open{
 #main_table{
   width:100%;
   display:grid;
-  grid-template-columns:minmax(0,1.12fr) minmax(560px, 640px);
+  grid-template-columns:minmax(0,1fr) minmax(700px, 780px);
   gap:12px;
   align-items:start;
   border-collapse:separate;
@@ -1130,7 +1130,7 @@ body.legacy-modal-open{
   vertical-align:top;
   min-width:0;
   width:100% !important;
-  max-width:640px !important;
+  max-width:780px !important;
   height:auto !important;
 }
 
@@ -2162,7 +2162,7 @@ div#paid_template{
 
 @media (max-width:1450px){
   #main_table{
-    grid-template-columns:minmax(0,1fr) minmax(400px, 440px);
+    grid-template-columns:minmax(0,1fr) minmax(620px, 680px);
   }
 }
 
@@ -3406,7 +3406,7 @@ var get_ticket_table = function () {
                         height: "auto",
                         rowHeaders: false,
                         colHeaders: ["#", "Name", "Total", "Paid", "Bar", "Range"],
-                        colWidths: [36, 138, 50, 50, 50, 180],
+                        colWidths: [36, 150, 58, 58, 58, 220],
                         contextMenu: false,
                         enterMoves: {row: 0, col: 1},
                         columnSorting: true,
@@ -3478,7 +3478,7 @@ var get_ticket_table = function () {
                         height: "auto",
                         rowHeaders: false,
                         colHeaders: ["#", "Name", "Total", "Range"],
-                        colWidths: [54, 156, 54, 180],
+                        colWidths: [54, 166, 64, 220],
                         contextMenu: false,
                         enterMoves: {row: 0, col: 1},
                         columnSorting: true,
@@ -3619,10 +3619,6 @@ $(document).ready(function () {
             $("#add_prize_button").click(function (event) {
                 event.preventDefault()
                 addPrizeCard()
-            })
-            $("#clone_last_prize_button").click(function (event) {
-                event.preventDefault()
-                cloneLastPrizeCard()
             })
             $("#manual_refresh").click(function () {
                 get_ticket_table()
@@ -4147,7 +4143,6 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
         <div id="add_prize_block">
             <input type="button" value="Add prize" id="add_prize_button" />
-            <input type="button" value="Clone last prize" id="clone_last_prize_button" />
         </div>
     </div>
         </td>
