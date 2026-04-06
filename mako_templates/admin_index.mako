@@ -1096,7 +1096,7 @@ body.legacy-modal-open{
 #main_table{
   width:100%;
   display:grid;
-  grid-template-columns:minmax(0,1fr) minmax(500px, 560px);
+  grid-template-columns:minmax(0,1fr) minmax(470px, 520px);
   gap:12px;
   align-items:start;
   border-collapse:separate;
@@ -1130,7 +1130,7 @@ body.legacy-modal-open{
   vertical-align:top;
   min-width:0;
   width:100% !important;
-  max-width:560px !important;
+  max-width:520px !important;
   height:auto !important;
 }
 
@@ -2162,7 +2162,7 @@ div#paid_template{
 
 @media (max-width:1450px){
   #main_table{
-    grid-template-columns:minmax(0,1fr) minmax(480px, 540px);
+    grid-template-columns:minmax(0,1fr) minmax(450px, 500px);
   }
 }
 
@@ -3406,7 +3406,7 @@ var get_ticket_table = function () {
                         height: "auto",
                         rowHeaders: false,
                         colHeaders: ["#", "Name", "Total", "Paid", "Bar", "Range"],
-                        colWidths: [36, 118, 48, 48, 48, 132],
+                        colWidths: [34, 140, 44, 44, 44, 112],
                         contextMenu: false,
                         enterMoves: {row: 0, col: 1},
                         columnSorting: true,
@@ -3478,7 +3478,7 @@ var get_ticket_table = function () {
                         height: "auto",
                         rowHeaders: false,
                         colHeaders: ["#", "Name", "Total", "Range"],
-                        colWidths: [48, 132, 52, 132],
+                        colWidths: [44, 144, 48, 112],
                         contextMenu: false,
                         enterMoves: {row: 0, col: 1},
                         columnSorting: true,
