@@ -2330,7 +2330,7 @@ function applyPrizeStyleState(template, prizeStyle) {
         shell.removeClass("prize-style-standard prize-style-featured prize-style-grand prize-style-jackpot")
         shell.addClass("prize-style-" + style)
 
-        var badge = $("#prize_badge", template)
+        var badge = $(".prize-badge", template)
         if (style === "jackpot") {
                 badge.text("Jackpot")
         } else if (style === "grand") {
@@ -2341,7 +2341,7 @@ function applyPrizeStyleState(template, prizeStyle) {
                 badge.text("")
         }
 
-        var select = $("#prize_style", template)
+        var select = $("select.prize_style", template)
         if (select.length) {
                 var el = select[0]
                 el.value = style
