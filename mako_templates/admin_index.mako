@@ -1792,10 +1792,44 @@ div#paid_template{
 
 .prize_number{
   width:100%;
-  min-height:112px;
+  min-height:82px;
   text-align:center;
   font-size:2.2rem !important;
   font-weight:900;
+}
+
+.prize-number-panel{
+  display:grid;
+  grid-template-rows:auto auto;
+  gap:10px;
+}
+
+.prize-style-control{
+  display:grid;
+  gap:6px;
+}
+
+.prize-style-label{
+  display:block;
+  font-size:.68rem;
+  font-weight:900;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:#8fa6cf;
+  text-align:center;
+}
+
+.prize_style{
+  width:100%;
+  min-height:32px;
+  padding:7px 10px;
+  border:1px solid rgba(80,120,210,.2);
+  background:#0f1622;
+  color:#eef3ff;
+  font:inherit;
+  font-size:.88rem;
+  font-weight:700;
+  text-transform:none;
 }
 
 .prize_winner,
@@ -1815,6 +1849,22 @@ div#paid_template{
   border:1px solid rgba(80,120,210,.18);
   border-radius:0;
   background:linear-gradient(180deg,rgba(9,18,35,.96),rgba(8,15,28,.98));
+}
+
+.prize-shell.prize-style-featured{
+  border-color:rgba(205,166,92,.42);
+  background:
+    linear-gradient(180deg,rgba(35,28,14,.18),rgba(8,15,28,.98)),
+    linear-gradient(180deg,rgba(9,18,35,.96),rgba(8,15,28,.98));
+  box-shadow:inset 0 0 0 1px rgba(255,218,132,.08);
+}
+
+.prize-shell.prize-style-flagship{
+  border-color:rgba(104,189,255,.44);
+  background:
+    radial-gradient(circle at top right, rgba(93,172,255,.22), transparent 42%),
+    linear-gradient(180deg,rgba(12,26,45,.98),rgba(7,14,28,.99));
+  box-shadow:0 0 0 1px rgba(130,205,255,.12), 0 10px 24px rgba(0,0,0,.22);
 }
 
 .prize-main{
@@ -1849,6 +1899,43 @@ div#paid_template{
 .prize-field input[type="text"]{
   width:100%;
   box-sizing:border-box;
+}
+
+.prize-badge-row{
+  display:flex;
+  justify-content:flex-start;
+}
+
+.prize-badge{
+  display:none;
+  align-items:center;
+  min-height:24px;
+  padding:0 10px;
+  border:1px solid rgba(141,167,215,.18);
+  background:rgba(255,255,255,.04);
+  color:#b8c8e7;
+  font-size:.68rem;
+  font-weight:900;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+
+.prize-shell.prize-style-featured .prize-badge,
+.prize-shell.prize-style-flagship .prize-badge{
+  display:inline-flex;
+}
+
+.prize-shell.prize-style-featured .prize-badge{
+  border-color:rgba(223,186,97,.38);
+  background:rgba(188,142,47,.14);
+  color:#f4dc9a;
+}
+
+.prize-shell.prize-style-flagship .prize-badge{
+  border-color:rgba(130,205,255,.4);
+  background:rgba(39,102,174,.18);
+  color:#d9f1ff;
 }
 
 .prize-winner-display{
@@ -2179,6 +2266,28 @@ function serializePrizeForm($form) {
         }
 
         return $.param(data)
+}
+
+function applyPrizeStyleState(template, prizeStyle) {
+        var style = (prizeStyle || "standard").toLowerCase()
+        if ($.inArray(style, ["standard", "featured", "flagship"]) === -1) {
+                style = "standard"
+        }
+
+        var shell = $(".prize-shell", template)
+        shell.removeClass("prize-style-standard prize-style-featured prize-style-flagship")
+        shell.addClass("prize-style-" + style)
+
+        var badge = $("#prize_badge", template)
+        if (style === "featured") {
+                badge.text("Featured Prize")
+        } else if (style === "flagship") {
+                badge.text("Flagship Prize")
+        } else {
+                badge.text("")
+        }
+
+        $("#prize_style", template).val(style)
 }
 
 function savePrizeForm($form, options) {
@@ -2818,10 +2927,13 @@ var get_prize_info = function (options) {
 
                     // at least the prize details are here
                     $("#prize_item", template).attr({"id": dom_id + "item"}).val(value["prize_text"] || "")
+                    $("#prize_badge", template).attr({"id": dom_id + "badge"})
                     var prizeValueField = $("#prize_value", template)
                         .attr({"id": dom_id + "value"})
                         .val(value["prize_value"] == null ? "" : value["prize_value"])[0]
                     formatPrizeValueField(prizeValueField)
+                    $("#prize_style", template).attr({"id": dom_id + "style"})
+                    applyPrizeStyleState(template, value["prize_style"])
                     if (value["prize_finalised"] != 0) {
                         $("#prize_delete", template).remove()
                         $("#prize_roll", template).remove()
@@ -2829,7 +2941,7 @@ var get_prize_info = function (options) {
                             .attr({"id": dom_id + "finalise", "title": "Unlock winner"})
                             .removeClass("prize_finalise")
                             .addClass("prize_unlock")
-                        $("input[type='text'][name]", template).prop("disabled", true)
+                        $("input[type='text'][name], select[name]", template).prop("disabled", true)
                     } else {
                         $("#prize_finalise", template).attr({"id": dom_id + "finalise", "title": "Lock winner"})
                         $("#prize_delete", template).attr({"id": dom_id + "delete"})
@@ -2895,7 +3007,11 @@ var get_prize_info = function (options) {
                                 })
                             })
 
-                    $("input[type='text'][name]", template).change(function () {
+                    $(".prize_style", template).change(function () {
+                            applyPrizeStyleState(template, $(this).val())
+                    })
+
+                    $("input[type='text'][name], select[name]", template).change(function () {
                             savePrizeForm($("#" + dom_id + "form"), {
                                 refreshAfterSave: true,
                                 refreshOptions: { preserveScroll: true }
@@ -3986,10 +4102,21 @@ document.addEventListener('DOMContentLoaded', function () {
 <div class="prize prize-shell">
     <div class="prize-field prize-number-panel">
         <input type="text" class="prize_number" id="prize_number" name="prize_text2" placeholder="#" />
+        <div class="prize-style-control">
+            <span class="prize-style-label">Spotlight</span>
+            <select id="prize_style" class="prize_style" name="prize_style">
+                <option value="standard">Standard</option>
+                <option value="featured">Featured</option>
+                <option value="flagship">Flagship</option>
+            </select>
+        </div>
     </div>
     <div class="prize-main">
         <div class="prize-top-row">
             <div class="prize-field">
+                <div class="prize-badge-row">
+                    <span id="prize_badge" class="prize-badge"></span>
+                </div>
                 <input type="text" id="prize_item" class="prize_item" name="prize_text" placeholder="Prize Details Soon" />
             </div>
         </div>

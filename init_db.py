@@ -32,6 +32,7 @@ def ensure_prize_columns(conn):
     """Backfill newer prize columns on older databases."""
     expected_columns = {
         "prize_value": "ALTER TABLE prizes ADD COLUMN prize_value INTEGER",
+        "prize_style": "ALTER TABLE prizes ADD COLUMN prize_style TEXT DEFAULT 'standard'",
     }
 
     cursor = conn.cursor()

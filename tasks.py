@@ -65,6 +65,17 @@ here = os.path.dirname(os.path.abspath(__file__))
 CANONICAL_PUBLIC_HOST = "raffles.bbcguild.com"
 PUBLIC_ALIAS_HOSTS = {"raffle.bbcguild.com", "tickets.bbcguild.com"}
 ADMIN_HOST = "raffle-admin.bbcguild.com"
+PRIZE_STYLE_CHOICES = {"standard", "featured", "flagship"}
+
+
+def normalize_prize_style(raw_style):
+    style = (raw_style or "standard")
+    if not isinstance(style, str):
+        style = str(style)
+    style = style.strip().lower()
+    if style not in PRIZE_STYLE_CHOICES:
+        return "standard"
+    return style
 
 def request_host(request):
     host = (request.host or "").split(":", 1)[0].strip().lower()
@@ -1054,6 +1065,8 @@ def get_all_prizes (request):
             except (TypeError, ValueError):
                 p["prize_value_display"] = str(raw_prize_value)
 
+        p["prize_style"] = normalize_prize_style(p.get("prize_style"))
+
         winner = p["prize_winner"]
         if winner != 0 and winner != "":
             if winner > 0:
@@ -1139,8 +1152,9 @@ def set_prize (request):
     if current_prize.get("prize_finalised"):
         return json_error("Unlock this prize before editing it.")
 
-    data = parse_keys(current_prize, request.params, ["prize_text", "prize_text2", "prize_winner", "prize_value"], objects.Prize)
+    data = parse_keys(current_prize, request.params, ["prize_text", "prize_text2", "prize_winner", "prize_value", "prize_style"], objects.Prize)
     data["prize_text"] = (data.get("prize_text") or "").strip()
+    data["prize_style"] = normalize_prize_style(request.params.get("prize_style", data.get("prize_style")))
 
     raw_prize_value = request.params.get("prize_value", data.get("prize_value"))
     prize_value_digits = re.sub(r"[^\d]", "", "" if raw_prize_value is None else str(raw_prize_value))

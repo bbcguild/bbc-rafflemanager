@@ -42,7 +42,8 @@ CREATE TABLE prizes (
     prize_text2 TEXT,               -- prize number (this is sorted)
     prize_winner INTEGER,           -- references the "winning" ticket, not won unless finalised
     prize_finalised INTEGER,        -- boolean value, true if prize is officially won
-    prize_value INTEGER             -- optional numeric value for the prize
+    prize_value INTEGER,            -- optional numeric value for the prize
+    prize_style TEXT DEFAULT 'standard' -- visual emphasis tier: standard / featured / flagship
 );
 
 CREATE TABLE auth_users (

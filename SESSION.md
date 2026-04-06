@@ -4,12 +4,12 @@ Use this file as the source of truth for the active work session. If chat dies, 
 
 ## Current Goal
 - Continue the raffle manager modernization with focus on the admin UI.
-- Most immediate active area: prize-card save behavior and rollout follow-through after the latest autosave bug fix.
-- Current unresolved theme: confirm the blank-winner autosave fix on the live admin flow, then resume remaining admin polish from real browser feedback.
+- Most immediate active area: general live QA, UX polish, and small follow-up bugs from real browser testing.
+- Current paused theme: GA4 reporting setup is installed and validated at the tag level, but the user got understandably frazzled while trying to build first-pass Explorations inside the shared `bbcguild.com` property.
 
 ## Current Status
-- Working tree is currently clean.
-- Local branch is ahead of `origin/main` by one commit: `e778449` (`admin: normalize blank prize winners`).
+- Working tree status should be checked before resuming; this file was refreshed as a recovery checkpoint after the latest analytics pass.
+- GA4 is deployed live using measurement ID `G-8C00Y7WF9G`.
 - The project was recently in a heavy admin/public UI iteration cycle, mostly on 2026-04-04 through 2026-04-05.
 - This file is now intentionally structured for crash recovery, not just narrative notes.
 
@@ -60,6 +60,10 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - Archive navigation follow-up on 2026-04-05: added a dedicated public `Home` return control for archive browsing so users can jump back to the current raffle without stepping forward raffle-by-raffle. The control is styled in the same family as the existing archive arrows, appears only when viewing an older raffle, and uses a slight accent to distinguish the “return to current” action from previous/next archive movement.
 - Archive navigation icon follow-up on 2026-04-05: the first `Home` glyph read too abstractly, so the control is now moving to an inline SVG house outline with a roof, chimney, and door for clearer recognition while keeping the same pill/button footprint.
 - Analytics follow-up on 2026-04-05: GA4 integration scaffolding is now in place for public, admin, and login pages using one configurable `GA4_MEASUREMENT_ID` app setting. The shared snippet sends page-level context (`site_area`, `raffle_view`, `raffle_number`, `guild_slug`, `host_name`) and tracks outbound clicks to Google Sheets URLs. The real measurement ID has now been supplied as `G-8C00Y7WF9G`, so the next step is activation via deploy and post-deploy verification in GA4 Realtime/DebugView.
+- Analytics follow-up on 2026-04-05: the first activation pass threw a 500 because the analytics snippet tried to JSON-encode undefined Mako values. That crash has been fixed by normalizing undefined context safely inside the shared snippet.
+- Analytics follow-up on 2026-04-05: a second activation bug meant the live page was outputting broken/escaped GA JavaScript and blank raffle context. The snippet now derives context directly from `request`, and live verification confirmed valid GA output on the public raffle page with populated values like `site_area=public`, `raffle_view=current`, `guild_slug=bbc1`, and `host_name=raffles.bbcguild.com`.
+- Analytics follow-up on 2026-04-05: user verification in GA4 Realtime confirmed `BBC Raffle` pageviews are now being seen, so the tag is alive. GA4 custom definitions for `Site Area`, `Raffle View`, `Raffle Number`, `Guild Slug`, and `Host Name` were also created successfully. We paused before finishing the first Exploration report because the shared-property reporting view was mixing in main-site traffic and the user wanted to stop before getting more frazzled.
+- Prize spotlight follow-up on 2026-04-06: started a universal prize-emphasis system instead of a BBC-specific jackpot flag. Current implementation adds a per-prize `prize_style` field with `standard`, `featured`, and `flagship` tiers, stores it in the DB as an additive schema change, exposes a small `Spotlight` selector on admin prize cards, and applies distinct but reusable styling/badges on both admin and public prize cards.
 
 ## Known Facts
 - `SESSION.md` was introduced after an earlier crash because conversation state had been lost.
@@ -109,11 +113,14 @@ Use this file as the source of truth for the active work session. If chat dies, 
 - `DECISIONS.md`
 
 ## Exact Next Step
-- Commit, push, and deploy the GA4 activation pass.
-- Then verify in-browser and GA4:
-- page views appear with `site_area` distinguishing `public`, `admin`, and `admin_auth`
-- archive views report `raffle_view=archive`
-- clicks on Google Sheets links register as outbound `google_sheet_link` events
+- On resume, start by checking `git status --short` and `git log --oneline -10` so the repo/deploy state is current.
+- If returning to analytics, do not redo GA installation. Start from GA4 reporting only:
+- use `Reports -> Realtime` as the sanity check that raffle traffic is arriving
+- remember the custom definitions already exist for `Site Area`, `Raffle View`, `Raffle Number`, `Guild Slug`, and `Host Name`
+- expect shared-property/main-site noise in Explorations, especially `(not set)` rows from WordPress traffic
+- build the first useful Exploration gradually, filtering tightly instead of trying to solve everything at once
+- Otherwise continue with the next live QA bug or UI polish item the user wants to tackle
+- If resuming the prize spotlight work, verify the new `Spotlight` selector behaves correctly on live admin prize cards and confirm the public featured/flagship treatments feel strong enough without overwhelming the default cards
 
 ## If Chat Dies, Resume By Doing This
 1. Read `SESSION.md`.

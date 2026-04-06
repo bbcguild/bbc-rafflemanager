@@ -527,9 +527,9 @@ def add_new_prize (cur, guild_id):
     cur.execute(
         """
         INSERT INTO prizes
-            (prize_raffle, prize_text, prize_text2, prize_winner, prize_finalised, prize_value)
+            (prize_raffle, prize_text, prize_text2, prize_winner, prize_finalised, prize_value, prize_style)
         VALUES
-            (?, '', '?', 0, 0, NULL)
+            (?, '', '?', 0, 0, NULL, 'standard')
         """,
         (cur_id, )
     )
@@ -596,7 +596,8 @@ def set_prize (cur, guild_id, prize_info):
                prize_text2=?,
                prize_winner=?,
                prize_finalised=?,
-               prize_value=?
+               prize_value=?,
+               prize_style=?
          WHERE prize_id=?
         """,
         (
@@ -606,6 +607,7 @@ def set_prize (cur, guild_id, prize_info):
             p["prize_winner"],
             p["prize_finalised"],
             p.get("prize_value"),
+            p.get("prize_style", "standard"),
             p["prize_id"]
         )
     )

@@ -13,4 +13,4 @@ def Ticket ():
     return {"ticket_id": None, "ticket_raffle": 0, "ticket_user": 0, "ticket_count": 0, "ticket_timestamp": 0}
 
 def Prize ():
-    return {"prize_id": None, "prize_raffle": 0, "prize_text": "", "prize_text2": "", "prize_winner": 0, "prize_finalised": 0, "prize_value": None}
+    return {"prize_id": None, "prize_raffle": 0, "prize_text": "", "prize_text2": "", "prize_winner": 0, "prize_finalised": 0, "prize_value": None, "prize_style": "standard"}

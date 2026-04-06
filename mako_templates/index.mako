@@ -467,6 +467,20 @@ body{
   background:linear-gradient(180deg,rgba(11,19,35,.96),rgba(8,14,24,.98));
   width:100%;
 }
+.prize.prize-style-featured{
+  border-color:rgba(208,171,96,.42);
+  background:
+    linear-gradient(180deg,rgba(43,32,12,.18),rgba(8,14,24,.98)),
+    linear-gradient(180deg,rgba(11,19,35,.96),rgba(8,14,24,.98));
+  box-shadow:inset 0 0 0 1px rgba(255,220,143,.08);
+}
+.prize.prize-style-flagship{
+  border-color:rgba(104,189,255,.44);
+  background:
+    radial-gradient(circle at top right, rgba(93,172,255,.22), transparent 42%),
+    linear-gradient(180deg,rgba(12,26,45,.98),rgba(7,14,28,.99));
+  box-shadow:0 0 0 1px rgba(130,205,255,.12), 0 12px 28px rgba(0,0,0,.22);
+}
 .num{
   display:flex;
   align-items:center;
@@ -478,11 +492,51 @@ body{
   font-size:2.15rem;
   font-weight:900;
 }
+.prize.prize-style-featured .num{
+  border-color:rgba(223,186,97,.3);
+  background:linear-gradient(180deg,rgba(54,40,16,.9),rgba(21,19,13,.98));
+  color:#ffe8ac;
+}
+.prize.prize-style-flagship .num{
+  border-color:rgba(130,205,255,.36);
+  background:linear-gradient(180deg,rgba(22,52,92,.94),rgba(10,23,42,.98));
+  color:#e0f4ff;
+}
 .pmid{
   display:grid;
   grid-template-rows:auto auto auto;
   gap:10px;
   min-width:0;
+}
+.pbadge{
+  display:none;
+  align-items:center;
+  min-height:24px;
+  width:max-content;
+  max-width:100%;
+  padding:0 10px;
+  border:1px solid rgba(141,167,215,.18);
+  background:rgba(255,255,255,.04);
+  color:#b8c8e7;
+  font-size:.68rem;
+  font-weight:900;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+.prize.prize-style-featured .pbadge,
+.prize.prize-style-flagship .pbadge{
+  display:inline-flex;
+}
+.prize.prize-style-featured .pbadge{
+  border-color:rgba(223,186,97,.38);
+  background:rgba(188,142,47,.14);
+  color:#f4dc9a;
+}
+.prize.prize-style-flagship .pbadge{
+  border-color:rgba(130,205,255,.4);
+  background:rgba(39,102,174,.18);
+  color:#d9f1ff;
 }
 .ptitle{
   width:100%;
@@ -1210,6 +1264,16 @@ function buildPrizeCards(result) {
     var metaText = value["prize_text2"] || "";
     var prizeText = value["prize_text_display"] || value["prize_text"] || "Prize Details Soon";
     var ticketText = "TBD";
+    var prizeStyle = (value["prize_style"] || "standard").toLowerCase();
+    if (["standard", "featured", "flagship"].indexOf(prizeStyle) === -1) {
+      prizeStyle = "standard";
+    }
+    var badgeText = "";
+    if (prizeStyle === "featured") {
+      badgeText = "Featured Prize";
+    } else if (prizeStyle === "flagship") {
+      badgeText = "Flagship Prize";
+    }
     if (value["prize_finalised"] != 0) {
       ticketText = value["prize_winner"] || "TBD";
     }
@@ -1219,9 +1283,10 @@ function buildPrizeCards(result) {
     var prizeValueText = value["prize_value_display"] || "";
 
     var card = ''
-      + '<div class="prize">'
+      + '<div class="prize prize-style-' + prizeStyle + '">'
       + '  <div class="num">' + escapeHtml(metaText) + '</div>'
       + '  <div class="pmid">'
+      + '    <div class="pbadge">' + escapeHtml(badgeText) + '</div>'
       + '    <div class="ptitle">' + escapeHtml(prizeText) + '</div>'
       + '    <div class="pmeta"></div>'
       + '    <div class="pwinner">'
