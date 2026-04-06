@@ -2342,9 +2342,16 @@ function applyPrizeStyleState(template, prizeStyle) {
         }
 
         var select = $("#prize_style", template)
-        select.find("option").prop("selected", false)
-        select.find('option[value="' + style + '"]').prop("selected", true)
-        select.val(style)
+        if (select.length) {
+                var el = select[0]
+                el.value = style
+                for (var i = 0; i < el.options.length; i++) {
+                        el.options[i].selected = (el.options[i].value === style)
+                }
+                if (el.value !== style) {
+                        el.selectedIndex = 0
+                }
+        }
 }
 
 function savePrizeForm($form, options) {
