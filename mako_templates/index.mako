@@ -497,6 +497,8 @@ body{
   border-width:2px;
   border-color:rgba(193,227,255,.52);
   background:
+    radial-gradient(circle at left center, rgba(184,223,255,.22), transparent 33%),
+    linear-gradient(90deg, rgba(184,223,255,.16), rgba(184,223,255,.05) 22%, transparent 44%),
     radial-gradient(circle at top right, rgba(122,204,255,.18), transparent 38%),
     linear-gradient(90deg, rgba(193,227,255,.1), transparent 28%),
     linear-gradient(180deg,rgba(12,26,45,.98),rgba(7,14,28,.99));
