@@ -1227,8 +1227,8 @@ body.legacy-modal-open{
 #ticket_info .handsontable td.ticket-range-cell,
 #ticket_info .handsontable th.ticket-range-cell{
   white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
+  overflow:visible;
+  text-overflow:clip;
 }
 
 .ticket-summary-box{
@@ -1883,12 +1883,12 @@ div#paid_template{
 
 .prize-shell{
   display:grid;
-  grid-template-columns:94px minmax(0,1fr) 76px;
-  gap:16px;
+  grid-template-columns:94px minmax(0,1fr) 84px;
+  gap:18px;
   align-items:stretch;
   width:100%;
   box-sizing:border-box;
-  padding:10px 14px 10px 10px;
+  padding:10px 18px 10px 10px;
   border:1px solid rgba(80,120,210,.18);
   border-radius:0;
   background:linear-gradient(180deg,rgba(9,18,35,.96),rgba(8,15,28,.98));
@@ -1906,10 +1906,25 @@ div#paid_template{
   pointer-events:none;
 }
 
+.prize-shell::after{
+  content:"";
+  position:absolute;
+  top:0;
+  right:0;
+  bottom:0;
+  width:1px;
+  background:rgba(80,120,210,.28);
+  pointer-events:none;
+}
+
 .prize-shell.prize-style-featured{
   border-width:1px;
   border-color:rgba(125,148,192,.26);
   box-shadow:inset 0 0 0 1px rgba(125,148,192,.16), inset 0 3px 0 rgba(130,205,255,.26);
+}
+
+.prize-shell.prize-style-featured::after{
+  background:rgba(125,148,192,.38);
 }
 
 .prize-shell.prize-style-featured::before{
@@ -1920,6 +1935,10 @@ div#paid_template{
   border-width:1px;
   border-color:rgba(205,166,92,.34);
   box-shadow:inset 0 0 0 1px rgba(205,166,92,.18), inset 0 4px 0 rgba(223,186,97,.44), 0 6px 18px rgba(0,0,0,.14);
+}
+
+.prize-shell.prize-style-grand::after{
+  background:rgba(205,166,92,.48);
 }
 
 .prize-shell.prize-style-grand::before{
@@ -1935,6 +1954,10 @@ div#paid_template{
     linear-gradient(270deg, rgba(154,211,255,.055), rgba(154,211,255,.02) 16%, transparent 40%),
     linear-gradient(180deg,rgba(12,26,45,.98),rgba(7,14,28,.99));
   box-shadow:inset 0 0 0 1px rgba(193,227,255,.16), 0 16px 34px rgba(0,0,0,.28), inset 0 0 22px rgba(122,204,255,.05);
+}
+
+.prize-shell.prize-style-jackpot::after{
+  background:rgba(193,227,255,.62);
 }
 
 .prize-shell.prize-style-jackpot::before{
@@ -3373,7 +3396,7 @@ var get_ticket_table = function () {
                         height: "auto",
                         rowHeaders: false,
                         colHeaders: ["#", "Name", "Total", "Paid", "Bar", "Range"],
-                        colWidths: [36, 138, 50, 50, 50, 150],
+                        colWidths: [36, 138, 50, 50, 50, 180],
                         contextMenu: false,
                         enterMoves: {row: 0, col: 1},
                         columnSorting: true,
@@ -3445,7 +3468,7 @@ var get_ticket_table = function () {
                         height: "auto",
                         rowHeaders: false,
                         colHeaders: ["#", "Name", "Total", "Range"],
-                        colWidths: [54, 156, 54, 150],
+                        colWidths: [54, 156, 54, 180],
                         contextMenu: false,
                         enterMoves: {row: 0, col: 1},
                         columnSorting: true,
