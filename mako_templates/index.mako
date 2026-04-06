@@ -466,21 +466,45 @@ body{
   border:1px solid var(--line);
   background:linear-gradient(180deg,rgba(11,19,35,.96),rgba(8,14,24,.98));
   width:100%;
+  position:relative;
+  overflow:hidden;
+}
+.prize::before{
+  content:"";
+  position:absolute;
+  inset:0 auto 0 0;
+  width:4px;
+  background:transparent;
+  pointer-events:none;
 }
 .prize.prize-style-featured{
-  border-color:rgba(122,143,188,.22);
-  background:
-    linear-gradient(180deg,rgba(31,27,17,.14),rgba(8,14,24,.98)),
-    linear-gradient(180deg,rgba(11,19,35,.96),rgba(8,14,24,.98));
-  box-shadow:inset 0 3px 0 rgba(223,186,97,.62);
+  border-width:2px;
+  border-color:rgba(125,148,192,.28);
+  box-shadow:inset 0 3px 0 rgba(223,186,97,.46);
 }
-.prize.prize-style-flagship{
-  border-color:rgba(130,205,255,.58);
+.prize.prize-style-featured::before{
+  background:linear-gradient(180deg,rgba(223,186,97,.85),rgba(223,186,97,.18));
+}
+.prize.prize-style-grand{
+  border-width:2px;
+  border-color:rgba(163,196,241,.34);
+  box-shadow:inset 0 4px 0 rgba(130,205,255,.44), 0 6px 18px rgba(0,0,0,.14);
+}
+.prize.prize-style-grand::before{
+  background:linear-gradient(180deg,rgba(130,205,255,.92),rgba(130,205,255,.2));
+}
+.prize.prize-style-jackpot{
+  border-width:2px;
+  border-color:rgba(193,227,255,.52);
   background:
-    radial-gradient(circle at top right, rgba(93,172,255,.32), transparent 42%),
-    linear-gradient(90deg, rgba(130,205,255,.08), transparent 28%),
+    radial-gradient(circle at top right, rgba(122,204,255,.18), transparent 38%),
+    linear-gradient(90deg, rgba(193,227,255,.1), transparent 28%),
     linear-gradient(180deg,rgba(12,26,45,.98),rgba(7,14,28,.99));
-  box-shadow:0 0 0 1px rgba(130,205,255,.18), 0 14px 30px rgba(0,0,0,.26), inset 0 0 24px rgba(69,140,219,.12);
+  box-shadow:0 0 0 1px rgba(193,227,255,.18), 0 16px 34px rgba(0,0,0,.28), inset 0 0 30px rgba(122,204,255,.1);
+}
+.prize.prize-style-jackpot::before{
+  width:6px;
+  background:linear-gradient(180deg,rgba(245,248,255,.95),rgba(130,205,255,.25));
 }
 .num{
   display:flex;
@@ -492,16 +516,6 @@ body{
   background:linear-gradient(180deg,rgba(15,28,51,.96),rgba(8,16,29,.98));
   font-size:2.15rem;
   font-weight:900;
-}
-.prize.prize-style-featured .num{
-  border-color:rgba(223,186,97,.3);
-  background:linear-gradient(180deg,rgba(54,40,16,.9),rgba(21,19,13,.98));
-  color:#ffe8ac;
-}
-.prize.prize-style-flagship .num{
-  border-color:rgba(130,205,255,.36);
-  background:linear-gradient(180deg,rgba(22,52,92,.94),rgba(10,23,42,.98));
-  color:#e0f4ff;
 }
 .pmid{
   display:grid;
@@ -526,18 +540,25 @@ body{
   white-space:nowrap;
 }
 .prize.prize-style-featured .pbadge,
-.prize.prize-style-flagship .pbadge{
+.prize.prize-style-grand .pbadge,
+.prize.prize-style-jackpot .pbadge{
   display:inline-flex;
 }
 .prize.prize-style-featured .pbadge{
-  border-color:rgba(223,186,97,.38);
-  background:rgba(188,142,47,.14);
-  color:#f4dc9a;
+  border-color:rgba(223,186,97,.28);
+  background:rgba(188,142,47,.09);
+  color:#e7d6a6;
 }
-.prize.prize-style-flagship .pbadge{
-  border-color:rgba(130,205,255,.4);
-  background:rgba(39,102,174,.18);
-  color:#d9f1ff;
+.prize.prize-style-grand .pbadge{
+  border-color:rgba(130,205,255,.28);
+  background:rgba(39,102,174,.12);
+  color:#d3ebff;
+}
+.prize.prize-style-jackpot .pbadge{
+  border-color:rgba(216,236,255,.44);
+  background:rgba(86,145,208,.14);
+  color:#f1f7ff;
+  box-shadow:0 0 16px rgba(122,204,255,.12);
 }
 .ptitle{
   width:100%;
@@ -1266,14 +1287,21 @@ function buildPrizeCards(result) {
     var prizeText = value["prize_text_display"] || value["prize_text"] || "Prize Details Soon";
     var ticketText = "TBD";
     var prizeStyle = (value["prize_style"] || "standard").toLowerCase();
-    if (["standard", "featured", "flagship"].indexOf(prizeStyle) === -1) {
+    if (prizeStyle === "flagship" || prizeStyle === "premier") {
+      prizeStyle = "jackpot";
+    } else if (prizeStyle === "signature") {
+      prizeStyle = "grand";
+    }
+    if (["standard", "featured", "grand", "jackpot"].indexOf(prizeStyle) === -1) {
       prizeStyle = "standard";
     }
     var badgeText = "";
-    if (prizeStyle === "featured") {
+    if (prizeStyle === "jackpot") {
+      badgeText = "Jackpot";
+    } else if (prizeStyle === "grand") {
+      badgeText = "Grand Prize";
+    } else if (prizeStyle === "featured") {
       badgeText = "Featured Prize";
-    } else if (prizeStyle === "flagship") {
-      badgeText = "Premier Prize";
     }
     if (value["prize_finalised"] != 0) {
       ticketText = value["prize_winner"] || "TBD";

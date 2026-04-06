@@ -65,7 +65,12 @@ here = os.path.dirname(os.path.abspath(__file__))
 CANONICAL_PUBLIC_HOST = "raffles.bbcguild.com"
 PUBLIC_ALIAS_HOSTS = {"raffle.bbcguild.com", "tickets.bbcguild.com"}
 ADMIN_HOST = "raffle-admin.bbcguild.com"
-PRIZE_STYLE_CHOICES = {"standard", "featured", "flagship"}
+PRIZE_STYLE_CHOICES = {"standard", "featured", "grand", "jackpot"}
+PRIZE_STYLE_ALIASES = {
+    "flagship": "jackpot",
+    "premier": "jackpot",
+    "signature": "grand",
+}
 
 
 def normalize_prize_style(raw_style):
@@ -73,6 +78,7 @@ def normalize_prize_style(raw_style):
     if not isinstance(style, str):
         style = str(style)
     style = style.strip().lower()
+    style = PRIZE_STYLE_ALIASES.get(style, style)
     if style not in PRIZE_STYLE_CHOICES:
         return "standard"
     return style

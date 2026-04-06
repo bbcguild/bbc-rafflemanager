@@ -1809,16 +1809,6 @@ div#paid_template{
   gap:6px;
 }
 
-.prize-style-label{
-  display:block;
-  font-size:.68rem;
-  font-weight:900;
-  letter-spacing:.12em;
-  text-transform:uppercase;
-  color:#8fa6cf;
-  text-align:center;
-}
-
 .prize_style{
   width:100%;
   min-height:32px;
@@ -1849,23 +1839,52 @@ div#paid_template{
   border:1px solid rgba(80,120,210,.18);
   border-radius:0;
   background:linear-gradient(180deg,rgba(9,18,35,.96),rgba(8,15,28,.98));
+  position:relative;
+  overflow:hidden;
+}
+
+.prize-shell::before{
+  content:"";
+  position:absolute;
+  inset:0 auto 0 0;
+  width:4px;
+  background:transparent;
+  pointer-events:none;
 }
 
 .prize-shell.prize-style-featured{
-  border-color:rgba(122,143,188,.22);
-  background:
-    linear-gradient(180deg,rgba(31,27,17,.14),rgba(8,15,28,.98)),
-    linear-gradient(180deg,rgba(9,18,35,.96),rgba(8,15,28,.98));
-  box-shadow:inset 0 3px 0 rgba(223,186,97,.62);
+  border-width:2px;
+  border-color:rgba(125,148,192,.28);
+  box-shadow:inset 0 3px 0 rgba(223,186,97,.46);
 }
 
-.prize-shell.prize-style-flagship{
-  border-color:rgba(130,205,255,.58);
+.prize-shell.prize-style-featured::before{
+  background:linear-gradient(180deg,rgba(223,186,97,.85),rgba(223,186,97,.18));
+}
+
+.prize-shell.prize-style-grand{
+  border-width:2px;
+  border-color:rgba(163,196,241,.34);
+  box-shadow:inset 0 4px 0 rgba(130,205,255,.44), 0 6px 18px rgba(0,0,0,.14);
+}
+
+.prize-shell.prize-style-grand::before{
+  background:linear-gradient(180deg,rgba(130,205,255,.92),rgba(130,205,255,.2));
+}
+
+.prize-shell.prize-style-jackpot{
+  border-width:2px;
+  border-color:rgba(193,227,255,.52);
   background:
-    radial-gradient(circle at top right, rgba(93,172,255,.32), transparent 42%),
-    linear-gradient(90deg, rgba(130,205,255,.08), transparent 28%),
+    radial-gradient(circle at top right, rgba(122,204,255,.18), transparent 38%),
+    linear-gradient(90deg, rgba(193,227,255,.1), transparent 28%),
     linear-gradient(180deg,rgba(12,26,45,.98),rgba(7,14,28,.99));
-  box-shadow:0 0 0 1px rgba(130,205,255,.18), 0 14px 30px rgba(0,0,0,.26), inset 0 0 24px rgba(69,140,219,.12);
+  box-shadow:0 0 0 1px rgba(193,227,255,.18), 0 16px 34px rgba(0,0,0,.28), inset 0 0 30px rgba(122,204,255,.1);
+}
+
+.prize-shell.prize-style-jackpot::before{
+  width:6px;
+  background:linear-gradient(180deg,rgba(245,248,255,.95),rgba(130,205,255,.25));
 }
 
 .prize-main{
@@ -1923,25 +1942,35 @@ div#paid_template{
 }
 
 .prize-shell.prize-style-featured .prize-badge,
-.prize-shell.prize-style-flagship .prize-badge{
+.prize-shell.prize-style-grand .prize-badge,
+.prize-shell.prize-style-jackpot .prize-badge{
   display:inline-flex;
 }
 
 .prize-shell.prize-style-featured .prize-badge{
-  border-color:rgba(223,186,97,.38);
-  background:rgba(188,142,47,.14);
-  color:#f4dc9a;
+  border-color:rgba(223,186,97,.28);
+  background:rgba(188,142,47,.09);
+  color:#e7d6a6;
 }
 
-.prize-shell.prize-style-flagship .prize-badge{
-  border-color:rgba(130,205,255,.4);
-  background:rgba(39,102,174,.18);
-  color:#d9f1ff;
+.prize-shell.prize-style-grand .prize-badge{
+  border-color:rgba(130,205,255,.28);
+  background:rgba(39,102,174,.12);
+  color:#d3ebff;
 }
 
-.prize-shell.prize-style-flagship .prize_item,
-.prize-shell.prize-style-flagship .prize_value{
-  border-color:rgba(130,205,255,.26);
+.prize-shell.prize-style-jackpot .prize-badge{
+  border-color:rgba(216,236,255,.44);
+  background:rgba(86,145,208,.14);
+  color:#f1f7ff;
+  box-shadow:0 0 16px rgba(122,204,255,.12);
+}
+
+.prize-shell.prize-style-grand .prize_item,
+.prize-shell.prize-style-grand .prize_value,
+.prize-shell.prize-style-jackpot .prize_item,
+.prize-shell.prize-style-jackpot .prize_value{
+  border-color:rgba(130,205,255,.24);
 }
 
 .prize-winner-display{
@@ -2276,19 +2305,26 @@ function serializePrizeForm($form) {
 
 function applyPrizeStyleState(template, prizeStyle) {
         var style = (prizeStyle || "standard").toLowerCase()
-        if ($.inArray(style, ["standard", "featured", "flagship"]) === -1) {
+        if (style === "flagship" || style === "premier") {
+                style = "jackpot"
+        } else if (style === "signature") {
+                style = "grand"
+        }
+        if ($.inArray(style, ["standard", "featured", "grand", "jackpot"]) === -1) {
                 style = "standard"
         }
 
         var shell = $(".prize-shell", template)
-        shell.removeClass("prize-style-standard prize-style-featured prize-style-flagship")
+        shell.removeClass("prize-style-standard prize-style-featured prize-style-grand prize-style-jackpot")
         shell.addClass("prize-style-" + style)
 
         var badge = $("#prize_badge", template)
-        if (style === "featured") {
+        if (style === "jackpot") {
+                badge.text("Jackpot")
+        } else if (style === "grand") {
+                badge.text("Grand Prize")
+        } else if (style === "featured") {
                 badge.text("Featured Prize")
-        } else if (style === "flagship") {
-                badge.text("Premier Prize")
         } else {
                 badge.text("")
         }
@@ -4112,11 +4148,11 @@ document.addEventListener('DOMContentLoaded', function () {
     <div class="prize-field prize-number-panel">
         <input type="text" class="prize_number" id="prize_number" name="prize_text2" placeholder="#" />
         <div class="prize-style-control">
-            <span class="prize-style-label">Spotlight</span>
             <select id="prize_style" class="prize_style" name="prize_style">
-                <option value="standard">Standard</option>
+                <option value="jackpot">Jackpot</option>
+                <option value="grand">Grand Prize</option>
                 <option value="featured">Featured</option>
-                <option value="flagship">Premier</option>
+                <option value="standard">Standard</option>
             </select>
         </div>
     </div>
