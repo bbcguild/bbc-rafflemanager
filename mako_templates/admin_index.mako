@@ -2847,7 +2847,8 @@ var GLOBAL_PRIZE_ALERTED = false
 var CURRENT_RAFFLE_INFO = {
     raffle_subheader: "",
     raffle_time: "",
-    raffle_cost: ""
+    raffle_cost: "",
+    raffle_status: "LIVE"
 }
 
 function normalizeFieldValue(value) {
@@ -3047,6 +3048,7 @@ $("#raffle_status").val(normalizeRaffleStatus(result["raffle_status"]))
                 CURRENT_RAFFLE_INFO.raffle_subheader = normalizeFieldValue(result["raffle_guild_num"])
                 CURRENT_RAFFLE_INFO.raffle_time = normalizeFieldValue(result["raffle_time"])
                 CURRENT_RAFFLE_INFO.raffle_cost = normalizeFieldValue(result["raffle_ticket_cost"])
+                CURRENT_RAFFLE_INFO.raffle_status = normalizeRaffleStatus(result["raffle_status"])
 
                 $("#display_raffle_subheader").text("#" + result["raffle_guild_num"] + " Raffle")
                 $("#display_raffle_time").text("Drawing: " + result["raffle_time"])
@@ -3616,8 +3618,24 @@ $(document).ready(function () {
                     url: "json/set/raffle",
                     data: $("#ginfo_form").serialize(),
                     success: function (result) {
+                        if (isActionError(result)) {
+                            if (fieldId === "raffle_status") {
+                                var previousStatus = normalizeRaffleStatus(CURRENT_RAFFLE_INFO.raffle_status)
+                                $field.val(previousStatus)
+                                applyAdminStatus(previousStatus)
+                            }
+                            alert(actionErrorMessage(result))
+                            return
+                        }
+
                         if (trackedMap[fieldId]) {
                             CURRENT_RAFFLE_INFO[trackedMap[fieldId]] = normalizeFieldValue($field.val())
+                        }
+                        if (fieldId === "raffle_status") {
+                            var savedStatus = normalizeRaffleStatus((result && result.raffle_status) || $field.val())
+                            $field.val(savedStatus)
+                            applyAdminStatus(savedStatus)
+                            CURRENT_RAFFLE_INFO.raffle_status = savedStatus
                         }
                     },
                     xhrFields: {

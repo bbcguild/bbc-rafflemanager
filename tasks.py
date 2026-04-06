@@ -343,7 +343,7 @@ def all_current_prizes_finalised():
 def set_current_raffle_info (request):
     current_info = db.get_cur_raffle_info()
     if not current_info:
-        return False
+        return json_error("No active raffle found.")
 
     data = dict(current_info)
     data["raffle_guild_num"] = request.params.get("raffle_guild_num", data.get("raffle_guild_num", ""))
@@ -351,9 +351,14 @@ def set_current_raffle_info (request):
     data["raffle_ticket_cost"] = request.params.get("raffle_ticket_cost", data.get("raffle_ticket_cost", ""))
     data["raffle_notes"] = request.params.get("raffle_notes", data.get("raffle_notes", ""))
     data["raffle_title"] = request.params.get("raffle_title", data.get("raffle_title", ""))
-    data["raffle_status"] = request.params.get("raffle_status", data.get("raffle_status", "LIVE")) or "LIVE"
+    current_status = normalize_raffle_status_value(data.get("raffle_status"))
+    requested_status = request.params.get("raffle_status", data.get("raffle_status", "LIVE")) or "LIVE"
+    data["raffle_status"] = normalize_raffle_status_value(requested_status)
     data["raffle_notes_admin"] = request.params.get("raffle_notes_admin", data.get("raffle_notes_admin", ""))
     data["raffle_notes_public_2"] = request.params.get("raffle_notes_public_2", data.get("raffle_notes_public_2", ""))
+
+    if current_status != "COMPLETE" and data["raffle_status"] == "COMPLETE" and not all_current_prizes_finalised():
+        return json_error('All prizes must be locked before the raffle can be marked "COMPLETE".')
 
     cur = db.cursor()
     cur.execute(
@@ -372,7 +377,13 @@ def set_current_raffle_info (request):
             data["raffle_id"],
         )
     )
-    return True
+    return json_ok(
+        raffle_guild_num=data["raffle_guild_num"],
+        raffle_time=data["raffle_time"],
+        raffle_ticket_cost=data["raffle_ticket_cost"],
+        raffle_title=data["raffle_title"],
+        raffle_status=data["raffle_status"],
+    )
 
 @view_config(route_name="close_current_raffle", renderer="json", permission="akaviri")
 def close_current_raffle (request):
