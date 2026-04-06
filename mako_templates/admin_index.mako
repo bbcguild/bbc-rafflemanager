@@ -1890,12 +1890,12 @@ div#paid_template{
 
 .prize-shell{
   display:grid;
-  grid-template-columns:94px minmax(0,1fr) 68px;
-  gap:16px;
+  grid-template-columns:84px minmax(0,1fr) 58px;
+  gap:12px;
   align-items:stretch;
   width:100%;
   box-sizing:border-box;
-  padding:10px 12px 10px 10px;
+  padding:10px;
   border:1px solid rgba(80,120,210,.18);
   border-radius:0;
   background:linear-gradient(180deg,rgba(9,18,35,.96),rgba(8,15,28,.98));
@@ -1952,7 +1952,7 @@ div#paid_template{
 .prize-main{
   display:grid;
   grid-template-rows:auto auto auto;
-  gap:14px;
+  gap:12px;
   min-width:0;
 }
 
@@ -1960,7 +1960,7 @@ div#paid_template{
 .prize-middle-row,
 .prize-bottom-row{
   display:grid;
-  gap:14px;
+  gap:10px;
   min-width:0;
 }
 
@@ -1970,7 +1970,7 @@ div#paid_template{
 }
 
 .prize-bottom-row{
-  grid-template-columns:110px minmax(0,1fr);
+  grid-template-columns:96px minmax(0,1fr);
   align-items:center;
 }
 
