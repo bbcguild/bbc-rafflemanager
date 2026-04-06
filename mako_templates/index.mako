@@ -497,9 +497,9 @@ body{
   border-width:1px;
   border-color:rgba(193,227,255,.52);
   background:
-    radial-gradient(circle at left center, rgba(154,211,255,.15), transparent 28%),
-    linear-gradient(90deg, rgba(154,211,255,.09), rgba(154,211,255,.03) 18%, transparent 36%),
-    radial-gradient(circle at top right, rgba(122,204,255,.18), transparent 38%),
+    radial-gradient(circle at 88% 24%, rgba(154,211,255,.20), transparent 22%),
+    radial-gradient(circle at right center, rgba(154,211,255,.12), transparent 30%),
+    linear-gradient(270deg, rgba(154,211,255,.08), rgba(154,211,255,.03) 16%, transparent 40%),
     linear-gradient(180deg,rgba(12,26,45,.98),rgba(7,14,28,.99));
   box-shadow:inset 0 0 0 1px rgba(193,227,255,.16), 0 16px 34px rgba(0,0,0,.28), inset 0 0 22px rgba(122,204,255,.07);
 }
