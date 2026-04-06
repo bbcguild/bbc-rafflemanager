@@ -568,6 +568,34 @@ def add_new_prize (cur, guild_id):
     )
 
 @with_cursor_boolean
+def clone_last_prize(cur, guild_id):
+    ensure_prize_columns(cur)
+    cur_id = gcri()
+    if not cur_id:
+        return False
+
+    cur.execute("SELECT * FROM prizes WHERE prize_raffle=? ORDER BY prize_id DESC LIMIT 1", (cur_id,))
+    source = cur.fetchone()
+    if not source:
+        return False
+
+    cur.execute(
+        """
+        INSERT INTO prizes
+            (prize_raffle, prize_text, prize_text2, prize_winner, prize_finalised, prize_value, prize_style)
+        VALUES
+            (?, ?, ?, 0, 0, ?, ?)
+        """,
+        (
+            cur_id,
+            source["prize_text"] or "",
+            source["prize_text2"] or "",
+            source["prize_value"],
+            source["prize_style"] if "prize_style" in source.keys() else "standard",
+        )
+    )
+
+@with_cursor_boolean
 def delete_prize (cur, prize_id):
     ensure_prize_columns(cur)
     # no going-backsies!

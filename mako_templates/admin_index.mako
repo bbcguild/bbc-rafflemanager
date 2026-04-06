@@ -1773,9 +1773,13 @@ div#paid_template{
 
 #add_prize_block{
   margin-top:12px;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
 }
 
 #add_prize_button,
+#clone_last_prize_button,
 #new_raffle_button,
 #manual_refresh,
 #clear_imported,
@@ -2640,6 +2644,26 @@ function addPrizeCard() {
                                 if (result) {
                                         get_prize_info({ scrollToLast: true })
                                 }
+                        })
+                })
+                .fail(function (result) {
+                        if (isActionError(result)) {
+                                alert(actionErrorMessage(result))
+                                get_prize_info()
+                        }
+                })
+        return false
+}
+
+function cloneLastPrizeCard() {
+        saveAllVisiblePrizeForms()
+                .done(function () {
+                        $.getJSON("json/set/prize_clone_last", function (result) {
+                                if (isActionError(result)) {
+                                        alert(actionErrorMessage(result))
+                                        return
+                                }
+                                get_prize_info({ scrollToLast: true })
                         })
                 })
                 .fail(function (result) {
@@ -3563,6 +3587,10 @@ $(document).ready(function () {
                 event.preventDefault()
                 addPrizeCard()
             })
+            $("#clone_last_prize_button").click(function (event) {
+                event.preventDefault()
+                cloneLastPrizeCard()
+            })
             $("#manual_refresh").click(function () {
                 get_ticket_table()
                 get_ticket_list()
@@ -4086,6 +4114,7 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
         <div id="add_prize_block">
             <input type="button" value="Add prize" id="add_prize_button" />
+            <input type="button" value="Clone last prize" id="clone_last_prize_button" />
         </div>
     </div>
         </td>
