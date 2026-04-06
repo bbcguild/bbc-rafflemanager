@@ -1096,7 +1096,7 @@ body.legacy-modal-open{
 #main_table{
   width:100%;
   display:grid;
-  grid-template-columns:minmax(0,1fr) minmax(430px, 480px);
+  grid-template-columns:minmax(0,1.12fr) minmax(560px, 640px);
   gap:12px;
   align-items:start;
   border-collapse:separate;
@@ -1130,7 +1130,7 @@ body.legacy-modal-open{
   vertical-align:top;
   min-width:0;
   width:100%;
-  max-width:480px;
+  max-width:640px;
   height:auto !important;
 }
 
@@ -1160,14 +1160,14 @@ body.legacy-modal-open{
 #right{
   width:100%;
   min-width:0;
-  overflow:hidden;
+  overflow:visible;
   height:auto !important;
 }
 
 #ticket_info{
   width:100%;
   height:auto !important;
-  overflow:hidden;
+  overflow:visible;
 }
 
 #ticket_info .handsontable th,
@@ -1883,12 +1883,12 @@ div#paid_template{
 
 .prize-shell{
   display:grid;
-  grid-template-columns:94px minmax(0,1fr) 84px;
-  gap:18px;
+  grid-template-columns:94px minmax(0,1fr) 68px;
+  gap:16px;
   align-items:stretch;
   width:100%;
   box-sizing:border-box;
-  padding:10px 18px 10px 10px;
+  padding:10px 12px 10px 10px;
   border:1px solid rgba(80,120,210,.18);
   border-radius:0;
   background:linear-gradient(180deg,rgba(9,18,35,.96),rgba(8,15,28,.98));
@@ -1906,25 +1906,10 @@ div#paid_template{
   pointer-events:none;
 }
 
-.prize-shell::after{
-  content:"";
-  position:absolute;
-  top:0;
-  right:0;
-  bottom:0;
-  width:1px;
-  background:rgba(80,120,210,.28);
-  pointer-events:none;
-}
-
 .prize-shell.prize-style-featured{
   border-width:1px;
   border-color:rgba(125,148,192,.26);
   box-shadow:inset 0 0 0 1px rgba(125,148,192,.16), inset 0 3px 0 rgba(130,205,255,.26);
-}
-
-.prize-shell.prize-style-featured::after{
-  background:rgba(125,148,192,.38);
 }
 
 .prize-shell.prize-style-featured::before{
@@ -1935,10 +1920,6 @@ div#paid_template{
   border-width:1px;
   border-color:rgba(205,166,92,.34);
   box-shadow:inset 0 0 0 1px rgba(205,166,92,.18), inset 0 4px 0 rgba(223,186,97,.44), 0 6px 18px rgba(0,0,0,.14);
-}
-
-.prize-shell.prize-style-grand::after{
-  background:rgba(205,166,92,.48);
 }
 
 .prize-shell.prize-style-grand::before{
@@ -1954,10 +1935,6 @@ div#paid_template{
     linear-gradient(270deg, rgba(154,211,255,.055), rgba(154,211,255,.02) 16%, transparent 40%),
     linear-gradient(180deg,rgba(12,26,45,.98),rgba(7,14,28,.99));
   box-shadow:inset 0 0 0 1px rgba(193,227,255,.16), 0 16px 34px rgba(0,0,0,.28), inset 0 0 22px rgba(122,204,255,.05);
-}
-
-.prize-shell.prize-style-jackpot::after{
-  background:rgba(193,227,255,.62);
 }
 
 .prize-shell.prize-style-jackpot::before{
@@ -2095,6 +2072,8 @@ div#paid_template{
   display:flex;
   flex-direction:column;
   gap:12px;
+  border-left:1px solid rgba(80,120,210,.26);
+  padding-left:14px;
 }
 
 .prize-action{
