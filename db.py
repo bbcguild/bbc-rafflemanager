@@ -579,7 +579,7 @@ def clone_last_prize(cur, guild_id):
     if not source:
         return False
 
-        cur.execute(
+    cur.execute(
         """
         INSERT INTO prizes
             (prize_raffle, prize_text, prize_text2, prize_winner, prize_finalised, prize_value, prize_style)
