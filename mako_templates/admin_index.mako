@@ -1096,7 +1096,7 @@ body.legacy-modal-open{
 #main_table{
   width:100%;
   display:grid;
-  grid-template-columns:minmax(0,1fr) minmax(500px, 560px);
+  grid-template-columns:minmax(0,1fr) auto;
   gap:12px;
   align-items:start;
   border-collapse:separate;
@@ -1129,8 +1129,9 @@ body.legacy-modal-open{
   display:block;
   vertical-align:top;
   min-width:0;
-  width:100% !important;
-  max-width:560px !important;
+  width:auto !important;
+  max-width:none !important;
+  justify-self:start;
   height:auto !important;
 }
 
@@ -1158,7 +1159,7 @@ body.legacy-modal-open{
 }
 
 #right{
-  width:100%;
+  width:auto;
   min-width:0;
   overflow:visible;
   height:auto !important;
@@ -1172,9 +1173,14 @@ body.legacy-modal-open{
 }
 
 #ticket_info{
-  width:100%;
+  width:auto;
+  display:inline-block;
   height:auto !important;
   overflow:visible;
+}
+
+#ticket_info .handsontable{
+  width:auto !important;
 }
 
 #ticket_info .handsontable th,
@@ -2162,7 +2168,7 @@ div#paid_template{
 
 @media (max-width:1450px){
   #main_table{
-    grid-template-columns:minmax(0,1fr) minmax(480px, 540px);
+    grid-template-columns:minmax(0,1fr) auto;
   }
 }
 
