@@ -17,4 +17,6 @@ settings = {
         # Mako - use relative path from project root
 "mako.directories": "mako_templates",
 "ga4_measurement_id": os.getenv("GA4_MEASUREMENT_ID", "").strip(),
+"app_env": os.getenv("APP_ENV", "production").strip().lower() or "production",
+"app_stage_label": os.getenv("APP_STAGE_LABEL", "").strip(),
 }

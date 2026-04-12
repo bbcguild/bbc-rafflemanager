@@ -132,12 +132,76 @@ def get_auth_user_by_id (cur, user_id):
 
 @with_cursor
 def get_auth_user_by_name (cur, user_name):
-    cur.execute("SELECT * FROM auth_users WHERE auth_name=?", (user_name, ))
+    cur.execute("SELECT * FROM auth_users WHERE lower(auth_name)=lower(?)", (user_name, ))
 
     res = cur.fetchone()
 
     if res:
         return res
+
+@with_cursor
+def get_auth_roles_for_user(cur, user_id):
+    cur.execute(
+        """
+        SELECT aur.auth_role, aur.auth_guild, g.guild_shortname
+        FROM auth_user_roles aur
+        LEFT JOIN guilds g ON g.guild_id = aur.auth_guild
+        WHERE aur.auth_user=?
+        ORDER BY aur.auth_role, aur.auth_guild
+        """,
+        (user_id,)
+    )
+    return cur.fetchall()
+
+@with_cursor
+def get_all_auth_users(cur):
+    cur.execute(
+        """
+        SELECT auth_id, auth_name, auth_must_change_password, auth_timezone, auth_datetime_format
+        FROM auth_users
+        ORDER BY lower(auth_name), auth_id
+        """
+    )
+    return cur.fetchall()
+
+@with_cursor_boolean
+def add_auth_role_to_user(cur, user_id, role_name, auth_guild_id=None):
+    cur.execute(
+        "INSERT OR IGNORE INTO auth_user_roles (auth_user, auth_role, auth_guild) VALUES (?, ?, ?)",
+        (user_id, role_name, auth_guild_id)
+    )
+
+@with_cursor_boolean
+def remove_auth_role_from_user(cur, user_id, role_name, auth_guild_id=None):
+    if auth_guild_id is None:
+        cur.execute(
+            "DELETE FROM auth_user_roles WHERE auth_user=? AND auth_role=? AND auth_guild IS NULL",
+            (user_id, role_name)
+        )
+    else:
+        cur.execute(
+            "DELETE FROM auth_user_roles WHERE auth_user=? AND auth_role=? AND auth_guild=?",
+            (user_id, role_name, auth_guild_id)
+        )
+
+@with_cursor_boolean
+def delete_auth_user(cur, user_id):
+    cur.execute("DELETE FROM auth_user_roles WHERE auth_user=?", (user_id,))
+    cur.execute("DELETE FROM auth_users WHERE auth_id=?", (user_id,))
+
+@with_cursor_row("count(*)")
+def count_auth_roles(cur, role_name, auth_guild_id=None):
+    if auth_guild_id is None:
+        cur.execute(
+            "SELECT count(*) FROM auth_user_roles WHERE auth_role=? AND auth_guild IS NULL",
+            (role_name,)
+        )
+    else:
+        cur.execute(
+            "SELECT count(*) FROM auth_user_roles WHERE auth_role=? AND auth_guild=?",
+            (role_name, auth_guild_id)
+        )
+    return cur.fetchone()
 
 # Unlike other methods which will just be dicts, this is dicks
 @with_cursor_boolean
@@ -146,9 +210,42 @@ def save_auth_user_info (cur, user):
 
     if not user.id:
         # it's an insert!
-        cur.execute("INSERT INTO auth_users VALUES (NULL, ?, ?)", (user.name, user.password))
+        cur.execute(
+            "INSERT INTO auth_users (auth_name, auth_password, auth_must_change_password, auth_timezone, auth_datetime_format) VALUES (?, ?, ?, ?, ?)",
+            (
+                user.name,
+                user.password,
+                int(getattr(user, "must_change_password", False)),
+                getattr(user, "timezone", None),
+                getattr(user, "datetime_format", "us_12") or "us_12",
+            )
+        )
     else:
-        cur.execute("UPDATE auth_users SET auth_name=?, auth_password=? WHERE auth_id=?", (user.name, user.password, user.id))
+        cur.execute(
+            "UPDATE auth_users SET auth_name=?, auth_password=?, auth_must_change_password=?, auth_timezone=?, auth_datetime_format=? WHERE auth_id=?",
+            (
+                user.name,
+                user.password,
+                int(getattr(user, "must_change_password", False)),
+                getattr(user, "timezone", None),
+                getattr(user, "datetime_format", "us_12") or "us_12",
+                user.id,
+            )
+        )
+
+@with_cursor_boolean
+def update_auth_user_password(cur, user_id, password_hash, must_change_password):
+    cur.execute(
+        "UPDATE auth_users SET auth_password=?, auth_must_change_password=? WHERE auth_id=?",
+        (password_hash, int(bool(must_change_password)), user_id)
+    )
+
+@with_cursor_boolean
+def update_auth_user_preferences(cur, user_id, timezone_value, datetime_format):
+    cur.execute(
+        "UPDATE auth_users SET auth_timezone=?, auth_datetime_format=? WHERE auth_id=?",
+        (timezone_value, datetime_format, user_id)
+    )
 
 ############# ACTUAL METHODS ##############
 
@@ -162,6 +259,176 @@ def get_guild_roster (cur, guild_id):
 @with_cursor_boolean
 def set_guild_roster (cur, guild_id, roster):
     cur.execute("UPDATE guilds SET guild_roster=? WHERE guild_id=?", (roster, guild_id))
+
+@with_cursor_boolean
+def set_guild_settings (cur, guild_id, guild_name=None, guild_shortname=None, guild_eso_id=None, guild_expected_mail_accounts=None, guild_import_blacklist=None, guild_timezone=None, guild_game_server=None, guild_logo_url=None, guild_favicon_url=None, guild_primary_color=None, guild_accent_color=None, guild_sister_guilds=None):
+    cur.execute(
+        "UPDATE guilds SET guild_name=?, guild_shortname=?, guild_eso_id=?, guild_expected_mail_accounts=?, guild_import_blacklist=?, guild_timezone=?, guild_game_server=?, guild_logo_url=?, guild_favicon_url=?, guild_primary_color=?, guild_accent_color=?, guild_sister_guilds=? WHERE guild_id=?",
+        (guild_name, guild_shortname, guild_eso_id, guild_expected_mail_accounts, guild_import_blacklist, guild_timezone, guild_game_server, guild_logo_url, guild_favicon_url, guild_primary_color, guild_accent_color, guild_sister_guilds, guild_id)
+    )
+
+@with_cursor
+def set_guild_sister_guilds (cur, target_guild_id, guild_sister_guilds):
+    cur.execute(
+        "UPDATE guilds SET guild_sister_guilds=? WHERE guild_id=?",
+        (guild_sister_guilds, target_guild_id)
+    )
+
+@with_cursor
+def get_barter_bounty_items(cur, guild_id):
+    cur.execute(
+        """
+        SELECT *
+        FROM barter_bounty_items
+        WHERE barter_bounty_guild=?
+        ORDER BY barter_bounty_sort, barter_bounty_item_id
+        """,
+        (guild_id,)
+    )
+    return cur.fetchall()
+
+@with_cursor_boolean
+def replace_barter_bounty_items(cur, guild_id, items):
+    cur.execute("DELETE FROM barter_bounty_items WHERE barter_bounty_guild=?", (guild_id,))
+    for index, item in enumerate(items, start=1):
+        cur.execute(
+            """
+            INSERT INTO barter_bounty_items
+                (barter_bounty_guild, barter_bounty_item_name, barter_bounty_item_code,
+                 barter_bounty_quantity, barter_bounty_value, barter_bounty_rate,
+                 barter_bounty_sort, barter_bounty_active)
+            VALUES
+                (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                guild_id,
+                item.get("item_name", ""),
+                item.get("item_code", ""),
+                item.get("quantity", 1),
+                item.get("item_value", 0),
+                item.get("barter_rate", 0),
+                index,
+                1 if item.get("active", 1) else 0,
+            )
+        )
+
+@with_cursor
+def get_raffle_bounty_items(cur, guild_id, raffle_id):
+    cur.execute(
+        """
+        SELECT *
+        FROM raffle_bounty_items
+        WHERE raffle_bounty_raffle=?
+        ORDER BY raffle_bounty_sort, raffle_bounty_item_id
+        """,
+        (raffle_id,)
+    )
+    return cur.fetchall()
+
+@with_cursor_boolean
+def replace_raffle_bounty_items(cur, guild_id, raffle_id, items):
+    cur.execute("DELETE FROM raffle_bounty_items WHERE raffle_bounty_raffle=?", (raffle_id,))
+    for index, item in enumerate(items, start=1):
+        cur.execute(
+            """
+            INSERT INTO raffle_bounty_items
+                (raffle_bounty_raffle, raffle_bounty_source_item, raffle_bounty_item_name, raffle_bounty_item_code,
+                 raffle_bounty_quantity, raffle_bounty_value, raffle_bounty_rate, raffle_bounty_sort)
+            VALUES
+                (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                raffle_id,
+                item.get("barter_bounty_item_id"),
+                item.get("item_name", ""),
+                item.get("item_code", ""),
+                item.get("quantity", 1),
+                item.get("item_value", 0),
+                item.get("barter_rate", 0),
+                index,
+            )
+        )
+
+@with_cursor_boolean
+def record_barter_entry(cur, guild_id, user_name, source_type, source_uid, source_timestamp, item_name, item_code, quantity, item_value, rate, ticket_count, import_uid=None):
+    raffle_id = gcri()
+    if not raffle_id:
+        return False
+
+    user = get_user_by_name(user_name)
+    if not user:
+        user_id = add_user(user_name)
+    else:
+        user_id = user["user_id"]
+
+    cur.execute(
+        """
+        INSERT OR IGNORE INTO barter_entries
+            (barter_entry_raffle, barter_entry_guild, barter_entry_user, barter_entry_source_type,
+             barter_entry_source_uid, barter_entry_source_timestamp, barter_entry_item_name,
+             barter_entry_item_code, barter_entry_quantity, barter_entry_item_value,
+             barter_entry_rate, barter_entry_ticket_count, barter_entry_import_uid)
+        VALUES
+            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            raffle_id,
+            guild_id,
+            user_id,
+            source_type,
+            source_uid,
+            source_timestamp,
+            item_name,
+            item_code,
+            quantity,
+            item_value,
+            rate,
+            ticket_count,
+            import_uid,
+        )
+    )
+    return True
+
+@with_cursor
+def get_barter_entries(cur, guild_id, raffle_id=None):
+    target_raffle_id = raffle_id or gcri()
+    if not target_raffle_id:
+        return []
+
+    cur.execute(
+        """
+        SELECT be.*, u.user_name
+        FROM barter_entries be
+        LEFT JOIN users u ON u.user_id = be.barter_entry_user
+        WHERE be.barter_entry_raffle=? AND be.barter_entry_guild=?
+        ORDER BY be.barter_entry_item_name, be.barter_entry_id
+        """,
+        (target_raffle_id, guild_id)
+    )
+    return cur.fetchall()
+
+@with_cursor
+def get_barter_summary(cur, guild_id, raffle_id=None):
+    target_raffle_id = raffle_id or gcri()
+    if not target_raffle_id:
+        return []
+
+    cur.execute(
+        """
+        SELECT
+            barter_entry_item_name,
+            barter_entry_item_code,
+            SUM(barter_entry_quantity) AS total_bartered,
+            SUM(barter_entry_item_value) AS total_row_value,
+            SUM(barter_entry_ticket_count) AS total_tickets
+        FROM barter_entries
+        WHERE barter_entry_raffle=? AND barter_entry_guild=?
+        GROUP BY lower(barter_entry_item_code), barter_entry_item_name
+        ORDER BY lower(barter_entry_item_name)
+        """,
+        (target_raffle_id, guild_id)
+    )
+    return cur.fetchall()
 
 ## other guild info
 
@@ -234,20 +501,28 @@ def create_new_raffle (cur, guild_id, raffle_info=None):
     cur.execute(
         """
         INSERT INTO raffles
-            (raffle_guild, raffle_guild_num, raffle_time, raffle_ticket_cost, raffle_closed,
-             raffle_notes, raffle_title, raffle_status, raffle_notes_admin, raffle_notes_public_2)
+            (raffle_guild, raffle_guild_num, raffle_opened_at, raffle_time, raffle_ticket_cost, raffle_closed,
+             raffle_notes, raffle_title, raffle_status, raffle_barter_enabled,
+             raffle_gold_mail_enabled, raffle_gold_bank_enabled, raffle_barter_mail_enabled, raffle_barter_bank_enabled,
+             raffle_notes_admin, raffle_notes_public_2)
         VALUES
-            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             guild_id,
             raffle_info.get("raffle_guild_num", 0),
+            raffle_info.get("raffle_opened_at", int(time.time())),
             raffle_info.get("raffle_time", "Time here"),
             raffle_info.get("raffle_ticket_cost", "Ticket cost"),
             raffle_info.get("raffle_closed", 0),
             raffle_info.get("raffle_notes", ""),
             raffle_info.get("raffle_title", ""),
             raffle_info.get("raffle_status", "LIVE"),
+            raffle_info.get("raffle_barter_enabled", 0),
+            raffle_info.get("raffle_gold_mail_enabled", 1),
+            raffle_info.get("raffle_gold_bank_enabled", 1),
+            raffle_info.get("raffle_barter_mail_enabled", 0),
+            raffle_info.get("raffle_barter_bank_enabled", 0),
             raffle_info.get("raffle_notes_admin", ""),
             raffle_info.get("raffle_notes_public_2", "")
         )
@@ -287,13 +562,25 @@ def clone_prizes_to_raffle(cur, guild_id, source_raffle_id, target_raffle_id):
 
 gcri = get_cur_raffle_id
 
-@with_cursor_row("timestamp")
-def get_max_timestamp (cur, guild_id):
+@with_cursor
+def get_last_update_info (cur, guild_id):
     cur_id = gcri()
     if not cur_id:
         return None
 
-    cur.execute("SELECT max(ticket_timestamp) AS timestamp FROM tickets WHERE ticket_raffle=?", (cur_id, ))
+    cur.execute(
+        """
+        SELECT
+            t.ticket_timestamp AS timestamp,
+            au.auth_name AS updated_by
+        FROM tickets t
+        LEFT JOIN auth_users au ON au.auth_id = t.ticket_updated_by_auth
+        WHERE t.ticket_raffle=? AND t.ticket_timestamp IS NOT NULL AND t.ticket_timestamp > 0
+        ORDER BY t.ticket_timestamp DESC, t.ticket_id DESC
+        LIMIT 1
+        """,
+        (cur_id,)
+    )
     return cur.fetchone()
 
 @with_cursor
@@ -363,12 +650,18 @@ def set_cur_raffle_info (cur, guild_id, raffle_info):
         UPDATE raffles
            SET raffle_guild=?,
                raffle_guild_num=?,
+               raffle_opened_at=?,
                raffle_time=?,
                raffle_ticket_cost=?,
                raffle_closed=?,
                raffle_notes=?,
                raffle_title=?,
                raffle_status=?,
+               raffle_barter_enabled=?,
+               raffle_gold_mail_enabled=?,
+               raffle_gold_bank_enabled=?,
+               raffle_barter_mail_enabled=?,
+               raffle_barter_bank_enabled=?,
                raffle_notes_admin=?,
                raffle_notes_public_2=?
          WHERE raffle_id=?
@@ -376,12 +669,18 @@ def set_cur_raffle_info (cur, guild_id, raffle_info):
         (
             r["raffle_guild"],
             r["raffle_guild_num"],
+            r.get("raffle_opened_at", int(time.time())),
             r["raffle_time"],
             r["raffle_ticket_cost"],
             r["raffle_closed"],
             r["raffle_notes"],
             r.get("raffle_title", ""),
             r.get("raffle_status", "LIVE"),
+            r.get("raffle_barter_enabled", 0),
+            r.get("raffle_gold_mail_enabled", 1),
+            r.get("raffle_gold_bank_enabled", 1),
+            r.get("raffle_barter_mail_enabled", 0),
+            r.get("raffle_barter_bank_enabled", 0),
             r.get("raffle_notes_admin", ""),
             r.get("raffle_notes_public_2", ""),
             cur_id
@@ -403,20 +702,28 @@ def open_new_raffle (cur, guild_id, raffle_info=None):
     cur.execute(
         """
         INSERT INTO raffles
-            (raffle_guild, raffle_guild_num, raffle_time, raffle_ticket_cost, raffle_closed,
-             raffle_notes, raffle_title, raffle_status, raffle_notes_admin, raffle_notes_public_2)
+            (raffle_guild, raffle_guild_num, raffle_opened_at, raffle_time, raffle_ticket_cost, raffle_closed,
+             raffle_notes, raffle_title, raffle_status, raffle_barter_enabled,
+             raffle_gold_mail_enabled, raffle_gold_bank_enabled, raffle_barter_mail_enabled, raffle_barter_bank_enabled,
+             raffle_notes_admin, raffle_notes_public_2)
         VALUES
-            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             guild_id,
             raffle_info.get("raffle_guild_num", 0),
+            raffle_info.get("raffle_opened_at", int(time.time())),
             raffle_info.get("raffle_time", "Fill this in!"),
             raffle_info.get("raffle_ticket_cost", "1000g"),
             raffle_info.get("raffle_closed", 0),
             raffle_info.get("raffle_notes", ""),
             raffle_info.get("raffle_title", ""),
             raffle_info.get("raffle_status", "LIVE"),
+            raffle_info.get("raffle_barter_enabled", 0),
+            raffle_info.get("raffle_gold_mail_enabled", 1),
+            raffle_info.get("raffle_gold_bank_enabled", 1),
+            raffle_info.get("raffle_barter_mail_enabled", 0),
+            raffle_info.get("raffle_barter_bank_enabled", 0),
             raffle_info.get("raffle_notes_admin", ""),
             raffle_info.get("raffle_notes_public_2", "")
         )
@@ -490,7 +797,7 @@ def clear_imports (cur):
     cur.execute("DELETE FROM imports")
 
 @with_cursor_boolean
-def set_user_tickets (cur, guild_id, user_name, ticket_count, ticket_free=0, ticket_barter=0):
+def set_user_tickets (cur, guild_id, user_name, ticket_count, ticket_free=0, ticket_barter=0, updated_by_auth=None):
     cur_id = gcri()
     if not cur_id:
         return False
@@ -506,9 +813,15 @@ def set_user_tickets (cur, guild_id, user_name, ticket_count, ticket_free=0, tic
     pot_raf = cur.execute("SELECT * FROM tickets WHERE ticket_raffle=? AND ticket_user=?", (cur_id, u))
     res = pot_raf.fetchone()
     if not res:
-        cur.execute("INSERT INTO tickets VALUES (null, ?, ?, ?, ?, ?, ?)", (cur_id, u, ticket_count, ts, ticket_free, ticket_barter))
+        cur.execute(
+            "INSERT INTO tickets VALUES (null, ?, ?, ?, ?, ?, ?, ?)",
+            (cur_id, u, ticket_count, ts, updated_by_auth, ticket_free, ticket_barter)
+        )
     else:
-        cur.execute("UPDATE tickets SET ticket_count=?, ticket_timestamp=?, ticket_free=?, ticket_barter=? WHERE ticket_raffle=? AND ticket_user=?", (ticket_count, ts, ticket_free, ticket_barter, cur_id, u))
+        cur.execute(
+            "UPDATE tickets SET ticket_count=?, ticket_timestamp=?, ticket_updated_by_auth=?, ticket_free=?, ticket_barter=? WHERE ticket_raffle=? AND ticket_user=?",
+            (ticket_count, ts, updated_by_auth, ticket_free, ticket_barter, cur_id, u)
+        )
 
 @with_cursor_boolean
 def fix_dupes (cur):

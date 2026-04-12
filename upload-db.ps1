@@ -4,10 +4,10 @@
 #   .\upload-db.ps1 <environment> [-LocalDbPath <path>] [-Force]
 #
 # Environments:
-#   dev      - Development  (bbcguild-raffle-dev)
-#   test     - Test         (bbcguild-raffle-test)
-#   staging  - Staging      (bbcguild-raffle-staging)
-#   prod     - Production   (bbcguild-raffle)
+#   dev      - Development  (bbcguilds)
+#   test     - Test         (bbcguilds)
+#   staging  - Staging      (bbcguilds-staging)
+#   prod     - Production   (bbcguilds)
 #
 # Options:
 #   -LocalDbPath  Path to the local .db file to upload (default: .\raffle.db)
@@ -38,10 +38,10 @@ function Show-Usage {
     Write-Host "Usage: .\upload-db.ps1 <environment> [-LocalDbPath <path>] [-Force]"
     Write-Host ""
     Write-Host "Environments:"
-    Write-Host "  dev      - Development  (bbcguild-raffle-dev)"
-    Write-Host "  test     - Test         (bbcguild-raffle-test)"
-    Write-Host "  staging  - Staging      (bbcguild-raffle-staging)"
-    Write-Host "  prod     - Production   (bbcguild-raffle)"
+    Write-Host "  dev      - Development  (bbcguilds)"
+    Write-Host "  test     - Test         (bbcguilds)"
+    Write-Host "  staging  - Staging      (bbcguilds-staging)"
+    Write-Host "  prod     - Production   (bbcguilds)"
     Write-Host ""
     Write-Host "Options:"
     Write-Host "  -LocalDbPath  Path to local database file (default: .\raffle.db)"
@@ -61,7 +61,7 @@ if (-not $Environment) {
 $AppName = switch ($Environment) {
     'dev'     { 'bbcguilds' }
     'test'    { 'bbcguilds' }
-    'staging' { 'bbcguilds' }
+    'staging' { 'bbcguilds-staging' }
     'prod'    { 'bbcguilds' }
     default   {
         Write-Err "Error: Invalid environment '$Environment'"
@@ -135,31 +135,35 @@ if ($machineStatus -notmatch 'started') {
 Write-Host ""
 Write-Info "Backing up remote database..."
 $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
-flyctl ssh console --app $AppName -C "cp $RemoteDbPath ${RemoteDbPath}.backup.$timestamp 2>/dev/null && echo 'Backup created: ${RemoteDbPath}.backup.$timestamp' || echo 'No existing database to back up'"
+flyctl ssh console --app $AppName --pty=false -C "if [ -f $RemoteDbPath ]; then cp $RemoteDbPath ${RemoteDbPath}.backup.$timestamp && mv $RemoteDbPath ${RemoteDbPath}.previous.$timestamp && echo 'Backup created: ${RemoteDbPath}.backup.$timestamp'; else echo 'No existing database to back up'; fi"
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Err "Failed while preparing the remote database path."
+    exit 1
+}
 
 # --- Upload ---
 
 Write-Host ""
 Write-Info "Uploading $LocalDbPath -> $RemoteDbPath ..."
-flyctl ssh sftp shell --app $AppName --command "put `"$LocalDbPath`" `"$RemoteDbPath`""
+flyctl ssh sftp put $LocalDbPath $RemoteDbPath --app $AppName
 
 if ($LASTEXITCODE -ne 0) {
     Write-Err "Upload failed (exit code $LASTEXITCODE)."
     Write-Host ""
     Write-Info "To upload manually:"
-    Write-Host "  flyctl ssh sftp shell --app $AppName"
-    Write-Host "  sftp> put `"$LocalDbPath`" `"$RemoteDbPath`""
+    Write-Host "  flyctl ssh sftp put `"$LocalDbPath`" `"$RemoteDbPath`" --app $AppName"
     exit 1
 }
 
 # Fix ownership and permissions
-flyctl ssh console --app $AppName -C "chown app:app $RemoteDbPath && chmod 644 $RemoteDbPath"
+flyctl ssh console --app $AppName --pty=false -C "chown app:app $RemoteDbPath && chmod 644 $RemoteDbPath"
 
 # --- Verify size ---
 
 Write-Host ""
 Write-Info "Verifying upload..."
-$remoteSize = (flyctl ssh console --app $AppName -C "stat -c%s $RemoteDbPath" 2>$null | Out-String).Trim()
+$remoteSize = (flyctl ssh console --app $AppName --pty=false -C "stat -c%s $RemoteDbPath" 2>$null | Out-String).Trim()
 if ($remoteSize -eq "$localSize") {
     Write-Ok "Verified: remote size matches local ($remoteSize bytes)"
 } else {
@@ -170,7 +174,12 @@ if ($remoteSize -eq "$localSize") {
 
 Write-Host ""
 Write-Info "Restarting application..."
-flyctl machine restart --app $AppName
+$machineId = (flyctl machine list --app $AppName --json | ConvertFrom-Json | Select-Object -First 1 -ExpandProperty id)
+if (-not $machineId) {
+    Write-Warn "No machine ID found to restart; app may reopen the database on next request."
+} else {
+    flyctl machine restart $machineId --app $AppName
+}
 if ($LASTEXITCODE -ne 0) {
     Write-Warn "Restart returned an error; app may restart automatically on next request."
 }

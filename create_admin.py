@@ -108,6 +108,22 @@ def create_admin_user(db_path, username, password):
             "INSERT INTO auth_users (auth_name, auth_password) VALUES (?, ?)",
             (username, hashed_password)
         )
+        user_id = cursor.lastrowid
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS auth_user_roles (
+                auth_user_role_id INTEGER PRIMARY KEY,
+                auth_user INTEGER NOT NULL,
+                auth_role TEXT NOT NULL,
+                auth_guild INTEGER,
+                CONSTRAINT uniq_auth_role UNIQUE (auth_user, auth_role, auth_guild)
+            )
+            """
+        )
+        cursor.execute(
+            "INSERT OR IGNORE INTO auth_user_roles (auth_user, auth_role, auth_guild) VALUES (?, ?, NULL)",
+            (user_id, "superadmin")
+        )
         conn.commit()
         conn.close()
         

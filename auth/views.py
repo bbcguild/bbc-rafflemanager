@@ -78,6 +78,19 @@ def login(request):
 
     return {'title': title, 'form': form, 'action': 'login'}
 
+def redirect_guild_login(request):
+    guild = (request.matchdict or {}).get("guild")
+    came_from = request.GET.get("came_from")
+    if not came_from and guild:
+        try:
+            came_from = route_url('guild_landing', request, guild=guild)
+        except Exception:
+            came_from = '/%s/' % guild
+    query = {}
+    if came_from:
+        query["came_from"] = came_from
+    return HTTPFound(location=route_url('apex_login', request, _query=query))
+
 def logout(request):
     """ logout(request):
     no return value, called with route_url('apex_logout', request)

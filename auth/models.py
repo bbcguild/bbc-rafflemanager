@@ -10,6 +10,10 @@ class AuthUser (object):
     _password = ""
     id = None
     name = None
+    roles = None
+    must_change_password = False
+    timezone = None
+    datetime_format = "us_12"
  
     def _set_password (self, password):
         self._password = BCRYPTPasswordManager().encode(password, rounds=12)
@@ -18,12 +22,25 @@ class AuthUser (object):
         return self._password
 
     def in_group (self, group):
-        # Note: This assumes authenticated users. Consider implementing proper role-based access control
-        # for production environments with more granular permissions
-        if group == "akaviri":
-            return True
-        else:
-            return False
+        request = get_current_request()
+        guild_slug = None
+        if request and getattr(request, "matchdict", None):
+            guild_slug = request.matchdict.get("guild")
+
+        if group == "owner":
+            return self.has_global_role("owner")
+
+        if group == "superadmin":
+            return self.has_global_role("owner") or self.has_global_role("superadmin")
+
+        if group == "admin_access":
+            if self.has_global_role("owner") or self.has_global_role("superadmin"):
+                return True
+            if guild_slug:
+                return self.has_guild_role("guild_admin", guild_slug)
+            return self.has_any_role("guild_admin")
+
+        return False
 
     password = property(_get_password, _set_password)
 
@@ -60,7 +77,37 @@ class AuthUser (object):
         u._password = data["auth_password"] # don't over-encode it
         u.name = data["auth_name"]
         u.id = data["auth_id"]
+        u.must_change_password = bool(data["auth_must_change_password"]) if "auth_must_change_password" in data.keys() else False
+        u.timezone = data["auth_timezone"] if "auth_timezone" in data.keys() else None
+        u.datetime_format = data["auth_datetime_format"] if "auth_datetime_format" in data.keys() and data["auth_datetime_format"] else "us_12"
+        role_rows = db.get_auth_roles_for_user(u.id) or []
+        u.roles = [{
+            "role": row["auth_role"],
+            "guild_id": row["auth_guild"],
+            "guild_shortname": row["guild_shortname"].lower() if row["guild_shortname"] else None,
+        } for row in role_rows]
         return u
+
+    def has_global_role(self, role_name):
+        for role in self.roles or []:
+            if role["role"] == role_name and role["guild_id"] is None:
+                return True
+        return False
+
+    def has_guild_role(self, role_name, guild_slug):
+        guild_slug = (guild_slug or "").strip().lower()
+        if not guild_slug:
+            return False
+        for role in self.roles or []:
+            if role["role"] == role_name and role["guild_shortname"] == guild_slug:
+                return True
+        return False
+
+    def has_any_role(self, role_name):
+        for role in self.roles or []:
+            if role["role"] == role_name:
+                return True
+        return False
 
     def save (self):
         return db.save_auth_user_info(self)

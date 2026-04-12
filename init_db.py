@@ -11,8 +11,14 @@ import shutil
 def ensure_raffle_columns(conn):
     """Backfill newer raffle columns on older databases."""
     expected_columns = {
+        "raffle_opened_at": "ALTER TABLE raffles ADD COLUMN raffle_opened_at INTEGER",
         "raffle_title": "ALTER TABLE raffles ADD COLUMN raffle_title TEXT DEFAULT ''",
         "raffle_status": "ALTER TABLE raffles ADD COLUMN raffle_status TEXT DEFAULT 'LIVE'",
+        "raffle_barter_enabled": "ALTER TABLE raffles ADD COLUMN raffle_barter_enabled INTEGER DEFAULT 0",
+        "raffle_gold_mail_enabled": "ALTER TABLE raffles ADD COLUMN raffle_gold_mail_enabled INTEGER DEFAULT 1",
+        "raffle_gold_bank_enabled": "ALTER TABLE raffles ADD COLUMN raffle_gold_bank_enabled INTEGER DEFAULT 1",
+        "raffle_barter_mail_enabled": "ALTER TABLE raffles ADD COLUMN raffle_barter_mail_enabled INTEGER DEFAULT 0",
+        "raffle_barter_bank_enabled": "ALTER TABLE raffles ADD COLUMN raffle_barter_bank_enabled INTEGER DEFAULT 0",
         "raffle_notes_admin": "ALTER TABLE raffles ADD COLUMN raffle_notes_admin TEXT DEFAULT ''",
         "raffle_notes_public_2": "ALTER TABLE raffles ADD COLUMN raffle_notes_public_2 TEXT DEFAULT ''",
     }
@@ -26,6 +32,62 @@ def ensure_raffle_columns(conn):
             print(f"Applying raffle schema migration: add column {column_name}")
             cursor.execute(statement)
 
+    conn.commit()
+
+def ensure_barter_tables(conn):
+    """Create barter storage tables used by future barter-week workflows."""
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS barter_bounty_items (
+            barter_bounty_item_id INTEGER PRIMARY KEY,
+            barter_bounty_guild INTEGER NOT NULL,
+            barter_bounty_item_name TEXT NOT NULL,
+            barter_bounty_item_code TEXT NOT NULL,
+            barter_bounty_quantity INTEGER NOT NULL DEFAULT 1,
+            barter_bounty_value INTEGER NOT NULL DEFAULT 0,
+            barter_bounty_rate INTEGER NOT NULL DEFAULT 0,
+            barter_bounty_sort INTEGER NOT NULL DEFAULT 0,
+            barter_bounty_active INTEGER NOT NULL DEFAULT 1
+        )
+        """
+    )
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS raffle_bounty_items (
+            raffle_bounty_item_id INTEGER PRIMARY KEY,
+            raffle_bounty_raffle INTEGER NOT NULL,
+            raffle_bounty_source_item INTEGER,
+            raffle_bounty_item_name TEXT NOT NULL,
+            raffle_bounty_item_code TEXT NOT NULL,
+            raffle_bounty_quantity INTEGER NOT NULL DEFAULT 1,
+            raffle_bounty_value INTEGER NOT NULL DEFAULT 0,
+            raffle_bounty_rate INTEGER NOT NULL DEFAULT 0,
+            raffle_bounty_sort INTEGER NOT NULL DEFAULT 0
+        )
+        """
+    )
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS barter_entries (
+            barter_entry_id INTEGER PRIMARY KEY,
+            barter_entry_raffle INTEGER NOT NULL,
+            barter_entry_guild INTEGER NOT NULL,
+            barter_entry_user INTEGER NOT NULL,
+            barter_entry_source_type TEXT NOT NULL,
+            barter_entry_source_uid TEXT NOT NULL,
+            barter_entry_source_timestamp INTEGER NOT NULL,
+            barter_entry_item_name TEXT NOT NULL,
+            barter_entry_item_code TEXT NOT NULL,
+            barter_entry_quantity INTEGER NOT NULL DEFAULT 0,
+            barter_entry_item_value INTEGER NOT NULL DEFAULT 0,
+            barter_entry_rate INTEGER NOT NULL DEFAULT 0,
+            barter_entry_ticket_count INTEGER NOT NULL DEFAULT 0,
+            barter_entry_import_uid TEXT,
+            CONSTRAINT uniq_barter_entry UNIQUE (barter_entry_raffle, barter_entry_source_type, barter_entry_source_uid, barter_entry_item_code)
+        )
+        """
+    )
     conn.commit()
 
 def ensure_prize_columns(conn):
@@ -56,6 +118,101 @@ def ensure_prize_columns(conn):
                 next_sort_by_raffle[raffle_id] = cursor.fetchone()[0] or 0
             next_sort_by_raffle[raffle_id] += 1
             cursor.execute("UPDATE prizes SET prize_sort=? WHERE prize_id=?", (next_sort_by_raffle[raffle_id], row[0]))
+
+    conn.commit()
+
+def ensure_ticket_columns(conn):
+    """Backfill newer ticket columns on older databases."""
+    expected_columns = {
+        "ticket_updated_by_auth": "ALTER TABLE tickets ADD COLUMN ticket_updated_by_auth INTEGER",
+    }
+
+    cursor = conn.cursor()
+    cursor.execute("PRAGMA table_info(tickets)")
+    existing_columns = {row[1] for row in cursor.fetchall()}
+
+    for column_name, statement in expected_columns.items():
+        if column_name not in existing_columns:
+            print(f"Applying ticket schema migration: add column {column_name}")
+            cursor.execute(statement)
+
+    conn.commit()
+
+def ensure_guild_columns(conn):
+    """Backfill newer guild config columns on older databases."""
+    expected_columns = {
+        "guild_eso_id": "ALTER TABLE guilds ADD COLUMN guild_eso_id TEXT",
+        "guild_expected_mail_accounts": "ALTER TABLE guilds ADD COLUMN guild_expected_mail_accounts TEXT",
+        "guild_import_blacklist": "ALTER TABLE guilds ADD COLUMN guild_import_blacklist TEXT",
+        "guild_timezone": "ALTER TABLE guilds ADD COLUMN guild_timezone TEXT",
+        "guild_game_server": "ALTER TABLE guilds ADD COLUMN guild_game_server TEXT",
+        "guild_logo_url": "ALTER TABLE guilds ADD COLUMN guild_logo_url TEXT",
+        "guild_favicon_url": "ALTER TABLE guilds ADD COLUMN guild_favicon_url TEXT",
+        "guild_primary_color": "ALTER TABLE guilds ADD COLUMN guild_primary_color TEXT",
+        "guild_accent_color": "ALTER TABLE guilds ADD COLUMN guild_accent_color TEXT",
+        "guild_sister_guilds": "ALTER TABLE guilds ADD COLUMN guild_sister_guilds TEXT",
+    }
+
+    cursor = conn.cursor()
+    cursor.execute("PRAGMA table_info(guilds)")
+    existing_columns = {row[1] for row in cursor.fetchall()}
+
+    for column_name, statement in expected_columns.items():
+        if column_name not in existing_columns:
+            print(f"Applying guild schema migration: add column {column_name}")
+            cursor.execute(statement)
+
+    conn.commit()
+
+def ensure_auth_role_tables(conn):
+    """Create auth role storage and preserve existing admins as superadmins."""
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS auth_user_roles (
+            auth_user_role_id INTEGER PRIMARY KEY,
+            auth_user INTEGER NOT NULL,
+            auth_role TEXT NOT NULL,
+            auth_guild INTEGER,
+            CONSTRAINT uniq_auth_role UNIQUE (auth_user, auth_role, auth_guild)
+        )
+        """
+    )
+
+    cursor.execute(
+        """
+        SELECT auth_id
+        FROM auth_users
+        WHERE auth_id NOT IN (
+            SELECT DISTINCT auth_user FROM auth_user_roles
+        )
+        """
+    )
+    for row in cursor.fetchall():
+        print(f"Backfilling auth roles for user {row[0]} as superadmin")
+        cursor.execute(
+            "INSERT OR IGNORE INTO auth_user_roles (auth_user, auth_role, auth_guild) VALUES (?, ?, NULL)",
+            (row[0], "superadmin")
+        )
+
+    conn.commit()
+
+def ensure_auth_user_columns(conn):
+    """Backfill newer auth user columns on older databases."""
+    expected_columns = {
+        "auth_must_change_password": "ALTER TABLE auth_users ADD COLUMN auth_must_change_password INTEGER DEFAULT 0",
+        "auth_timezone": "ALTER TABLE auth_users ADD COLUMN auth_timezone TEXT",
+        "auth_datetime_format": "ALTER TABLE auth_users ADD COLUMN auth_datetime_format TEXT DEFAULT 'us_12'",
+    }
+
+    cursor = conn.cursor()
+    cursor.execute("PRAGMA table_info(auth_users)")
+    existing_columns = {row[1] for row in cursor.fetchall()}
+
+    for column_name, statement in expected_columns.items():
+        if column_name not in existing_columns:
+            print(f"Applying auth schema migration: add column {column_name}")
+            cursor.execute(statement)
 
     conn.commit()
 
@@ -171,8 +328,13 @@ def init_database():
             result = cursor.fetchone()
             if result:
                 print("Database schema is valid, skipping initialization")
+                ensure_auth_user_columns(conn)
                 ensure_raffle_columns(conn)
                 ensure_prize_columns(conn)
+                ensure_ticket_columns(conn)
+                ensure_guild_columns(conn)
+                ensure_barter_tables(conn)
+                ensure_auth_role_tables(conn)
                 conn.close()
                 return db_path
             else:
@@ -233,8 +395,13 @@ def init_database():
                     cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
                     tables = cursor.fetchall()
                     print(f"Copied database tables: {[t[0] for t in tables]}")
+                    ensure_auth_user_columns(conn)
                     ensure_raffle_columns(conn)
                     ensure_prize_columns(conn)
+                    ensure_ticket_columns(conn)
+                    ensure_guild_columns(conn)
+                    ensure_barter_tables(conn)
+                    ensure_auth_role_tables(conn)
                     conn.close()
                     return db_path
                 else:
@@ -262,8 +429,13 @@ def init_database():
             print("Executing schema...")
             conn.executescript(schema_sql)
             print("Schema applied successfully")
+            ensure_auth_user_columns(conn)
             ensure_raffle_columns(conn)
             ensure_prize_columns(conn)
+            ensure_ticket_columns(conn)
+            ensure_guild_columns(conn)
+            ensure_barter_tables(conn)
+            ensure_auth_role_tables(conn)
             
             # Verify schema was applied
             cursor = conn.cursor()
@@ -306,12 +478,17 @@ def init_database():
                 "INSERT INTO auth_users (auth_name, auth_password) VALUES (?, ?)",
                 ('admin', default_hash)
             )
+            cursor.execute(
+                "INSERT OR IGNORE INTO auth_user_roles (auth_user, auth_role, auth_guild) VALUES (?, ?, NULL)",
+                (cursor.lastrowid, 'superadmin')
+            )
             print("Default admin user created:")
             print("  Username: admin")
             print("  Password: admin123") 
             print("  ⚠️  IMPORTANT: Change this password immediately after first login!")
         else:
             print(f"Found {user_count} existing auth users, skipping default user creation")
+            ensure_auth_role_tables(conn)
         
         # Optionally load test data (only if explicitly requested)
         if os.path.exists(test_data_path) and os.getenv('LOAD_TEST_DATA', '').lower() == 'true':

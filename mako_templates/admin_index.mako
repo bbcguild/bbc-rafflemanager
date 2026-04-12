@@ -6,6 +6,8 @@ ga4_site_area = 'admin'
 ga4_raffle_view = 'current'
 ga4_raffle_number = ''
 ga4_guild_slug = request.matchdict.get('guild', '')
+is_staging = (request.registry.settings.get("app_env") == "staging")
+stage_label = (request.registry.settings.get("app_stage_label") or "STAGING").strip()
 %>
 <%include file="analytics_snippet.mako"/>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.js"></script>
@@ -24,24 +26,31 @@ ga4_guild_slug = request.matchdict.get('guild', '')
 <script type="text/javascript" src="/static/js/dateformat.js"></script>
 <link rel="stylesheet" href="/static/css/dropzone.css">
 %endif
-<title>Raffle Admin</title>
-<link rel="icon" type="image/x-icon" href="/static/favicon.ico">
-<link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-256.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-256.png">
+<title>${('[%s] ' % stage_label) if is_staging else ''}Raffle Admin</title>
+<link rel="icon" id="appFaviconIco" type="image/x-icon" href="/static/favicon.ico">
+<link rel="icon" id="appFavicon32" type="image/png" sizes="32x32" href="/static/favicon-256.png">
+<link rel="icon" id="appFavicon16" type="image/png" sizes="16x16" href="/static/favicon-256.png">
 
 <style>
 :root{
   --bg:#060a12;
   --panel:#091224;
   --panel2:#07101f;
-  --line:rgba(80,120,210,.18);
-  --line2:rgba(80,120,210,.34);
+  --brand-primary:#284CA6;
+  --brand-accent:#5078D2;
+  --brand-primary-rgb:40,76,166;
+  --brand-accent-rgb:80,120,210;
+  --line:rgba(var(--brand-accent-rgb),.18);
+  --line2:rgba(var(--brand-accent-rgb),.34);
   --text:#f4f7ff;
   --muted:#9fb0cf;
-  --blue:#244fb3;
-  --blue2:#183a8f;
+  --blue:var(--brand-accent);
+  --blue2:var(--brand-primary);
   --shadow:0 18px 48px rgba(0,0,0,.38);
   --page-gutter:18px;
+  --admin-header-art:url("/static/cakes2026.png");
+  --admin-header-art-position:center 48%;
+  --admin-header-art-size:95% auto;
 }
 
 *,
@@ -70,6 +79,41 @@ body{
   min-height:100vh;
   overflow-x:hidden;
   padding:0 var(--page-gutter);
+}
+
+body.is-staging{
+  box-shadow:inset 0 6px 0 #d94a4a;
+}
+
+.stage-banner{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:12px auto 0;
+  padding:10px 14px;
+  width:min(100%, 1480px);
+  border:1px solid rgba(217,74,74,.55);
+  background:linear-gradient(180deg, rgba(123,21,21,.96), rgba(95,16,16,.96));
+  color:#fff3f3;
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  box-shadow:0 12px 28px rgba(0,0,0,.28);
+}
+
+.stage-pill{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:5px 10px;
+  border:1px solid rgba(255,122,122,.55);
+  background:rgba(122,22,22,.9);
+  color:#fff2f2;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.14em;
+  text-transform:uppercase;
 }
 body.legacy-modal-open{
   overflow:hidden;
@@ -128,25 +172,21 @@ body.legacy-modal-open{
   position:relative;
   overflow:hidden;
   isolation:isolate;
+  background:
+    linear-gradient(90deg, rgba(8,12,20,.84) 0%, rgba(8,12,20,.72) 24%, rgba(8,12,20,.34) 58%, rgba(8,12,20,.12) 100%),
+    linear-gradient(180deg, rgba(18,27,44,.38), rgba(10,18,32,.48)),
+    var(--admin-header-art) var(--admin-header-art-position) / var(--admin-header-art-size) no-repeat,
+    linear-gradient(180deg,var(--panel),var(--panel2));
 }
 .admin-header::before{
   content:"";
   position:absolute;
-  top:50%;
-  right:-28px;
-  width:768px;
-  height:768px;
-  background-image:
-    radial-gradient(circle at 34% 50%, rgba(7,12,22,0) 0%, rgba(7,12,22,.1) 38%, rgba(7,12,22,.34) 100%),
-    url("/static/eso-ouroboros.png");
-  background-repeat:no-repeat;
-  background-position:center center, center center;
-  background-size:100% 100%, auto;
-  opacity:.12;
-  filter:saturate(.52) brightness(.72);
+  inset:0;
+  background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
+  opacity:1;
+  filter:none;
   pointer-events:none;
   z-index:0;
-  transform:translateY(-50%);
 }
 .header-left{
   display:grid;
@@ -345,6 +385,10 @@ body.legacy-modal-open{
 .profile-menu{
   position:relative;
   flex:0 0 auto;
+  z-index:2200;
+}
+.profile-menu.open{
+  z-index:2210;
 }
 .profile-menu-trigger{
   display:flex;
@@ -405,13 +449,14 @@ body.legacy-modal-open{
   right:0;
   width:336px;
   padding:0;
-  border-radius:16px;
+  border-radius:0;
   border:1px solid rgba(95,132,212,.34);
   background:linear-gradient(180deg,rgba(22,34,58,.99),rgba(9,17,31,.99));
   box-shadow:var(--shadow);
   display:none;
-  z-index:60;
-  overflow:hidden;
+  z-index:2215;
+  overflow:visible;
+  max-height:none;
 }
 .profile-menu.open .profile-menu-panel{
   display:block;
@@ -440,6 +485,10 @@ body.legacy-modal-open{
 .profile-submenu-list{
   display:grid;
   gap:0;
+}
+.profile-menu-list{
+  max-height:none;
+  overflow:visible;
 }
 .profile-menu-item,
 .profile-submenu-trigger{
@@ -492,33 +541,44 @@ body.legacy-modal-open{
 .profile-submenu{
   position:relative;
 }
+.profile-submenu::after{
+  content:"";
+  position:absolute;
+  top:0;
+  right:100%;
+  width:18px;
+  height:100%;
+}
 .profile-submenu-trigger{
   gap:12px;
 }
 .profile-submenu-arrow{
-  font-size:.82rem;
+  font-size:.94rem;
   line-height:1;
+  color:#c9d7f4;
 }
 .profile-submenu-panel{
   position:absolute;
   top:-1px;
-  right:calc(100% + 8px);
+  right:calc(100% - 2px);
   width:248px;
   padding:0;
-  border-radius:16px;
+  border-radius:0;
   border:1px solid rgba(95,132,212,.34);
   background:linear-gradient(180deg,rgba(18,29,50,.99),rgba(9,17,31,.99));
   box-shadow:var(--shadow);
   display:none;
   overflow:hidden;
+  z-index:2220;
+  max-height:calc(100vh - 120px);
 }
 .profile-submenu-panel::before{
   content:"";
   position:absolute;
   top:18px;
-  right:-8px;
-  width:14px;
-  height:14px;
+  right:-6px;
+  width:12px;
+  height:12px;
   background:linear-gradient(180deg,rgba(18,29,50,.99),rgba(12,21,37,.99));
   border-top:1px solid rgba(95,132,212,.34);
   border-right:1px solid rgba(95,132,212,.34);
@@ -534,6 +594,10 @@ body.legacy-modal-open{
   width:100%;
   min-height:48px;
   padding:0 16px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:0;
   border:none;
   border-radius:0;
   background:transparent;
@@ -543,6 +607,7 @@ body.legacy-modal-open{
   text-align:left;
   cursor:pointer;
   border-top:1px solid rgba(95,132,212,.12);
+  text-decoration:none;
 }
 .profile-submenu-item:hover,
 .profile-submenu-item:focus{
@@ -551,6 +616,24 @@ body.legacy-modal-open{
 }
 .profile-menu-item.is-placeholder{
   opacity:.7;
+}
+
+.profile-menu-divider{
+  height:1px;
+  margin:8px 14px;
+  background:rgba(95,132,212,.22);
+}
+
+.profile-menu-user{
+  padding:10px 14px 6px;
+}
+
+.profile-menu-user-name{
+  margin:0;
+  font-size:.92rem;
+  font-weight:800;
+  color:#dbe7ff;
+  letter-spacing:.01em;
 }
 
 /* NEW BUTTON BAR */
@@ -718,6 +801,9 @@ body.legacy-modal-open{
 .tool-field{
   display:grid;
   gap:6px;
+}
+.tool-field.is-wide{
+  grid-column:1 / -1;
 }
 .tool-field label{
   color:#b8c7e4;
@@ -1491,6 +1577,10 @@ border:1px solid rgba(140,170,230,.12);
   gap:7px;
 }
 
+.new-raffle-field.is-wide{
+  grid-column:1 / -1;
+}
+
 .new-raffle-field label,
 .new-raffle-note-header h3{
   color:#c2d2ee;
@@ -1523,6 +1613,100 @@ border:1px solid rgba(140,170,230,.12);
   color:#8ff0ba;
   font-size:.94rem;
   font-weight:800;
+}
+
+.barter-toggle-field{
+  display:grid;
+  gap:8px;
+}
+
+.barter-toggle-shell{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-height:40px;
+}
+
+.barter-toggle-switch{
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  width:64px;
+  height:36px;
+  flex:0 0 auto;
+}
+
+.barter-toggle-switch input{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  margin:0;
+  opacity:0;
+  cursor:pointer;
+  z-index:2;
+}
+
+.barter-toggle-slider{
+  position:relative;
+  width:64px;
+  height:36px;
+  border-radius:999px;
+  background:rgba(84,97,120,.48);
+  border:1px solid rgba(95,132,212,.22);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.04);
+  transition:background .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+
+.barter-toggle-slider::after{
+  content:"";
+  position:absolute;
+  top:4px;
+  left:4px;
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  background:#ffffff;
+  box-shadow:0 3px 12px rgba(0,0,0,.28);
+  transition:transform .18s ease;
+}
+
+.barter-toggle-switch input:checked + .barter-toggle-slider{
+  background:linear-gradient(180deg,#6169f4,#515ade);
+  border-color:rgba(126,137,255,.55);
+  box-shadow:0 0 0 1px rgba(97,105,244,.18), 0 10px 24px rgba(65,79,232,.2);
+}
+
+.barter-toggle-switch input:checked + .barter-toggle-slider::after{
+  transform:translateX(28px);
+}
+
+.barter-toggle-switch input:focus-visible + .barter-toggle-slider{
+  outline:2px solid rgba(180,198,255,.95);
+  outline-offset:2px;
+}
+
+.barter-toggle-copy{
+  display:grid;
+  gap:2px;
+}
+
+.barter-toggle-label{
+  color:#eef3ff;
+  font-size:.9rem;
+  font-weight:800;
+}
+
+.barter-toggle-value{
+  color:#9eb0d1;
+  font-size:.76rem;
+  font-weight:700;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+
+.barter-toggle-value.is-on{
+  color:#8ff0ba;
 }
 
 .new-raffle-status-chip::before{
@@ -1677,6 +1861,13 @@ border:1px solid rgba(140,170,230,.12);
 
 #import_template,
 #confirm_template,
+#change_password_template,
+#account_settings_template,
+#manage_access_template,
+#guild_settings_template,
+#bounty_list_template,
+#recent_imports_template,
+#barter_summary_template,
 #barter_template,
 #paid_template{
   display:none;
@@ -1713,6 +1904,8 @@ div#paid_template{
 
 #import_buttons,
 #confirm_buttons,
+#change_password_buttons,
+#manage_access_buttons,
 #barter_buttons,
 #paid_buttons{
   display:flex;
@@ -1726,6 +1919,8 @@ div#paid_template{
 
 #import_data,
 #confirm_data,
+#change_password_data,
+#manage_access_data,
 #barter_data,
 #paid_data{
   height:auto !important;
@@ -1736,10 +1931,831 @@ div#paid_template{
   background:#d8dce1 !important;
 }
 
+.import-empty-state{
+  padding:18px 12px !important;
+  text-align:center;
+  color:#445062;
+  font-weight:700;
+}
+
+#confirm_import_summary{
+  display:none;
+  margin:0 0 16px;
+  padding:14px 16px;
+  border:1px solid #9aa5b4;
+  border-radius:12px;
+  background:#eef1f5;
+}
+
+.confirm-import-summary-title{
+  margin:0 0 6px;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:#41556f;
+}
+
+.confirm-import-summary-text{
+  margin:0;
+  font-size:15px;
+  line-height:1.45;
+  color:#202937;
+}
+
+.import-guardrail-line + .import-guardrail-line{
+  margin-top:8px;
+}
+
+.import-file-summary{
+  margin:0 0 12px;
+  padding:8px 14px;
+  border:1px solid #9aa5b4;
+  border-radius:12px;
+  background:#eef1f5;
+}
+
+.import-file-summary-row{
+  display:flex;
+  align-items:flex-start;
+  justify-content:flex-start;
+  gap:10px;
+  flex-wrap:nowrap;
+}
+
+.import-file-summary-text{
+  flex:1 1 auto;
+  min-width:0;
+  font-size:12px;
+  line-height:1.45;
+  color:#1f2a38;
+  font-weight:500;
+}
+
+.import-file-summary-segment{
+  white-space:nowrap;
+}
+
+.import-file-summary-off{
+  display:inline-block;
+  margin-left:4px;
+  padding:1px 6px;
+  border-radius:999px;
+  background:#cf5b5b;
+  color:#ffffff;
+  font-weight:800;
+  letter-spacing:.03em;
+  text-shadow:0 1px 0 rgba(0,0,0,.12);
+}
+
+.import-file-summary-segment + .import-file-summary-segment::before{
+  content:" | ";
+  color:#7b8794;
+  font-weight:600;
+}
+
+.import-file-summary-actions{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.import-summary-warning{
+  margin:0 0 12px;
+  color:#f6b2b2;
+  font-size:12px;
+  line-height:1.45;
+  font-weight:500;
+}
+
+.import-summary-warning p{
+  margin:0;
+}
+
+.import-debug-copy{
+  border:1px solid #8d97a5;
+  background:#e9edf4;
+  color:#243142;
+  border-radius:10px;
+  padding:7px 11px;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.04em;
+  cursor:pointer;
+  white-space:nowrap;
+}
+
+.import-debug-copy:hover{
+  background:#dfe6ef;
+}
+
+.import-guardrail-label{
+  display:inline-block;
+  margin-right:4px;
+  padding:1px 6px;
+  border-radius:999px;
+  background:#cf5b5b;
+  color:#ffffff;
+  font-weight:800;
+  letter-spacing:.03em;
+  text-shadow:0 1px 0 rgba(0,0,0,.12);
+}
+
+.import-guardrail-ignored{
+  display:inline-block;
+  margin-right:4px;
+  padding:1px 6px;
+  border-radius:999px;
+  background:#d98a3d;
+  color:#ffffff;
+  font-weight:800;
+  letter-spacing:.03em;
+  text-shadow:0 1px 0 rgba(0,0,0,.12);
+}
+
+.import-guardrail-strong{
+  display:block;
+  margin-top:4px;
+  font-style:italic;
+  text-decoration:underline;
+}
+
+#confirm_data{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.confirm-copy-block{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.confirm-copy-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.confirm-copy-label{
+  margin:0;
+  font-weight:700;
+  color:#334155;
+}
+
+.confirm-copy-btn{
+  border:1px solid #8d97a5;
+  background:#eef1f5;
+  color:#243142;
+  border-radius:10px;
+  padding:6px 10px;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.confirm-copy-btn:hover{
+  background:#e5e9ef;
+}
+
+#recent_imports_template{
+  display:none;
+}
+
+#recent_imports_data{
+  display:grid;
+  gap:12px;
+}
+
+.recent-import-empty{
+  padding:18px 16px;
+  border:1px dashed #9aa5b4;
+  border-radius:12px;
+  color:#405166;
+  background:#eef1f5;
+}
+
+.recent-import-item{
+  display:grid;
+  gap:8px;
+  padding:14px 16px;
+  border:1px solid #a2acb9;
+  border-radius:12px;
+  background:#f1f4f8;
+}
+
+.recent-import-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.recent-import-kind{
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:#41556f;
+}
+
+.recent-import-time{
+  font-size:12px;
+  color:#58697d;
+}
+
+.recent-import-summary{
+  font-size:14px;
+  line-height:1.45;
+  color:#202937;
+}
+
+.recent-import-actions{
+  display:flex;
+  justify-content:flex-end;
+}
+
+.recent-import-open{
+  border:1px solid #8d97a5;
+  background:#e9edf4;
+  color:#243142;
+  border-radius:10px;
+  padding:7px 11px;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.recent-import-open:hover{
+  background:#dfe6ef;
+}
+
+.barter-summary-shell{
+  display:grid;
+  gap:12px;
+}
+
+.barter-summary-toolbar{
+  display:flex;
+  justify-content:flex-end;
+}
+
+.barter-summary-table{
+  width:100%;
+  border-collapse:collapse;
+  background:#eef2f6;
+  border:1px solid #c8d0da;
+}
+
+.barter-summary-table th,
+.barter-summary-table td{
+  padding:10px 12px;
+  border-bottom:1px solid #d5dde6;
+  text-align:left;
+  color:#233142;
+}
+
+.barter-summary-table th{
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:#4a5c74;
+}
+
+.barter-summary-total-row td{
+  font-weight:900;
+  background:#e3e8ef;
+}
+
+#manage_access_template{
+  display:none;
+}
+
+#change_password_template{
+  display:none;
+}
+
+#account_settings_template{
+  display:none;
+}
+
+.manage-access-section{
+  display:grid;
+  gap:12px;
+}
+
+.manage-access-card{
+  border:1px solid #a2acb9;
+  border-radius:12px;
+  background:#eef2f6;
+  padding:14px 16px;
+}
+
+.manage-access-title{
+  margin:0 0 10px;
+  font-size:13px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:#41556f;
+}
+
+.manage-access-create{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:10px;
+}
+
+.manage-access-create input{
+  width:100%;
+}
+
+.manage-access-checkbox input,
+.manage-access-guilds input{
+  width:auto;
+  margin:0;
+}
+
+.manage-access-create .manage-access-full{
+  grid-column:1 / -1;
+}
+
+.guild-settings-grid{
+  display:grid;
+  gap:12px;
+}
+
+.guild-settings-section{
+  border:1px solid #d0d7e2;
+  border-radius:12px;
+  background:#f7f9fc;
+  padding:14px 16px;
+}
+
+.guild-settings-fields{
+  display:grid;
+  gap:0;
+  align-items:start;
+}
+
+.guild-settings-row{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:10px 18px;
+  align-items:start;
+  padding:12px 0;
+  border-top:1px solid #d7dde6;
+}
+
+.guild-settings-row:first-child{
+  padding-top:0;
+  border-top:none;
+}
+
+.guild-settings-row.is-single{
+  grid-template-columns:minmax(0, 1fr);
+}
+
+.guild-settings-row.is-full{
+  grid-template-columns:minmax(0, 1fr);
+}
+
+.guild-settings-field{
+  display:grid;
+  gap:6px;
+  align-content:start;
+}
+
+.guild-settings-field.is-full{
+  grid-column:1 / -1;
+}
+
+.guild-settings-label{
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.03em;
+  color:#445062;
+}
+
+.guild-settings-input,
+.guild-settings-select{
+  width:100%;
+  min-height:40px;
+  padding:0 12px;
+  border-radius:10px;
+  border:1px solid #bcc7d6;
+  background:#ffffff;
+  color:#1d2735;
+  font-size:14px;
+  font-weight:600;
+  box-sizing:border-box;
+}
+
+.guild-settings-select{
+  appearance:none;
+  -webkit-appearance:none;
+  -moz-appearance:none;
+  padding-right:38px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'%3E%3Cpath d='M3.25 5.25L7 9l3.75-3.75' fill='none' stroke='%23505f73' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 12px center;
+  background-size:14px 14px;
+  color-scheme:light;
+}
+
+.guild-settings-select option{
+  background:#ffffff;
+  color:#1d2735;
+  color-scheme:light;
+}
+
+.guild-settings-section-title{
+  margin:0 0 10px;
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:#4a5665;
+}
+
+.guild-settings-rule-title{
+  margin:12px 0 6px;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:#445062;
+}
+
+.guild-settings-rule-block + .guild-settings-rule-block{
+  margin-top:14px;
+  padding-top:14px;
+  border-top:1px solid #d7dde6;
+}
+
+.guild-settings-toolbar{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-right:auto;
+}
+
+.guild-settings-barter-strip{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-left:auto;
+}
+
+.guild-settings-barter-strip .barter-toggle-label{
+  color:#243142;
+}
+
+.guild-settings-barter-strip .barter-toggle-value{
+  color:#5e6d80;
+}
+
+.guild-settings-barter-strip .barter-toggle-value.is-on{
+  color:#2f8f57;
+}
+
+.guild-settings-toolbar-status{
+  margin:0;
+  font-size:13px;
+  font-weight:800;
+}
+
+.guild-settings-toolbar-status.is-pending{
+  color:#c84646;
+}
+
+.guild-settings-toolbar-status.is-success{
+  color:#2f8f57;
+}
+
+.guild-settings-help{
+  margin:6px 0 0;
+  font-size:12px;
+  line-height:1.45;
+  color:#5b6776;
+}
+
+.guild-settings-help.is-inline{
+  margin-top:0;
+}
+
+.guild-sister-list{
+  display:grid;
+  gap:8px;
+}
+
+.guild-logo-preview{
+  width:52px;
+  height:52px;
+  object-fit:cover;
+  border-radius:12px;
+  border:1px solid #c6d0dc;
+  background:#ffffff;
+  box-shadow:0 6px 18px rgba(24,34,48,.08);
+}
+
+.guild-branding-row{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:12px;
+  align-items:start;
+}
+
+.guild-color-input{
+  width:100%;
+  min-height:44px;
+  padding:4px;
+  border:1px solid #cfd8e3;
+  border-radius:12px;
+  background:#ffffff;
+  cursor:pointer;
+}
+
+.guild-color-field{
+  display:grid;
+  gap:6px;
+  align-content:start;
+}
+
+.guild-color-swatch-label{
+  font-size:12px;
+  font-weight:800;
+  color:#445062;
+}
+
+.guild-mail-account-list{
+  display:grid;
+  gap:8px;
+}
+
+.guild-mail-account-row{
+  display:grid;
+  grid-template-columns:minmax(0, 1fr) auto;
+  gap:8px;
+  align-items:center;
+}
+
+.bounty-list-shell{
+  display:grid;
+  gap:14px;
+  text-align:left;
+}
+
+.bounty-list-toolbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.bounty-list-grid{
+  display:grid;
+  gap:8px;
+}
+
+.bounty-list-table{
+  width:100%;
+  table-layout:fixed;
+  border-collapse:separate;
+  border-spacing:0 8px;
+}
+
+.bounty-list-table col.col-name{
+  width:29%;
+}
+
+.bounty-list-table col.col-code{
+  width:26%;
+}
+
+.bounty-list-table col.col-qty{
+  width:12%;
+}
+
+.bounty-list-table col.col-value{
+  width:14%;
+}
+
+.bounty-list-table col.col-rate{
+  width:14%;
+}
+
+.bounty-list-table col.col-actions{
+  width:120px;
+}
+
+.bounty-list-table th{
+  padding:0 12px 6px 0;
+  box-sizing:border-box;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.03em;
+  color:#445062;
+  text-align:left;
+  vertical-align:bottom;
+}
+
+.bounty-list-table th:last-child{
+  padding-right:0;
+}
+
+.bounty-list-table td{
+  padding:0 12px 0 0;
+  vertical-align:middle;
+}
+
+.bounty-list-table td:last-child{
+  padding-right:0;
+}
+
+.bounty-list-table .manage-access-btn.subtle{
+  width:100%;
+  white-space:nowrap;
+}
+
+.bounty-list-table tbody:empty::before{
+  content:"";
+  display:block;
+}
+
+.bounty-list-paste{
+  display:grid;
+  gap:8px;
+}
+
+.bounty-list-paste textarea{
+  width:100%;
+  min-height:120px;
+  padding:10px 12px;
+  border:1px solid #bcc7d6;
+  background:#fff;
+  color:#1d2735;
+  font-size:13px;
+  font-weight:600;
+  resize:vertical;
+  box-sizing:border-box;
+}
+
+.manage-access-btn.subtle{
+  background:#e2e8f0;
+  color:#243041;
+}
+
+.manage-access-grid{
+  display:grid;
+  gap:10px;
+}
+
+.manage-access-user{
+  display:grid;
+  gap:10px;
+  border:1px solid #b2bcc8;
+  border-radius:12px;
+  background:#f6f8fb;
+  padding:12px 14px;
+}
+
+.manage-access-user-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.manage-access-username{
+  font-size:18px;
+  font-weight:800;
+  color:#1f2937;
+}
+
+.manage-access-roleline{
+  font-size:13px;
+  color:#5b6b7d;
+}
+
+.manage-access-controls{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+}
+
+.manage-access-checkbox{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-weight:700;
+  color:#263445;
+}
+
+.manage-access-guilds{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px 14px;
+}
+
+.manage-access-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.account-settings-actions{
+  width:100%;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.manage-access-btn{
+  border:1px solid #8d97a5;
+  background:#e9edf4;
+  color:#243142;
+  border-radius:10px;
+  padding:8px 12px;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.manage-access-btn:hover{
+  background:#dfe6ef;
+}
+
+.manage-access-btn.is-danger{
+  border-color:#c69191;
+  background:#f5e8e8;
+  color:#7a2323;
+}
+
+.manage-access-status{
+  margin:0;
+  font-size:13px;
+  color:#536476;
+}
+
+.manage-access-status.is-error{
+  color:#8b1e1e;
+}
+
+.manage-access-status.is-pending{
+  color:#c84646;
+}
+
+.manage-access-status.is-success{
+  color:#2f8f57;
+}
+
+.manage-access-password-row{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:10px;
+  justify-content:flex-start;
+}
+
+.manage-access-password-row .manage-access-full{
+  grid-column:1 / -1;
+}
+
+.manage-access-password-row.is-separated{
+  margin-bottom:12px;
+}
+
+.manage-access-password-row.is-pair{
+  grid-template-columns:repeat(2, minmax(220px, 260px));
+  width:fit-content;
+  max-width:100%;
+  gap:8px;
+}
+
+.manage-access-password-row input{
+  width:min(100%, 260px);
+}
+
+.manage-access-password-row .manage-access-full{
+  width:min(100%, 320px);
+}
+
+.manage-access-password-tools{
+  display:flex;
+  justify-content:flex-start;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
 #import_data_here{
   width:100%;
   border-collapse:separate;
   border-spacing:0;
+  table-layout:fixed;
 }
 
 #import_data_here th{
@@ -1752,6 +2768,31 @@ div#paid_template{
 #import_data_here th,
 #import_data_here td{
   padding:8px 10px;
+}
+
+#import_data_here th:nth-child(1),
+#import_data_here td:nth-child(1){
+  width:170px;
+}
+
+#import_data_here th:nth-child(2),
+#import_data_here td:nth-child(2){
+  width:90px;
+}
+
+#import_data_here th:nth-child(4),
+#import_data_here td:nth-child(4){
+  width:220px;
+}
+
+#import_data_here th:nth-child(5),
+#import_data_here td:nth-child(5){
+  width:42px;
+}
+
+#import_data_here input[type="text"]{
+  width:100%;
+  box-sizing:border-box;
 }
 
 #import_template input,
@@ -1776,6 +2817,11 @@ div#paid_template{
 #paid_confirm_string{
   width:100%;
   min-height:180px;
+}
+
+#confirm_string,
+#confirm_names{
+  min-height:126px;
 }
 
 #add_prize_block{
@@ -2348,6 +3394,57 @@ function copyNamesAndTotals() {
         showCopiedState()
 }
 
+function copyPrizeCardsToSheets() {
+        var output = []
+
+        $("#prize_info .prize-shell").each(function () {
+                var $card = $(this)
+                var prizeNumber = $.trim(String($card.find("input[name='prize_text2']").val() || ""))
+                var description = $.trim(String($card.find("input[name='prize_text']").val() || ""))
+                var value = $.trim(String($card.find("input[name='prize_value']").val() || ""))
+
+                if (!prizeNumber && !description && !value) {
+                        return
+                }
+
+                output.push([prizeNumber, description, value].join("\t"))
+        })
+
+        var text = output.join("\n")
+        if (!text) {
+                window.alert("No current prize cards to copy yet.")
+                return
+        }
+
+        function showCopiedState() {
+                window.alert("Current Prize Cards copied to clipboard")
+        }
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(showCopiedState).catch(function () {
+                        fallbackCopyPrizeCards(text, showCopiedState)
+                })
+                return
+        }
+
+        fallbackCopyPrizeCards(text, showCopiedState)
+}
+
+function fallbackCopyPrizeCards(text, onSuccess) {
+        var helper = document.createElement("textarea")
+        helper.value = text
+        helper.setAttribute("readonly", "")
+        helper.style.position = "absolute"
+        helper.style.left = "-9999px"
+        document.body.appendChild(helper)
+        helper.select()
+        document.execCommand("copy")
+        document.body.removeChild(helper)
+        if (onSuccess) {
+                onSuccess()
+        }
+}
+
 function normalizePrizeValue(rawValue) {
         var digits = String(rawValue == null ? "" : rawValue).replace(/[^\d]/g, "")
         if (!digits) {
@@ -2480,7 +3577,7 @@ function saveAllVisiblePrizeForms() {
 }
 
 function syncLegacyModalState() {
-        var anyVisible = $("#import_template:visible, #confirm_template:visible, #barter_template:visible, #paid_template:visible, #new_raffle_modal:visible").length > 0
+        var anyVisible = $("#import_template:visible, #confirm_template:visible, #change_password_template:visible, #account_settings_template:visible, #manage_access_template:visible, #guild_settings_template:visible, #bounty_list_template:visible, #recent_imports_template:visible, #barter_summary_template:visible, #barter_template:visible, #paid_template:visible, #new_raffle_modal:visible").length > 0
         $("#legacy_modal_backdrop").toggle(anyVisible)
         $("body").toggleClass("legacy-modal-open", anyVisible)
 }
@@ -2498,6 +3595,1724 @@ function showLegacyModal(selector, modalClass) {
 function hideLegacyModal(selector) {
         $(selector).hide()
         syncLegacyModalState()
+}
+
+function escapeHtml(value) {
+        return String(value == null ? "" : value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;")
+}
+
+function normalizeImportResult(result) {
+        if ($.isArray(result)) {
+                return {
+                        confirm_string: result[0] || "",
+                        confirm_names: result[1] || "",
+                        import_summary: null
+                }
+        }
+
+        return {
+                confirm_string: (result && result.confirm_string) || "",
+                confirm_names: (result && result.confirm_names) || "",
+                import_summary: (result && result.import_summary) || null
+        }
+}
+
+function formatImportSummaryText(summary) {
+        if (!summary) {
+                return ""
+        }
+
+        var totalAdded = Number(summary.total_added) || 0
+        var newParticipants = Number(summary.new_participants) || 0
+        var existingParticipants = Number(summary.existing_participants) || 0
+        var parts = [
+                totalAdded.toLocaleString() + " tickets added.",
+                newParticipants.toLocaleString() + " new participant" + (newParticipants === 1 ? "" : "s") + "."
+        ]
+
+        if (existingParticipants > 0) {
+                parts.push(existingParticipants.toLocaleString() + " participant" + (existingParticipants === 1 ? "" : "s") + " added more tickets.")
+        } else {
+                parts.push("No existing participants added more tickets.")
+        }
+
+        return parts.join(" ")
+}
+
+function updateConfirmImportSummary(summary) {
+        var $box = $("#confirm_import_summary")
+        var text = formatImportSummaryText(summary)
+
+        if (!text) {
+                $("#confirm_import_summary_text").text("")
+                $box.hide()
+                return
+        }
+
+        $("#confirm_import_summary_text").text(text)
+        $box.show()
+}
+
+function updateImportGuardrailSummary(warnings) {
+        var $box = $("#import_guardrail_summary")
+        var html = ""
+
+        if ($.isArray(warnings) && warnings.length) {
+                var formattedWarnings = $.map(warnings, function (warning) {
+                        var text = escapeHtml(String(warning || ""))
+                        text = text.replace(/^Ignored\b/i, '<span class="import-guardrail-ignored">Ignored</span>')
+                        text = text.replace(/^Warning:/i, '<span class="import-guardrail-label">Warning</span>')
+                        text = text.replace(/They will not be processed\./gi, '<span class="import-guardrail-strong">They will not be processed.</span>')
+                        text = text.replace(/Review carefully before importing\./gi, '<span class="import-guardrail-strong">Review carefully before importing.</span>')
+                        return '<div class="import-guardrail-line">' + text + '</div>'
+                })
+                html = formattedWarnings.join("")
+        }
+
+        if (!html) {
+                $("#import_guardrail_summary_text").html("")
+                $box.hide()
+                return
+        }
+
+        $("#import_guardrail_summary_text").html(html)
+        $box.show()
+}
+
+function collectImportMismatchPrompts(warnings) {
+        var prompts = []
+        if (!$.isArray(warnings)) {
+                return prompts
+        }
+
+        $.each(warnings, function (_, warning) {
+                var text = String(warning || "")
+                if (/Addon settings and settings for this raffle do not match/i.test(text)) {
+                        prompts.push(text + " Continue with this import?")
+                }
+        })
+
+        return prompts
+}
+
+function updateImportFileSummary(context) {
+        var $box = $("#import_file_summary")
+        var $text = $("#import_file_summary_text")
+
+        if (!context || typeof context !== "object") {
+                $text.text("")
+                window.LAST_IMPORT_DEBUG_REPORT = ""
+                $box.hide()
+                return
+        }
+
+        function toNumber(value) {
+                var n = Number(value)
+                return isNaN(n) ? 0 : n
+        }
+
+        function normalizeRuleEnabled(value, fallbackValue) {
+                if (value === null || value === undefined || value === "") {
+                        return !!fallbackValue
+                }
+                return normalizeToggleEnabledValue(value)
+        }
+
+        function renderCategorySegment(label, amount, enabled) {
+                if (!enabled) {
+                        return '<span class="import-file-summary-segment">' + escapeHtml(label + ':') + ' <span class="import-file-summary-off">OFF</span></span>'
+                }
+                return '<span class="import-file-summary-segment">' + escapeHtml(label + ': ' + String(toNumber(amount).toLocaleString())) + '</span>'
+        }
+
+        var rows = $.isArray(context.import_rows) ? context.import_rows : []
+        function getPreviewRowValue(item, key, fallbackIndex) {
+                if (item && typeof item === "object" && !$.isArray(item)) {
+                        return item[key]
+                }
+                if ($.isArray(item)) {
+                        return item[fallbackIndex]
+                }
+                return ""
+        }
+        var mailGoldTickets = 0
+        var bankGoldTickets = 0
+        var mailBarterTickets = 0
+        var bankBarterTickets = 0
+        var importedUsers = {}
+        for (var i = 0; i < rows.length; i++) {
+                var item = rows[i] || []
+                var paidAmount = toNumber(getPreviewRowValue(item, "paid_tickets", 1))
+                var barterAmount = toNumber(getPreviewRowValue(item, "barter_tickets", -1))
+                var subject = String(getPreviewRowValue(item, "subject", 2) || "")
+                var sourceType = String(getPreviewRowValue(item, "source_type", "") || "").toUpperCase()
+                var user = $.trim(String(getPreviewRowValue(item, "name", 0) || "")).toLowerCase()
+
+                var isBank = (sourceType === "BANK") || (subject === "GUILD BANK DEPOSIT")
+
+                if (isBank) {
+                        bankGoldTickets += paidAmount
+                        bankBarterTickets += barterAmount
+                } else {
+                        mailGoldTickets += paidAmount
+                        mailBarterTickets += barterAmount
+                }
+                if (user) {
+                        importedUsers[user] = true
+                }
+        }
+
+        var existingTicketTotal = 0
+        var existingEntrants = {}
+        try {
+                var hot = $("#ticket_info").handsontable("getInstance")
+                var hotData = hot ? hot.getData() : []
+                for (var j = 0; j < hotData.length; j++) {
+                        var row = hotData[j] || []
+                        var userName = $.trim(String(row[1] || "")).toLowerCase()
+                        var totalTickets = toNumber(row[2])
+                        if (totalTickets > 0) {
+                                existingTicketTotal += totalTickets
+                                if (userName) {
+                                        existingEntrants[userName] = true
+                                }
+                        }
+                }
+        } catch (error) {
+                console.warn("Unable to read current ticket table for import summary", error)
+        }
+
+        var addedEntrants = 0
+        $.each(importedUsers, function (userName) {
+                if (!existingEntrants[userName]) {
+                        addedEntrants += 1
+                }
+        })
+
+        var oldEntrantsCount = Object.keys(existingEntrants).length
+        var totalImportedTickets = mailGoldTickets + bankGoldTickets + mailBarterTickets + bankBarterTickets
+        var newTicketTotal = existingTicketTotal + totalImportedTickets
+        var newEntrantsCount = oldEntrantsCount + addedEntrants
+        var raffleRules = context.raffle_import_rules || {}
+        var goldMailEnabled = normalizeRuleEnabled(raffleRules.raffle_gold_mail_enabled, true)
+        var goldBankEnabled = normalizeRuleEnabled(raffleRules.raffle_gold_bank_enabled, true)
+        var barterMailEnabled = normalizeRuleEnabled(raffleRules.raffle_barter_mail_enabled, false)
+        var barterBankEnabled = normalizeRuleEnabled(raffleRules.raffle_barter_bank_enabled, false)
+
+        var segments = []
+        segments.push(renderCategorySegment("Mail-Gold", mailGoldTickets, goldMailEnabled))
+        segments.push(renderCategorySegment("Bank-Gold", bankGoldTickets, goldBankEnabled))
+        segments.push(renderCategorySegment("Mail-Barter", mailBarterTickets, barterMailEnabled))
+        segments.push(renderCategorySegment("Bank-Barter", bankBarterTickets, barterBankEnabled))
+        if (context.bank_source_guild_name) {
+                segments.push('<span class="import-file-summary-segment">Bank Source: ' + escapeHtml(String(context.bank_source_guild_name)) + '</span>')
+        }
+        segments.push('<span class="import-file-summary-segment">Tickets: ' + escapeHtml(String(existingTicketTotal.toLocaleString())) + ' &gt; ' + escapeHtml(String(newTicketTotal.toLocaleString())) + '</span>')
+        segments.push('<span class="import-file-summary-segment">Entrants: ' + escapeHtml(String(oldEntrantsCount.toLocaleString())) + ' &gt; ' + escapeHtml(String(newEntrantsCount.toLocaleString())) + '</span>')
+
+        $text.html(segments.join(""))
+
+        var debugPayload = {
+                selected_account: context.selected_account || "",
+                metadata_detected: !!context.metadata_detected,
+                mail_row_count: context.mail_row_count,
+                bank_row_count: context.bank_row_count,
+                mail_source_account: context.mail_source_account || "",
+                bank_source_guild_name: context.bank_source_guild_name || "",
+                bank_source_guild_id: context.bank_source_guild_id || "",
+                bank_selected_days: context.bank_selected_days || "",
+                raffle_import_rules: raffleRules,
+                suppressed_counts: context.suppressed_counts || {},
+                addon_mail_barter_enabled: normalizeRuleEnabled(context.addon_mail_barter_enabled, false),
+                addon_bank_barter_enabled: normalizeRuleEnabled(context.addon_bank_barter_enabled, false),
+                rows_shown: rows.length,
+                mail_gold_tickets_to_add: mailGoldTickets,
+                bank_gold_tickets_to_add: bankGoldTickets,
+                mail_barter_tickets_to_add: mailBarterTickets,
+                bank_barter_tickets_to_add: bankBarterTickets,
+                current_ticket_total: existingTicketTotal,
+                projected_ticket_total: newTicketTotal,
+                current_entrant_count: oldEntrantsCount,
+                projected_entrant_count: newEntrantsCount
+        }
+        window.LAST_IMPORT_DEBUG_REPORT = JSON.stringify(debugPayload, null, 2)
+
+        $box.show()
+}
+
+function populateConfirmModal(result) {
+        var normalized = normalizeImportResult(result)
+        $("#confirm_string").val(normalized.confirm_string)
+        $("#confirm_names").val(normalized.confirm_names)
+        updateConfirmImportSummary(normalized.import_summary)
+}
+
+function setGuildSettingsStatus(message, isError) {
+        var $status = $("#guildSettingsStatus")
+        $status.text(message || "")
+        $status.removeClass("is-error is-pending is-success")
+        if (!message) {
+                return
+        }
+        if (isError) {
+                $status.addClass("is-error")
+        } else {
+                $status.addClass("is-success")
+        }
+}
+
+var GUILD_GAME_SERVER_OPTIONS = ["PC-NA", "PC-EU", "XBOX-NA", "XBOX-EU", "PS-NA", "PS-EU"]
+var DEFAULT_GUILD_LOGO_URL = "https://www.bbcguild.com/wp-content/uploads/2020/04/cropped-cropped-BBC-LOGO-V2-2.gif"
+var DEFAULT_GUILD_FAVICON_URL = "/static/favicon-256.png"
+var DEFAULT_GUILD_PRIMARY_COLOR = "#284CA6"
+var DEFAULT_GUILD_ACCENT_COLOR = "#5078D2"
+var GUILD_SETTINGS_DIRTY = false
+var GUILD_SETTINGS_LOADING = false
+
+function markGuildSettingsDirty() {
+        if (GUILD_SETTINGS_LOADING) {
+                return
+        }
+        GUILD_SETTINGS_DIRTY = true
+        var $status = $("#guildSettingsStatus")
+        $status.text("You have unsaved changes.")
+        $status.removeClass("is-error is-success").addClass("is-pending")
+}
+
+function clearGuildSettingsDirty(message) {
+        GUILD_SETTINGS_DIRTY = false
+        setGuildSettingsStatus(message || "", false)
+}
+
+function normalizeEsoAccountName(value) {
+        var text = $.trim(String(value || ""))
+        if (!text) {
+                return ""
+        }
+        return text.charAt(0) === "@" ? text : ("@" + text)
+}
+
+function buildGuildMailAccountRow(value) {
+        var $row = $('<div class="guild-mail-account-row"></div>')
+        var $input = $('<input type="text" class="guild-mail-account-input guild-settings-input" placeholder="@accountname" />').val(value || "")
+        var $remove = $('<button type="button" class="manage-access-btn subtle">Remove</button>')
+        $remove.on("click", function () {
+                $row.remove()
+                ensureGuildMailAccountRow()
+                markGuildSettingsDirty()
+        })
+        $row.append($input, $remove)
+        return $row
+}
+
+function buildGuildBlacklistRow(value) {
+        var $row = $('<div class="guild-mail-account-row"></div>')
+        var $input = $('<input type="text" class="guild-blacklist-input guild-settings-input" placeholder="@accountname" />').val(value || "")
+        var $remove = $('<button type="button" class="manage-access-btn subtle">Remove</button>')
+        $remove.on("click", function () {
+                $row.remove()
+                ensureGuildBlacklistRow()
+                markGuildSettingsDirty()
+        })
+        $row.append($input, $remove)
+        return $row
+}
+
+function ensureGuildMailAccountRow() {
+        var $list = $("#guildSettingsMailAccountsList")
+        if ($list.children().length === 0) {
+                $list.append(buildGuildMailAccountRow(""))
+        }
+}
+
+function renderGuildMailAccountRows(accounts) {
+        var $list = $("#guildSettingsMailAccountsList")
+        $list.empty()
+        if (!$.isArray(accounts) || accounts.length === 0) {
+                $list.append(buildGuildMailAccountRow(""))
+                return
+        }
+        $.each(accounts, function (_, account) {
+                $list.append(buildGuildMailAccountRow(account))
+        })
+}
+
+function ensureGuildBlacklistRow() {
+        var $list = $("#guildSettingsImportBlacklistList")
+        if ($list.children().length === 0) {
+                $list.append(buildGuildBlacklistRow(""))
+        }
+}
+
+function renderGuildBlacklistRows(accounts) {
+        var $list = $("#guildSettingsImportBlacklistList")
+        $list.empty()
+        if (!$.isArray(accounts) || accounts.length === 0) {
+                $list.append(buildGuildBlacklistRow(""))
+                return
+        }
+        $.each(accounts, function (_, account) {
+                $list.append(buildGuildBlacklistRow(account ? ("@" + String(account).replace(/^@+/, "")) : ""))
+        })
+}
+
+function collectGuildMailAccounts() {
+        var accounts = []
+        $("#guildSettingsMailAccountsList .guild-mail-account-input").each(function () {
+                var value = normalizeEsoAccountName($(this).val())
+                if (value) {
+                        accounts.push(value)
+                }
+        })
+        return accounts
+}
+
+function collectGuildImportBlacklist() {
+        var accounts = []
+        $("#guildSettingsImportBlacklistList .guild-blacklist-input").each(function () {
+                var value = normalizeEsoAccountName($(this).val())
+                if (value) {
+                        accounts.push(value)
+                }
+        })
+        return accounts
+}
+
+function populateGuildServerOptions(selectedValue) {
+        var $select = $("#guildSettingsGameServer")
+        $select.empty()
+        $.each(GUILD_GAME_SERVER_OPTIONS, function (_, optionValue) {
+                var $option = $("<option></option>").attr("value", optionValue).text(optionValue)
+                if (optionValue === selectedValue) {
+                        $option.prop("selected", true)
+                }
+                $select.append($option)
+        })
+}
+
+function getSupportedTimeZones() {
+        var fallbackZones = [
+                "America/New_York",
+                "America/Chicago",
+                "America/Denver",
+                "America/Los_Angeles",
+                "America/Phoenix",
+                "America/Anchorage",
+                "Pacific/Honolulu",
+                "Europe/London",
+                "Europe/Paris",
+                "Europe/Berlin",
+                "Australia/Sydney",
+                "Asia/Tokyo"
+        ]
+        var zones = []
+        if (typeof Intl !== "undefined" && typeof Intl.supportedValuesOf === "function") {
+                try {
+                        zones = Intl.supportedValuesOf("timeZone") || []
+                } catch (error) {
+                        zones = []
+                }
+        }
+        if (!zones.length) {
+                zones = fallbackZones.slice()
+        }
+        return zones
+}
+
+function populateTimeZoneOptions(selectSelector, selectedValue, includeBrowserOption) {
+        var zones = getSupportedTimeZones()
+        if (selectedValue && zones.indexOf(selectedValue) === -1) {
+                zones.unshift(selectedValue)
+        }
+        var $select = $(selectSelector)
+        $select.empty()
+        if (includeBrowserOption) {
+                var browserLabel = "Use Browser Local Time"
+                var $browserOption = $("<option></option>").attr("value", "browser").text(browserLabel)
+                if (!selectedValue || selectedValue === "browser") {
+                        $browserOption.prop("selected", true)
+                }
+                $select.append($browserOption)
+        }
+        $.each(zones, function (_, zoneValue) {
+                var $option = $("<option></option>").attr("value", zoneValue).text(zoneValue)
+                if (zoneValue === selectedValue) {
+                        $option.prop("selected", true)
+                }
+                $select.append($option)
+        })
+}
+
+function populateGuildTimeZoneOptions(selectedValue) {
+        populateTimeZoneOptions("#guildSettingsTimeZone", selectedValue, false)
+}
+
+function populateAccountTimeZoneOptions(selectedValue) {
+        populateTimeZoneOptions("#accountSettingsTimeZone", selectedValue || "browser", true)
+}
+
+function renderGuildSisterGuilds(options, currentShortname, selectedValues) {
+        var selectedSet = {}
+        $.each(selectedValues || [], function (_, value) {
+                selectedSet[String(value || "").toLowerCase()] = true
+        })
+        var $list = $("#guildSettingsSisterGuilds")
+        $list.empty()
+        $.each(options || [], function (_, guild) {
+                var shortname = String(guild.guild_shortname || "").toLowerCase()
+                if (!shortname || shortname === String(currentShortname || "").toLowerCase()) {
+                        return
+                }
+                var $label = $('<label class="manage-access-checkbox"></label>')
+                var $input = $('<input type="checkbox" class="guild-sister-checkbox" />').val(shortname)
+                if (selectedSet[shortname]) {
+                        $input.prop("checked", true)
+                }
+                $label.append($input).append(" " + (guild.guild_name || shortname))
+                $list.append($label)
+        })
+        if ($list.children().length === 0) {
+                $list.append('<p class="guild-settings-help is-inline">No other guilds are available to link yet.</p>')
+        }
+}
+
+function collectSelectedSisterGuilds() {
+        var sisterGuilds = []
+        $("#guildSettingsSisterGuilds .guild-sister-checkbox:checked").each(function () {
+                var value = $.trim(String($(this).val() || "")).toLowerCase()
+                if (value) {
+                        sisterGuilds.push(value)
+                }
+        })
+        return sisterGuilds
+}
+
+function applyGuildBranding(guild) {
+        guild = guild || {}
+        var logoUrl = $.trim(String(guild.guild_logo_url || "")) || DEFAULT_GUILD_LOGO_URL
+        var faviconUrl = $.trim(String(guild.guild_favicon_url || "")) || DEFAULT_GUILD_FAVICON_URL
+        var primaryColor = normalizeBrandColor(guild.guild_primary_color, DEFAULT_GUILD_PRIMARY_COLOR)
+        var accentColor = normalizeBrandColor(guild.guild_accent_color, DEFAULT_GUILD_ACCENT_COLOR)
+        $("#mainLogo").attr("src", logoUrl)
+        $("#adminProfileLogo").attr("src", logoUrl)
+        updateAppFavicons(faviconUrl)
+        applyBrandColors(primaryColor, accentColor)
+}
+
+function updateGuildLogoPreview(urlValue) {
+        var logoUrl = $.trim(String(urlValue || "")) || DEFAULT_GUILD_LOGO_URL
+        $("#guildSettingsLogoPreview").attr("src", logoUrl)
+}
+
+function updateGuildFaviconPreview(urlValue) {
+        var faviconUrl = $.trim(String(urlValue || "")) || DEFAULT_GUILD_FAVICON_URL
+        $("#guildSettingsFaviconPreview").attr("src", faviconUrl)
+}
+
+function normalizeBrandColor(value, fallback) {
+        var raw = $.trim(String(value || ""))
+        if (!raw) {
+                return fallback
+        }
+        if (raw.charAt(0) !== "#") {
+                raw = "#" + raw
+        }
+        if (!/^#[0-9a-fA-F]{6}$/.test(raw)) {
+                return fallback
+        }
+        return raw.toUpperCase()
+}
+
+function hexToRgbList(hexValue) {
+        var hex = normalizeBrandColor(hexValue, "#000000").slice(1)
+        return [
+                parseInt(hex.slice(0, 2), 16),
+                parseInt(hex.slice(2, 4), 16),
+                parseInt(hex.slice(4, 6), 16)
+        ].join(",")
+}
+
+function applyBrandColors(primaryColor, accentColor) {
+        var root = document.documentElement
+        var normalizedPrimary = normalizeBrandColor(primaryColor, DEFAULT_GUILD_PRIMARY_COLOR)
+        var normalizedAccent = normalizeBrandColor(accentColor, DEFAULT_GUILD_ACCENT_COLOR)
+        root.style.setProperty("--brand-primary", normalizedPrimary)
+        root.style.setProperty("--brand-accent", normalizedAccent)
+        root.style.setProperty("--brand-primary-rgb", hexToRgbList(normalizedPrimary))
+        root.style.setProperty("--brand-accent-rgb", hexToRgbList(normalizedAccent))
+}
+
+function updateAppFavicons(faviconUrl) {
+        $("#appFaviconIco").attr("href", faviconUrl)
+        $("#appFavicon32").attr("href", faviconUrl)
+        $("#appFavicon16").attr("href", faviconUrl)
+}
+
+function renderProfileGuildLinks(currentShortname, sisterGuilds, guildChoices) {
+        var $container = $("#profileGuildLinks")
+        $container.empty()
+        var currentSlug = String(currentShortname || "").toLowerCase()
+        var selected = {}
+        $.each(sisterGuilds || [], function (_, shortname) {
+                selected[String(shortname || "").toLowerCase()] = true
+        })
+        $.each(guildChoices || [], function (_, guild) {
+                var shortname = String(guild.guild_shortname || "").toLowerCase()
+                var reverseLinks = {}
+                $.each(String(guild.guild_sister_guilds || "").split(","), function (_, value) {
+                        var slug = $.trim(String(value || "")).toLowerCase()
+                        if (slug) {
+                                reverseLinks[slug] = true
+                        }
+                })
+                var shouldShow = selected[shortname] || reverseLinks[currentSlug]
+                if (!shortname || shortname === currentSlug || !shouldShow) {
+                        return
+                }
+                var $link = $('<a class="profile-menu-item"></a>').attr("href", "/" + shortname + "/")
+                $link.append(
+                        '<span class="profile-menu-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18"></path><path d="M15 5l6 7-6 7"></path></svg></span>'
+                )
+                $link.append($('<span class="profile-menu-text"></span>').text("Swap to " + (guild.guild_name || shortname.toUpperCase())))
+                $container.append($link)
+        })
+        $("#profileGuildLinksSection").toggle($container.children().length > 0)
+}
+
+var BOUNTY_LIST_DIRTY = false
+var BOUNTY_LIST_LOADING = false
+
+function formatCommaNumber(value) {
+        var raw = $.trim(String(value || ""))
+        if (!raw) {
+                return ""
+        }
+        raw = raw.replace(/,/g, "")
+        if (!/^\d+$/.test(raw)) {
+                return $.trim(String(value || ""))
+        }
+        return raw.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+}
+
+function normalizeNumberString(value, fallbackValue) {
+        var raw = $.trim(String(value || ""))
+        if (!raw) {
+                return fallbackValue
+        }
+        return raw.replace(/,/g, "")
+}
+
+function setBountyListDirtyStatus(message, statusClass) {
+        var $status = $("#bountyListStatus")
+        $status.text(message || "")
+        $status.removeClass("is-error is-success is-pending")
+        if (statusClass) {
+                $status.addClass(statusClass)
+        }
+}
+
+function markBountyListDirty() {
+        if (BOUNTY_LIST_LOADING) {
+                return
+        }
+        BOUNTY_LIST_DIRTY = true
+        setBountyListDirtyStatus("You have unsaved changes.", "is-pending")
+}
+
+function clearBountyListDirty(message) {
+        BOUNTY_LIST_DIRTY = false
+        if (!message) {
+                setBountyListDirtyStatus("", "")
+                return
+        }
+        setBountyListDirtyStatus(message, "is-success")
+}
+
+function showGuildSettingsModal() {
+        GUILD_SETTINGS_LOADING = true
+        clearGuildSettingsDirty("")
+        hideLegacyModal("#account_settings_template")
+        $.when($.getJSON("json/get/guild"), $.getJSON("json/get/guild_choices")).done(function (guildResponse, choicesResponse) {
+                var result = guildResponse[0] || {}
+                var choices = (choicesResponse[0] && choicesResponse[0].guilds) || []
+                $("#guildSettingsName").val(result.guild_name || "")
+                $("#guildSettingsShortname").val(result.guild_shortname || "")
+                $("#guildSettingsEsoId").val(result.guild_eso_id || "")
+                $("#guildSettingsLogoUrl").val(result.guild_logo_url || "")
+                $("#guildSettingsFaviconUrl").val(result.guild_favicon_url || "")
+                $("#guildSettingsPrimaryColor").val(normalizeBrandColor(result.guild_primary_color, DEFAULT_GUILD_PRIMARY_COLOR))
+                $("#guildSettingsAccentColor").val(normalizeBrandColor(result.guild_accent_color, DEFAULT_GUILD_ACCENT_COLOR))
+                updateGuildLogoPreview(result.guild_logo_url || "")
+                updateGuildFaviconPreview(result.guild_favicon_url || "")
+                populateGuildTimeZoneOptions(result.guild_timezone || "America/New_York")
+                populateGuildServerOptions(result.guild_game_server || "PC-NA")
+                renderGuildMailAccountRows(result.guild_expected_mail_accounts || [])
+                renderGuildBlacklistRows(result.guild_import_blacklist || [])
+                renderGuildSisterGuilds(choices, result.guild_shortname || "", result.guild_sister_guilds || [])
+                GUILD_SETTINGS_LOADING = false
+                clearGuildSettingsDirty("")
+                showLegacyModal("#guild_settings_template", "confirm")
+        }).fail(function () {
+                setGuildSettingsStatus("Unable to load guild settings right now.", true)
+                updateGuildLogoPreview("")
+                updateGuildFaviconPreview("")
+                $("#guildSettingsFaviconUrl").val("")
+                $("#guildSettingsPrimaryColor").val(DEFAULT_GUILD_PRIMARY_COLOR)
+                $("#guildSettingsAccentColor").val(DEFAULT_GUILD_ACCENT_COLOR)
+                populateGuildTimeZoneOptions("America/New_York")
+                populateGuildServerOptions("PC-NA")
+                renderGuildMailAccountRows([])
+                renderGuildBlacklistRows([])
+                renderGuildSisterGuilds([], "", [])
+                GUILD_SETTINGS_LOADING = false
+                showLegacyModal("#guild_settings_template", "confirm")
+        })
+}
+
+function setBountyListStatus(message, isError) {
+        setBountyListDirtyStatus(message || "", isError ? "is-error" : (message ? "is-success" : ""))
+}
+
+  function buildBountyListRow(item) {
+        item = item || {}
+        var $row = $('<tr class="bounty-list-row"></tr>')
+        var $name = $('<input type="text" class="guild-settings-input bounty-item-name" placeholder="Item Name" />').val(item.item_name || "")
+        var $code = $('<input type="text" class="guild-settings-input bounty-item-code" placeholder="item code" />').val(item.item_code || "")
+        var $quantity = $('<input type="number" min="1" step="1" class="guild-settings-input bounty-item-quantity" placeholder="1" />').val(item.quantity || 1)
+        var $value = $('<input type="text" class="guild-settings-input bounty-item-value" placeholder="0" inputmode="numeric" />').val(formatCommaNumber(item.item_value || 0))
+        var $rate = $('<input type="number" min="0" step="1" class="guild-settings-input bounty-item-rate" placeholder="0" />').val(item.barter_rate || 0)
+        var $remove = $('<button type="button" class="manage-access-btn subtle">Remove</button>')
+        $remove.on("click", function () {
+                $row.remove()
+                markBountyListDirty()
+        })
+        $value.on("blur", function () {
+                $(this).val(formatCommaNumber($(this).val()))
+        })
+        $row.append(
+                $("<td></td>").append($name),
+                $("<td></td>").append($code),
+                $("<td></td>").append($quantity),
+                $("<td></td>").append($value),
+                $("<td></td>").append($rate),
+                $("<td></td>").append($remove)
+        )
+        return $row
+  }
+
+function renderBountyListRows(items) {
+        var $list = $("#bountyListRows")
+        $list.empty()
+        $.each(items || [], function (_, item) {
+                $list.append(buildBountyListRow(item))
+        })
+        if (!$list.children().length) {
+                $list.append(buildBountyListRow({}))
+        }
+}
+
+function collectBountyListRows() {
+        var rows = []
+        $("#bountyListRows .bounty-list-row").each(function () {
+                var item = {
+                        item_name: $.trim($(this).find(".bounty-item-name").val() || ""),
+                        item_code: $.trim($(this).find(".bounty-item-code").val() || ""),
+                        quantity: $.trim($(this).find(".bounty-item-quantity").val() || ""),
+                        item_value: normalizeNumberString($(this).find(".bounty-item-value").val(), ""),
+                        barter_rate: $.trim($(this).find(".bounty-item-rate").val() || "")
+                }
+                if (item.item_name || item.item_code || item.quantity || item.item_value || item.barter_rate) {
+                        rows.push(item)
+                }
+        })
+        return rows
+}
+
+function parseBountyImportText(raw) {
+        var lines = String(raw || "").split(/\r?\n/)
+        var rows = []
+        $.each(lines, function (_, line) {
+                var trimmed = $.trim(line)
+                if (!trimmed) {
+                        return
+                }
+                var cols = trimmed.split("\t")
+                if (cols.length < 2) {
+                        cols = trimmed.split(/\s{2,}/)
+                }
+                cols = $.map(cols, function (value) { return $.trim(value) })
+                if (cols.length < 2) {
+                        return
+                }
+                var first = String(cols[0] || "").toLowerCase()
+                var second = String(cols[1] || "").toLowerCase()
+                if ((first === "item" || first === "item name" || first === "name") && (second === "item code" || second === "code")) {
+                        return
+                }
+                rows.push({
+                        item_name: cols[0] || "",
+                        item_code: cols[1] || "",
+                        quantity: cols.length > 2 ? (cols[2] || "1") : "1",
+                        item_value: cols.length > 3 ? normalizeNumberString(cols[3] || "0", "0") : "0",
+                        barter_rate: cols.length > 4 ? (cols[4] || "0") : "0"
+                })
+        })
+        return rows
+}
+
+function applyBountyImportText() {
+        var parsed = parseBountyImportText($("#bountyListPasteInput").val())
+        if (!parsed.length) {
+                setBountyListStatus("No valid bounty rows were found in the pasted text.", true)
+                return
+        }
+        renderBountyListRows(parsed)
+        BOUNTY_LIST_DIRTY = true
+        setBountyListDirtyStatus("You have unsaved changes.", "is-pending")
+}
+
+function copyBountyListToSpreadsheet() {
+        var rows = collectBountyListRows()
+        var $button = $("#copyBountyListButton")
+        var originalText = $button.text()
+        var payload = ["Item Name\tItem Code\tQuantity\tItem Value\tBarter Rate"]
+        $.each(rows, function (_, item) {
+                payload.push([
+                        item.item_name || "",
+                        item.item_code || "",
+                        item.quantity || "",
+                        item.item_value || "",
+                        item.barter_rate || ""
+                ].join("\t"))
+        })
+        navigator.clipboard.writeText(payload.join("\n")).then(function () {
+                setBountyListStatus("Bounty list copied to clipboard.", false)
+                $button.text("Copied")
+                window.setTimeout(function () {
+                        $button.text(originalText)
+                }, 2400)
+        }).catch(function () {
+                setBountyListStatus("Could not copy the bounty list automatically.", true)
+        })
+}
+
+function showBountyListModal() {
+        BOUNTY_LIST_LOADING = true
+        clearBountyListDirty("")
+        $("#bountyListPasteInput").val("")
+        $.getJSON("json/get/barter_bounty_list", function (result) {
+                renderBountyListRows(result.items || [])
+                BOUNTY_LIST_LOADING = false
+                clearBountyListDirty("")
+                showLegacyModal("#bounty_list_template", "confirm")
+        }).fail(function () {
+                renderBountyListRows([])
+                BOUNTY_LIST_LOADING = false
+                setBountyListStatus("Unable to load the bounty list right now.", true)
+                showLegacyModal("#bounty_list_template", "confirm")
+        })
+}
+
+function saveBountyList() {
+        setBountyListStatus("Saving...", false)
+        $.ajax({
+                type: "POST",
+                url: "json/set/barter_bounty_list",
+                data: {
+                        items_json: JSON.stringify(collectBountyListRows())
+                },
+                success: function (result) {
+                        if (result.error) {
+                                setBountyListStatus(result.error, true)
+                                return
+                        }
+                        renderBountyListRows(result.items || [])
+                        $("#bountyListPasteInput").val("")
+                        clearBountyListDirty("Barter bounty list saved.")
+                },
+                error: function () {
+                        setBountyListStatus("Save failed.", true)
+                }
+        })
+}
+
+function saveGuildSettings() {
+        var accounts = collectGuildMailAccounts()
+        var blacklist = collectGuildImportBlacklist()
+        setGuildSettingsStatus("Saving...", false)
+        $.ajax({
+                type: "POST",
+                url: "json/set/guild_settings",
+                data: {
+                        guild_name: $("#guildSettingsName").val(),
+                        guild_shortname: $("#guildSettingsShortname").val(),
+                        guild_eso_id: $("#guildSettingsEsoId").val(),
+                        guild_logo_url: $("#guildSettingsLogoUrl").val(),
+                        guild_favicon_url: $("#guildSettingsFaviconUrl").val(),
+                        guild_primary_color: $("#guildSettingsPrimaryColor").val(),
+                        guild_accent_color: $("#guildSettingsAccentColor").val(),
+                        guild_timezone: $("#guildSettingsTimeZone").val(),
+                        guild_game_server: $("#guildSettingsGameServer").val(),
+                        guild_sister_guilds: collectSelectedSisterGuilds().join(","),
+                        guild_expected_mail_accounts: accounts.join(","),
+                        guild_import_blacklist: blacklist.join(",")
+                },
+                success: function (result) {
+                        if (result.error) {
+                                setGuildSettingsStatus(result.error, true)
+                                return
+                        }
+                        var guild = result.guild || {}
+                        $("#guild_header").text(guild.guild_name || "")
+                        $("#display_guild_header").text(guild.guild_name || "")
+                        applyGuildBranding(guild)
+                        if (guild.guild_shortname && guild.guild_shortname !== ADMIN_GUILD_SLUG) {
+                                clearGuildSettingsDirty("Guild settings saved. Redirecting to the new guild URL...")
+                                window.setTimeout(function () {
+                                        window.location.href = "/" + guild.guild_shortname + "/"
+                                }, 700)
+                                return
+                        }
+                        clearGuildSettingsDirty("Guild settings saved.")
+                },
+                error: function () {
+                        setGuildSettingsStatus("Save failed.", true)
+                }
+        })
+}
+
+function buildImportTimeLabel(item) {
+        try {
+                var isObjectRow = (item && typeof item === "object" && !$.isArray(item))
+                var subject = isObjectRow ? (item.subject || "") : (item[2] || "")
+                var sourceType = isObjectRow ? String(item.source_type || "").toUpperCase() : ((subject === "GUILD BANK DEPOSIT") ? "BANK" : "MAIL")
+                var paidTickets = isObjectRow ? Number(item.paid_tickets || 0) : Number(item[1] || 0)
+                var barterTickets = isObjectRow ? Number(item.barter_tickets || 0) : 0
+                var sourceLabel = "[Mail]"
+
+                if (barterTickets > 0 && paidTickets > 0) {
+                        sourceLabel = (sourceType === "BANK") ? "[Gold+Barter-Bank]" : "[Gold+Barter-Mail]"
+                } else if (barterTickets > 0) {
+                        sourceLabel = (sourceType === "BANK") ? "[Barter-Bank]" : "[Barter-Mail]"
+                } else if (paidTickets > 0) {
+                        sourceLabel = (sourceType === "BANK") ? "[Gold-Bank]" : "[Gold-Mail]"
+                } else if (sourceType === "BANK") {
+                        sourceLabel = "[Gold-Bank]"
+                }
+
+                var rawValue = isObjectRow ? item.timestamp : item[3]
+                var timestampLabel = ""
+                if (rawValue !== null && rawValue !== undefined && rawValue !== "") {
+                        var epochSeconds = Number(rawValue)
+                        if (!isNaN(epochSeconds) && epochSeconds > 0) {
+                                timestampLabel = formatAdminDateTime(epochSeconds, false)
+                        } else {
+                                timestampLabel = $.trim(String(rawValue))
+                        }
+                }
+                return timestampLabel ? (sourceLabel + " " + timestampLabel) : sourceLabel
+        } catch (error) {
+                console.warn("Failed to build import time label", error, item)
+                return "[Gold-Mail]"
+        }
+}
+
+function buildBarterItemSummary(barterItems) {
+        if (!$.isArray(barterItems) || !barterItems.length) {
+                return ""
+        }
+
+        var parts = []
+        for (var i = 0; i < barterItems.length; i++) {
+                var row = barterItems[i] || {}
+                var itemName = $.trim(String(row.item_name || row.name || ""))
+                var quantity = Number(row.quantity || row.qty || 0)
+                if (!itemName) {
+                        continue
+                }
+                if (quantity > 0) {
+                        parts.push(quantity.toLocaleString() + "x " + itemName)
+                } else {
+                        parts.push(itemName)
+                }
+        }
+
+        return parts.join(", ")
+}
+
+var ADMIN_ACCOUNT_SETTINGS = {
+        timezone: ${repr(getattr(request.user, "timezone", None) or "") | n},
+        datetime_format: ${repr(getattr(request.user, "datetime_format", "us_12") or "us_12") | n}
+}
+
+function getAdminDateTimeFormatConfig() {
+        var formatKey = String(ADMIN_ACCOUNT_SETTINGS.datetime_format || "us_12").toLowerCase()
+        var configs = {
+                us_12: { locale: "en-US", hour12: true },
+                us_24: { locale: "en-US", hour12: false },
+                intl_12: { locale: "en-GB", hour12: true },
+                intl_24: { locale: "en-GB", hour12: false }
+        }
+        return configs[formatKey] || configs.us_12
+}
+
+function formatAdminDateTime(epochSeconds, includeTimeZoneName) {
+        var value = Number(epochSeconds)
+        if (isNaN(value) || value <= 0) {
+                return ""
+        }
+        var formatConfig = getAdminDateTimeFormatConfig()
+        var options = {
+                month: "numeric",
+                day: "numeric",
+                year: "numeric",
+                hour: "numeric",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: formatConfig.hour12
+        }
+        var timezoneValue = $.trim(String(ADMIN_ACCOUNT_SETTINGS.timezone || ""))
+        if (timezoneValue && timezoneValue !== "browser") {
+                options.timeZone = timezoneValue
+        }
+        if (includeTimeZoneName) {
+                options.timeZoneName = "short"
+        }
+        try {
+                return new Date(value * 1000).toLocaleString(formatConfig.locale, options)
+        } catch (error) {
+                console.warn("Failed to format admin datetime with preferred timezone", error, options)
+                delete options.timeZone
+                return new Date(value * 1000).toLocaleString(formatConfig.locale, options)
+        }
+}
+
+function formatAdminTimestamp(epochSeconds) {
+        return formatAdminDateTime(epochSeconds, true)
+}
+
+function normalizeEasternTimeLabel(value) {
+        var text = $.trim(String(value || ""))
+        if (!text) {
+                return ""
+        }
+        var easternShort = new Intl.DateTimeFormat("en-US", {
+                timeZone: "America/New_York",
+                timeZoneName: "short"
+        }).formatToParts(new Date()).find(function (part) {
+                return part.type === "timeZoneName"
+        })
+        var currentEastern = easternShort ? easternShort.value : "ET"
+        return text.replace(/\bEDT\b|\bEST\b/g, currentEastern)
+}
+
+function buildRaffleHeaderParts(raffleNumber, raffleTitle, raffleTime) {
+        var numberText = $.trim(String(raffleNumber || ""))
+        var titleText = $.trim(String(raffleTitle || ""))
+        var timeText = normalizeEasternTimeLabel(raffleTime)
+        var headingText = ""
+        var trailingText = ""
+
+        if (titleText) {
+                headingText = "#" + numberText
+                trailingText = titleText + (timeText ? " • " + timeText : "")
+        } else {
+                headingText = "#" + numberText + " Raffle"
+                trailingText = timeText ? "Drawing: " + timeText : ""
+        }
+
+        return {
+                heading: headingText,
+                trailing: trailingText,
+                separator: (headingText && trailingText) ? " • " : ""
+        }
+}
+
+var ADMIN_GUILD_SLUG = "${request.matchdict.get('guild', '')}"
+var IMPORT_HISTORY_PREFIX = "raffle_import_history:"
+
+function getCurrentImportHistoryKey() {
+        var raffleNumber = normalizeFieldValue(CURRENT_RAFFLE_INFO.raffle_subheader)
+        if (!ADMIN_GUILD_SLUG || !raffleNumber) {
+                return null
+        }
+        return IMPORT_HISTORY_PREFIX + ADMIN_GUILD_SLUG + ":" + raffleNumber
+}
+
+function loadImportHistoryForCurrentRaffle() {
+        var key = getCurrentImportHistoryKey()
+        if (!key) {
+                return []
+        }
+
+        try {
+                var raw = window.localStorage.getItem(key)
+                var parsed = raw ? JSON.parse(raw) : []
+                return Array.isArray(parsed) ? parsed : []
+        } catch (error) {
+                return []
+        }
+}
+
+function saveImportHistoryForCurrentRaffle(entries) {
+        var key = getCurrentImportHistoryKey()
+        if (!key) {
+                return
+        }
+        window.localStorage.setItem(key, JSON.stringify(entries || []))
+}
+
+function pruneImportHistoryToCurrentRaffle() {
+        var currentKey = getCurrentImportHistoryKey()
+        if (!currentKey || !window.localStorage) {
+                return
+        }
+
+        var prefix = IMPORT_HISTORY_PREFIX + ADMIN_GUILD_SLUG + ":"
+        for (var i = window.localStorage.length - 1; i >= 0; i--) {
+                var key = window.localStorage.key(i)
+                if (!key || key.indexOf(prefix) !== 0) {
+                        continue
+                }
+                if (key !== currentKey) {
+                        window.localStorage.removeItem(key)
+                }
+        }
+}
+
+function storeImportBatch(importKind, result) {
+        var normalized = normalizeImportResult(result)
+        if (!normalized.confirm_string && !normalized.confirm_names) {
+                return
+        }
+
+        var entries = loadImportHistoryForCurrentRaffle()
+        entries.unshift({
+                id: String(Date.now()),
+                kind: importKind || "import",
+                saved_at: new Date().toISOString(),
+                confirm_string: normalized.confirm_string,
+                confirm_names: normalized.confirm_names,
+                import_summary: normalized.import_summary
+        })
+        saveImportHistoryForCurrentRaffle(entries.slice(0, 12))
+}
+
+function formatRecentImportTime(isoValue) {
+        if (!isoValue) {
+                return ""
+        }
+        var date = new Date(isoValue)
+        if (isNaN(date.getTime())) {
+                return ""
+        }
+        return date.toLocaleString([], { month: "numeric", day: "numeric", hour: "numeric", minute: "2-digit" })
+}
+
+function formatImportKindLabel(kind) {
+        if (kind === "lua") return "Lua Import"
+        if (kind === "paid") return "Paid Import"
+        if (kind === "barter") return "Barter Import"
+        return "Import"
+}
+
+function reopenStoredImport(index) {
+        var entries = loadImportHistoryForCurrentRaffle()
+        var entry = entries[index]
+        if (!entry) {
+                alert("That saved import batch is no longer available.")
+                return
+        }
+
+        hideLegacyModal("#recent_imports_template")
+        hideLegacyModal("#barter_template")
+        hideLegacyModal("#paid_template")
+        showLegacyModal("#confirm_template", "confirm")
+        populateConfirmModal(entry)
+}
+
+function renderRecentImportsList() {
+        var entries = loadImportHistoryForCurrentRaffle()
+        var $host = $("#recent_imports_data")
+        $host.empty()
+
+        if (!entries.length) {
+                $host.append('<div class="recent-import-empty">No saved import batches for this raffle yet.</div>')
+                return
+        }
+
+        entries.forEach(function (entry, index) {
+                var summaryText = formatImportSummaryText(entry.import_summary) || "Saved import batch."
+                $host.append(
+                        '<div class="recent-import-item">' +
+                        '  <div class="recent-import-top">' +
+                        '    <div class="recent-import-kind">' + escapeHtml(formatImportKindLabel(entry.kind)) + '</div>' +
+                        '    <div class="recent-import-time">' + escapeHtml(formatRecentImportTime(entry.saved_at)) + '</div>' +
+                        '  </div>' +
+                        '  <div class="recent-import-summary">' + escapeHtml(summaryText) + '</div>' +
+                        '  <div class="recent-import-actions"><button type="button" class="recent-import-open" onclick="reopenStoredImport(' + index + ')">Open</button></div>' +
+                        '</div>'
+                )
+        })
+}
+
+function showRecentImportsModal() {
+        renderRecentImportsList()
+        hideLegacyModal("#account_settings_template")
+        hideLegacyModal("#manage_access_template")
+        hideLegacyModal("#confirm_template")
+        hideLegacyModal("#import_template")
+        hideLegacyModal("#barter_template")
+        hideLegacyModal("#paid_template")
+        showLegacyModal("#recent_imports_template", "confirm")
+}
+
+function formatBarterSummaryValue(value) {
+        var parsed = Number(value) || 0
+        return parsed.toLocaleString()
+}
+
+function renderBarterSummary(result) {
+        var rows = (result && result.rows) || []
+        var totals = (result && result.totals) || {}
+        var $host = $("#barter_summary_data")
+        $host.empty()
+
+        if (!rows.length) {
+                $host.append('<div class="recent-import-empty">No barter items have been accepted for this raffle yet.</div>')
+                return
+        }
+
+        var html = ''
+        html += '<div class="barter-summary-shell">'
+        html += '  <div class="barter-summary-toolbar"><button type="button" class="manage-access-btn subtle" id="copyBarterSummaryButton" onclick="copyBarterSummaryToSpreadsheet()">Copy to Spreadsheet</button></div>'
+        html += '  <table class="barter-summary-table">'
+        html += '    <thead><tr><th>Item Name</th><th>Total Bartered</th><th>Total Row Value</th></tr></thead>'
+        html += '    <tbody>'
+        rows.forEach(function (row) {
+                html += '      <tr>'
+                html += '        <td>' + escapeHtml(row.item_name || '') + '</td>'
+                html += '        <td>' + escapeHtml(formatBarterSummaryValue(row.total_bartered)) + '</td>'
+                html += '        <td>' + escapeHtml(formatBarterSummaryValue(row.total_row_value)) + '</td>'
+                html += '      </tr>'
+        })
+        html += '      <tr class="barter-summary-total-row">'
+        html += '        <td>TOTAL</td>'
+        html += '        <td>' + escapeHtml(formatBarterSummaryValue(totals.total_bartered)) + '</td>'
+        html += '        <td>' + escapeHtml(formatBarterSummaryValue(totals.total_row_value)) + '</td>'
+        html += '      </tr>'
+        html += '    </tbody>'
+        html += '  </table>'
+        html += '</div>'
+        $host.append(html)
+}
+
+function copyBarterSummaryToSpreadsheet() {
+        $.getJSON("json/get/barter_summary", function (result) {
+                var rows = (result && result.rows) || []
+                var totals = (result && result.totals) || {}
+                var lines = ["Item Name\tTotal Bartered\tTotal Row Value"]
+                rows.forEach(function (row) {
+                        lines.push([
+                                row.item_name || "",
+                                formatBarterSummaryValue(row.total_bartered),
+                                formatBarterSummaryValue(row.total_row_value)
+                        ].join("\t"))
+                })
+                lines.push([
+                        "TOTAL",
+                        formatBarterSummaryValue(totals.total_bartered),
+                        formatBarterSummaryValue(totals.total_row_value)
+                ].join("\t"))
+                var text = lines.join("\n")
+                navigator.clipboard.writeText(text).then(function () {
+                        var $button = $("#copyBarterSummaryButton")
+                        $button.text("Copied")
+                        window.setTimeout(function () { $button.text("Copy to Spreadsheet") }, 1800)
+                }).catch(function () {
+                        alert("Could not copy the barter summary automatically.")
+                })
+        }).fail(function () {
+                alert("Unable to load the barter summary right now.")
+        })
+}
+
+function showBarterSummaryModal() {
+        $.getJSON("json/get/barter_summary", function (result) {
+                renderBarterSummary(result || {})
+                hideLegacyModal("#account_settings_template")
+                hideLegacyModal("#manage_access_template")
+                hideLegacyModal("#guild_settings_template")
+                hideLegacyModal("#bounty_list_template")
+                hideLegacyModal("#recent_imports_template")
+                hideLegacyModal("#confirm_template")
+                hideLegacyModal("#import_template")
+                hideLegacyModal("#barter_template")
+                hideLegacyModal("#paid_template")
+                showLegacyModal("#barter_summary_template", "confirm")
+        }).fail(function () {
+                alert("Unable to load the barter summary right now.")
+        })
+}
+
+var ACCESS_MANAGER_STATE = {
+        users: [],
+        guilds: []
+}
+
+function setPasswordFieldsVisible(fieldIds, visible) {
+        fieldIds.forEach(function (fieldId) {
+                var field = document.getElementById(fieldId)
+                if (field) {
+                        field.type = visible ? "text" : "password"
+                }
+        })
+}
+
+function renderAccessManager() {
+        var $host = $("#manage_access_users")
+        $host.empty()
+
+        if (!ACCESS_MANAGER_STATE.users.length) {
+                $host.append('<div class="recent-import-empty">No admin users found.</div>')
+                return
+        }
+
+        ACCESS_MANAGER_STATE.users.forEach(function (user) {
+                var guildMarkup = ACCESS_MANAGER_STATE.guilds.map(function (guild) {
+                        var checked = user.guild_admins.indexOf(guild.guild_shortname) >= 0 ? ' checked' : ''
+                        return '<label class="manage-access-checkbox"><input type="checkbox" class="manage-access-guild" data-auth-id="' + user.auth_id + '" value="' + escapeHtml(guild.guild_shortname) + '"' + checked + ' /> <span>' + escapeHtml(guild.guild_shortname.toUpperCase()) + '</span></label>'
+                }).join("")
+
+                var roleParts = []
+                if (user.is_owner) {
+                        roleParts.push("Owner")
+                }
+                if (user.is_superadmin) {
+                        roleParts.push("Superadmin")
+                }
+                if (user.guild_admins.length) {
+                        roleParts.push("Guild admin: " + user.guild_admins.join(", "))
+                }
+                if (!roleParts.length) {
+                        roleParts.push("No admin roles assigned")
+                }
+
+                $host.append(
+                        '<div class="manage-access-user" data-auth-id="' + user.auth_id + '">' +
+                        '  <div class="manage-access-user-top">' +
+                        '    <div>' +
+                        '      <div class="manage-access-username">' + escapeHtml(user.auth_name) + '</div>' +
+                        '      <div class="manage-access-roleline">' + escapeHtml(roleParts.join(" | ")) + '</div>' +
+                        '    </div>' +
+                        '  </div>' +
+                        '  <div class="manage-access-controls">' +
+                        '    <label class="manage-access-checkbox"><input type="checkbox" class="manage-access-superadmin" data-auth-id="' + user.auth_id + '"' + (user.is_superadmin ? ' checked' : '') + ' /> <span>Superadmin</span></label>' +
+                        '    <div class="manage-access-guilds">' + guildMarkup + '</div>' +
+                        '  </div>' +
+                        '  <div class="manage-access-actions">' +
+                        '    <button type="button" class="manage-access-btn" onclick="resetAccessUserPassword(' + user.auth_id + ', \'' + escapeHtml(user.auth_name) + '\')">Reset Password</button>' +
+                        '    <button type="button" class="manage-access-btn" onclick="saveAccessUser(' + user.auth_id + ')">Save Access</button>' +
+                        '    <button type="button" class="manage-access-btn is-danger" onclick="deleteAccessUser(' + user.auth_id + ', \'' + escapeHtml(user.auth_name) + '\')">Delete User</button>' +
+                        '  </div>' +
+                        '</div>'
+                )
+        })
+}
+
+function setAccessManagerStatus(message, isError) {
+        var $status = $("#manageAccessStatus")
+        $status.text(message || "")
+        $status.css("color", isError ? "#8b1e1e" : "#536476")
+}
+
+function renderAccessCreateGuilds() {
+        var $host = $("#manageAccessCreateGuilds")
+        $host.empty()
+        ACCESS_MANAGER_STATE.guilds.forEach(function (guild) {
+                $host.append('<label class="manage-access-checkbox"><input type="checkbox" value="' + escapeHtml(guild.guild_shortname) + '" /> <span>' + escapeHtml(guild.guild_shortname.toUpperCase()) + '</span></label>')
+        })
+}
+
+function loadAccessManagerModal(statusMessage, isError) {
+        setAccessManagerStatus("Loading users...", false)
+        $.getJSON("json/get/auth_users", function (result) {
+                if (isActionError(result)) {
+                        setAccessManagerStatus(actionErrorMessage(result), true)
+                        return
+                }
+                ACCESS_MANAGER_STATE.users = result.users || []
+                ACCESS_MANAGER_STATE.guilds = result.guilds || []
+                renderAccessCreateGuilds()
+                renderAccessManager()
+                setAccessManagerStatus(statusMessage || "Superadmins can create users and assign guild access here.", !!isError)
+        }).fail(function () {
+                setAccessManagerStatus("Unable to load user access right now.", true)
+        })
+}
+
+function showManageAccessModal() {
+        hideLegacyModal("#change_password_template")
+        hideLegacyModal("#account_settings_template")
+        hideLegacyModal("#recent_imports_template")
+        hideLegacyModal("#confirm_template")
+        hideLegacyModal("#import_template")
+        hideLegacyModal("#barter_template")
+        hideLegacyModal("#paid_template")
+        showLegacyModal("#manage_access_template", "confirm")
+        loadAccessManagerModal()
+}
+
+function showChangePasswordModal(forceChange) {
+        var $template = $("#change_password_template")
+        $template.data("force-change", forceChange ? "1" : "0")
+        $("#changePasswordCurrent").val("")
+        $("#changePasswordNew").val("")
+        $("#changePasswordConfirm").val("")
+        $("#changePasswordShow").prop("checked", false)
+        setPasswordFieldsVisible(["changePasswordCurrent", "changePasswordNew", "changePasswordConfirm"], false)
+        setChangePasswordStatus(forceChange ? "Choose a new password before continuing." : "Update your password here.", false)
+        hideLegacyModal("#manage_access_template")
+        hideLegacyModal("#account_settings_template")
+        hideLegacyModal("#recent_imports_template")
+        hideLegacyModal("#confirm_template")
+        hideLegacyModal("#import_template")
+        hideLegacyModal("#barter_template")
+        hideLegacyModal("#paid_template")
+        showLegacyModal("#change_password_template", "confirm")
+}
+
+function setChangePasswordStatus(message, isError) {
+        var $status = $("#changePasswordStatus")
+        $status.text(message || "")
+        $status.toggleClass("is-error", !!isError)
+}
+
+function submitOwnPasswordChange() {
+        $.ajax({
+                type: "POST",
+                url: "json/set/change_password",
+                data: {
+                        current_password: $("#changePasswordCurrent").val(),
+                        new_password: $("#changePasswordNew").val(),
+                        confirm_password: $("#changePasswordConfirm").val()
+                },
+                success: function (result) {
+                        if (isActionError(result)) {
+                                setChangePasswordStatus(actionErrorMessage(result), true)
+                                return
+                        }
+                        setChangePasswordStatus("Password updated.", false)
+                        hideLegacyModal("#change_password_template")
+                        window.location.reload()
+                },
+                error: function () {
+                        setChangePasswordStatus("Unable to change password right now.", true)
+                },
+                xhrFields: {
+                        withCredentials: true
+                }
+        })
+}
+
+function setAccountSettingsStatus(message, isError) {
+        var $status = $("#accountSettingsStatus")
+        $status.text(message || "")
+        $status.toggleClass("is-error", !!isError)
+}
+
+function populateAccountDateTimeFormatOptions(selectedValue) {
+        var options = [
+                { value: "us_12", label: "M/D/YYYY h:mm:ss AM/PM" },
+                { value: "us_24", label: "M/D/YYYY HH:mm:ss" },
+                { value: "intl_12", label: "D/M/YYYY h:mm:ss AM/PM" },
+                { value: "intl_24", label: "D/M/YYYY HH:mm:ss" }
+        ]
+        var normalized = String(selectedValue || "us_12").toLowerCase()
+        var $select = $("#accountSettingsDateTimeFormat")
+        $select.empty()
+        $.each(options, function (_, option) {
+                var $option = $("<option></option>").attr("value", option.value).text(option.label)
+                if (option.value === normalized) {
+                        $option.prop("selected", true)
+                }
+                $select.append($option)
+        })
+}
+
+function applyAccountSettings(settings) {
+        settings = settings || {}
+        ADMIN_ACCOUNT_SETTINGS.timezone = $.trim(String(settings.auth_timezone || ""))
+        ADMIN_ACCOUNT_SETTINGS.datetime_format = $.trim(String(settings.auth_datetime_format || "us_12")) || "us_12"
+}
+
+function showAccountSettingsModal() {
+        if ($("#change_password_template").data("force-change") === "1" && $("#change_password_template").is(":visible")) {
+                return
+        }
+        setAccountSettingsStatus("Loading account settings...", false)
+        $.getJSON("json/get/account_settings", function (result) {
+                if (isActionError(result)) {
+                        setAccountSettingsStatus(actionErrorMessage(result), true)
+                        return
+                }
+                var settings = result.settings || {}
+                $("#accountSettingsTimeZone").val("browser")
+                populateAccountTimeZoneOptions(settings.auth_timezone || "browser")
+                populateAccountDateTimeFormatOptions(settings.auth_datetime_format || "us_12")
+                setAccountSettingsStatus("", false)
+                hideLegacyModal("#change_password_template")
+                hideLegacyModal("#manage_access_template")
+                hideLegacyModal("#recent_imports_template")
+                hideLegacyModal("#confirm_template")
+                hideLegacyModal("#import_template")
+                hideLegacyModal("#barter_template")
+                hideLegacyModal("#paid_template")
+                hideLegacyModal("#guild_settings_template")
+                showLegacyModal("#account_settings_template", "confirm")
+        }).fail(function () {
+                populateAccountTimeZoneOptions("browser")
+                populateAccountDateTimeFormatOptions("us_12")
+                setAccountSettingsStatus("Unable to load account settings right now.", true)
+                hideLegacyModal("#change_password_template")
+                hideLegacyModal("#manage_access_template")
+                hideLegacyModal("#recent_imports_template")
+                hideLegacyModal("#confirm_template")
+                hideLegacyModal("#import_template")
+                hideLegacyModal("#barter_template")
+                hideLegacyModal("#paid_template")
+                hideLegacyModal("#guild_settings_template")
+                showLegacyModal("#account_settings_template", "confirm")
+        })
+}
+
+function saveAccountSettings() {
+        setAccountSettingsStatus("Saving...", false)
+        $.ajax({
+                type: "POST",
+                url: "json/set/account_settings",
+                data: {
+                        auth_timezone: $("#accountSettingsTimeZone").val(),
+                        auth_datetime_format: $("#accountSettingsDateTimeFormat").val()
+                },
+                success: function (result) {
+                        if (isActionError(result)) {
+                                setAccountSettingsStatus(actionErrorMessage(result), true)
+                                return
+                        }
+                        applyAccountSettings(result.settings || {})
+                        setAccountSettingsStatus("Account settings saved.", false)
+                        if (window.CURRENT_RAFFLE_INFO && CURRENT_RAFFLE_INFO.raffle_updated) {
+                                var updated = formatAdminTimestamp(CURRENT_RAFFLE_INFO.raffle_updated)
+                                var updatedBy = $.trim(String(CURRENT_RAFFLE_INFO.raffle_updated_by || ""))
+                                var rendered = updated ? (updatedBy ? ("Last Updated " + updated + " by " + updatedBy) : ("Last Updated " + updated)) : ""
+                                $("#raffle_updated").text(rendered)
+                                $("#display_raffle_updated").text(rendered)
+                        }
+                },
+                error: function () {
+                        setAccountSettingsStatus("Unable to save account settings right now.", true)
+                },
+                xhrFields: {
+                        withCredentials: true
+                }
+        })
+}
+
+function createAccessUser() {
+        var username = $.trim($("#manageAccessUsername").val())
+        var password = $("#manageAccessPassword").val()
+        var confirmPassword = $("#manageAccessPasswordConfirm").val()
+        var isSuperadmin = $("#manageAccessCreateSuperadmin").is(":checked")
+        var guilds = []
+
+        $("#manageAccessCreateGuilds input:checked").each(function () {
+                guilds.push($(this).val())
+        })
+
+        $.ajax({
+                type: "POST",
+                url: "json/set/auth_user_create",
+                data: {
+                        auth_name: username,
+                        auth_password: password,
+                        auth_password_confirm: confirmPassword,
+                        is_superadmin: isSuperadmin ? "1" : "0",
+                        guild_admins: guilds.join(",")
+                },
+                success: function (result) {
+                        if (isActionError(result)) {
+                                setAccessManagerStatus(actionErrorMessage(result), true)
+                                return
+                        }
+                        $("#manageAccessUsername").val("")
+                        $("#manageAccessPassword").val("")
+                        $("#manageAccessPasswordConfirm").val("")
+                        $("#manageAccessCreateSuperadmin").prop("checked", false)
+                        $("#manageAccessShowPassword").prop("checked", false)
+                        setPasswordFieldsVisible(["manageAccessPassword", "manageAccessPasswordConfirm"], false)
+                        $("#manageAccessCreateGuilds input").prop("checked", false)
+                        loadAccessManagerModal()
+                        setAccessManagerStatus("User created. They will be asked to choose a new password after first login.", false)
+                },
+                error: function () {
+                        setAccessManagerStatus("Unable to create that user.", true)
+                },
+                xhrFields: {
+                        withCredentials: true
+                }
+        })
+}
+
+function resetAccessUserPassword(userId, username) {
+        var password = window.prompt('Set a temporary password for "' + username + '"')
+        if (password == null) {
+                return
+        }
+        var confirmPassword = window.prompt('Confirm the temporary password for "' + username + '"')
+        if (confirmPassword == null) {
+                return
+        }
+        if (password !== confirmPassword) {
+                setAccessManagerStatus("Temporary password and confirmation do not match.", true)
+                window.alert("Temporary password and confirmation do not match.")
+                return
+        }
+
+        $.ajax({
+                type: "POST",
+                url: "json/set/auth_user_reset_password",
+                data: {
+                        auth_id: userId,
+                        auth_password: password,
+                        auth_password_confirm: confirmPassword
+                },
+                success: function (result) {
+                        if (isActionError(result)) {
+                                setAccessManagerStatus(actionErrorMessage(result), true)
+                                window.alert(actionErrorMessage(result))
+                                return
+                        }
+                        loadAccessManagerModal()
+                        setAccessManagerStatus("Password reset. That user will be asked to choose a new password after login.", false)
+                        window.alert('Password reset for "' + username + '". They will be asked to choose a new password after login.')
+                },
+                error: function () {
+                        setAccessManagerStatus("Unable to reset that password.", true)
+                        window.alert("Unable to reset that password right now.")
+                },
+                xhrFields: {
+                        withCredentials: true
+                }
+        })
+}
+
+function saveAccessUser(userId) {
+        var isSuperadmin = $('.manage-access-superadmin[data-auth-id="' + userId + '"]').is(":checked")
+        var guilds = []
+        $('.manage-access-guild[data-auth-id="' + userId + '"]:checked').each(function () {
+                guilds.push($(this).val())
+        })
+
+        $.ajax({
+                type: "POST",
+                url: "json/set/auth_user_roles",
+                data: {
+                        auth_id: userId,
+                        is_superadmin: isSuperadmin ? "1" : "0",
+                        guild_admins: guilds.join(",")
+                },
+                success: function (result) {
+                        if (isActionError(result)) {
+                                var errorMessage = actionErrorMessage(result)
+                                window.alert(errorMessage)
+                                loadAccessManagerModal(errorMessage, true)
+                                return
+                        }
+                        loadAccessManagerModal("Access updated.", false)
+                        window.alert("Access updated.")
+                },
+                error: function () {
+                        setAccessManagerStatus("Unable to update that user.", true)
+                        window.alert("Unable to update that user right now.")
+                },
+                xhrFields: {
+                        withCredentials: true
+                }
+        })
+}
+
+function deleteAccessUser(userId, username) {
+        if (!window.confirm('Delete user "' + username + '"? This removes login access immediately.')) {
+                return
+        }
+
+        $.ajax({
+                type: "POST",
+                url: "json/set/auth_user_delete",
+                data: {
+                        auth_id: userId
+                },
+                success: function (result) {
+                        if (isActionError(result)) {
+                                setAccessManagerStatus(actionErrorMessage(result), true)
+                                return
+                        }
+                        loadAccessManagerModal()
+                        setAccessManagerStatus("User deleted.", false)
+                },
+                error: function () {
+                        setAccessManagerStatus("Unable to delete that user.", true)
+                },
+                xhrFields: {
+                        withCredentials: true
+                }
+        })
+}
+
+function copyTextAreaValue(textareaId, buttonEl) {
+        var field = document.getElementById(textareaId)
+        if (!field) {
+                return
+        }
+
+        var originalLabel = buttonEl ? buttonEl.textContent : ""
+        field.focus()
+        field.select()
+        field.setSelectionRange(0, field.value.length)
+
+        var copyPromise
+        if (navigator.clipboard && window.isSecureContext) {
+                copyPromise = navigator.clipboard.writeText(field.value)
+        } else {
+                copyPromise = new Promise(function (resolve, reject) {
+                        try {
+                                if (document.execCommand("copy")) {
+                                        resolve()
+                                } else {
+                                        reject(new Error("copy failed"))
+                                }
+                        } catch (error) {
+                                reject(error)
+                        }
+                })
+        }
+
+        copyPromise.then(function () {
+                if (buttonEl) {
+                        buttonEl.textContent = "Copied"
+                        window.setTimeout(function () {
+                                buttonEl.textContent = originalLabel || "Copy"
+                        }, 1200)
+                }
+        }).catch(function () {
+                window.alert("Copy failed. Please copy the text manually.")
+        })
 }
 
 var NOTE_TAB_ORDER = [
@@ -2589,8 +5404,11 @@ function renderActiveNoteTab() {
         $('.note-tab[data-note-key="' + NOTE_EDITOR_STATE.activeKey + '"]').addClass("active")
 }
 
-function loadNoteTab(noteKey) {
-        persistActiveNoteDraft()
+function loadNoteTab(noteKey, options) {
+        options = options || {}
+        if (!options.skipPersist) {
+                persistActiveNoteDraft()
+        }
         NOTE_EDITOR_STATE.activeKey = noteKey
 
         var surface = getNotesEditorSurface()
@@ -2612,7 +5430,7 @@ function loadNoteDraftsFromRaffle(result) {
         $("#raffle_notes").val(NOTE_EDITOR_STATE.drafts.raffle_notes)
         $("#raffle_notes_public_2").val(NOTE_EDITOR_STATE.drafts.raffle_notes_public_2)
 
-        loadNoteTab(NOTE_EDITOR_STATE.activeKey || "raffle_notes_admin")
+        loadNoteTab(NOTE_EDITOR_STATE.activeKey || "raffle_notes_admin", { skipPersist: true })
         setNoteSaveState(false, "Saved")
         applyNotesEditorMode()
 }
@@ -2639,8 +5457,12 @@ function saveNotes() {
 
         $.ajax({
                 type: "POST",
-                url: "json/set/raffle",
-                data: $("#ginfo_form").serialize(),
+                url: "json/set/raffle_notes",
+                data: {
+                        raffle_notes: $("#raffle_notes").val(),
+                        raffle_notes_admin: $("#raffle_notes_admin").val(),
+                        raffle_notes_public_2: $("#raffle_notes_public_2").val()
+                },
                 success: function () {
                         setNoteSaveState(false, "Saved")
                 },
@@ -2825,8 +5647,14 @@ $(document).on("click", "#notesSaveBtn", function () {
 })
 
 $(document).on("click", "#legacy_modal_backdrop", function () {
+        if ($("#change_password_template").data("force-change") === "1") {
+                return
+        }
         hideLegacyModal("#import_template")
         hideLegacyModal("#confirm_template")
+        hideLegacyModal("#change_password_template")
+        hideLegacyModal("#manage_access_template")
+        hideLegacyModal("#recent_imports_template")
         hideLegacyModal("#barter_template")
         hideLegacyModal("#paid_template")
         hideNewRaffleModal()
@@ -2848,7 +5676,21 @@ var CURRENT_RAFFLE_INFO = {
     raffle_subheader: "",
     raffle_time: "",
     raffle_cost: "",
-    raffle_status: "LIVE"
+    raffle_status: "LIVE",
+    raffle_barter_enabled: 0,
+    raffle_gold_mail_enabled: 1,
+    raffle_gold_bank_enabled: 1,
+    raffle_barter_mail_enabled: 0,
+    raffle_barter_bank_enabled: 0,
+    raffle_updated: "",
+    raffle_updated_by: ""
+}
+
+var DEFAULT_RAFFLE_IMPORT_RULES = {
+    raffle_gold_mail_enabled: 1,
+    raffle_gold_bank_enabled: 1,
+    raffle_barter_mail_enabled: 0,
+    raffle_barter_bank_enabled: 0
 }
 
 function normalizeFieldValue(value) {
@@ -2856,6 +5698,72 @@ function normalizeFieldValue(value) {
         return ""
     }
     return $.trim(String(value))
+}
+
+function normalizeToggleEnabledValue(value) {
+    return String(value == null ? "" : value).trim().toLowerCase() === "1" ||
+        String(value == null ? "" : value).trim().toLowerCase() === "true" ||
+        String(value == null ? "" : value).trim().toLowerCase() === "yes" ||
+        String(value == null ? "" : value).trim().toLowerCase() === "on"
+}
+
+function getNormalizedRaffleImportRules(source) {
+    var raw = source || {}
+    return {
+        raffle_gold_mail_enabled: normalizeToggleEnabledValue(raw.raffle_gold_mail_enabled == null ? DEFAULT_RAFFLE_IMPORT_RULES.raffle_gold_mail_enabled : raw.raffle_gold_mail_enabled) ? 1 : 0,
+        raffle_gold_bank_enabled: normalizeToggleEnabledValue(raw.raffle_gold_bank_enabled == null ? DEFAULT_RAFFLE_IMPORT_RULES.raffle_gold_bank_enabled : raw.raffle_gold_bank_enabled) ? 1 : 0,
+        raffle_barter_mail_enabled: normalizeToggleEnabledValue(raw.raffle_barter_mail_enabled == null ? (raw.raffle_barter_enabled == null ? DEFAULT_RAFFLE_IMPORT_RULES.raffle_barter_mail_enabled : raw.raffle_barter_enabled) : raw.raffle_barter_mail_enabled) ? 1 : 0,
+        raffle_barter_bank_enabled: normalizeToggleEnabledValue(raw.raffle_barter_bank_enabled == null ? (raw.raffle_barter_enabled == null ? DEFAULT_RAFFLE_IMPORT_RULES.raffle_barter_bank_enabled : raw.raffle_barter_enabled) : raw.raffle_barter_bank_enabled) ? 1 : 0
+    }
+}
+
+function updateBarterToggleVisual(input) {
+    var $input = $(input)
+    var isEnabled = $input.is(":checked")
+    var $scope = $input.closest(".barter-toggle-shell, .guild-settings-barter-strip")
+    $scope.find(".barter-toggle-value").text(isEnabled ? "ON" : "OFF").toggleClass("is-on", isEnabled)
+}
+
+function syncCurrentRaffleImportRuleState(source) {
+    var normalized = getNormalizedRaffleImportRules(source)
+    $.each(normalized, function (fieldName, enabledValue) {
+        CURRENT_RAFFLE_INFO[fieldName] = enabledValue ? 1 : 0
+    })
+    CURRENT_RAFFLE_INFO.raffle_barter_enabled = (CURRENT_RAFFLE_INFO.raffle_barter_mail_enabled || CURRENT_RAFFLE_INFO.raffle_barter_bank_enabled) ? 1 : 0
+
+    $(".barter-toggle-input[data-mode='current']").each(function () {
+        var fieldName = $(this).attr("data-field")
+        var isEnabled = !!CURRENT_RAFFLE_INFO[fieldName]
+        this.checked = isEnabled
+        updateBarterToggleVisual(this)
+    })
+}
+
+function saveCurrentRaffleImportRule(fieldName, enabled) {
+    var previousState = getNormalizedRaffleImportRules(CURRENT_RAFFLE_INFO)
+    var nextState = $.extend({}, previousState)
+    nextState[fieldName] = enabled ? 1 : 0
+    syncCurrentRaffleImportRuleState(nextState)
+    $.ajax({
+        type: "POST",
+        url: "json/set/raffle",
+        data: $.extend({}, nextState),
+        success: function (result) {
+            if (isActionError(result)) {
+                syncCurrentRaffleImportRuleState(previousState)
+                alert(actionErrorMessage(result))
+                return
+            }
+            syncCurrentRaffleImportRuleState(result || nextState)
+        },
+        error: function () {
+            syncCurrentRaffleImportRuleState(previousState)
+            alert("Unable to update raffle import rules right now.")
+        },
+        xhrFields: {
+            withCredentials: true
+        }
+    })
 }
 
 function padWeekNumber(value) {
@@ -2937,6 +5845,12 @@ function populateNewRaffleModal() {
     $("#newRaffleTime").val($("#raffle_time").val() || CURRENT_RAFFLE_INFO.raffle_time || "")
     $("#newRaffleCost").val($("#raffle_cost").val() || CURRENT_RAFFLE_INFO.raffle_cost || "")
     $("#newRaffleTitle").val("")
+    $(".barter-toggle-input[data-mode='new']").each(function () {
+        var fieldName = $(this).attr("data-field")
+        var shouldEnable = !!DEFAULT_RAFFLE_IMPORT_RULES[fieldName]
+        $(this).prop("checked", shouldEnable)
+        updateBarterToggleVisual(this)
+    })
     $("#newRaffleClonePrizes").prop("checked", false)
 
     document.querySelectorAll(".new-raffle-editor").forEach(function (surface) {
@@ -2976,6 +5890,11 @@ function collectNewRafflePayload() {
         raffle_status: "LIVE",
         clone_prizes: $("#newRaffleClonePrizes").is(":checked") ? "1" : "0"
     }
+
+    $(".barter-toggle-input[data-mode='new']").each(function () {
+        var fieldName = $(this).attr("data-field")
+        payload[fieldName] = $(this).is(":checked") ? "1" : "0"
+    })
 
     document.querySelectorAll(".new-raffle-editor").forEach(function (surface) {
         var noteKey = surface.getAttribute("data-note-key")
@@ -3032,6 +5951,10 @@ var get_guild_header = function () {
         $.getJSON("json/get/guild", function (result) {
                 $("#guild_header").text(result["guild_name"])
                 $("#display_guild_header").text(result["guild_name"])
+                applyGuildBranding(result)
+                $.getJSON("json/get/guild_choices", function (choicesResult) {
+                        renderProfileGuildLinks(result["guild_shortname"], result["guild_sister_guilds"] || [], (choicesResult && choicesResult.guilds) || [])
+                })
             });
     }
 var get_raffle_info = function () {
@@ -3040,8 +5963,9 @@ var get_raffle_info = function () {
                 $("#raffle_subheader").val(result["raffle_guild_num"])
 $("#raffle_time").val(result["raffle_time"])
 $("#raffle_cost").val(result["raffle_ticket_cost"])
-$("#raffle_title").val(result["raffle_title"] || "")
-$("#raffle_status").val(normalizeRaffleStatus(result["raffle_status"]))
+  $("#raffle_title").val(result["raffle_title"] || "")
+  $("#raffle_status").val(normalizeRaffleStatus(result["raffle_status"]))
+  syncCurrentRaffleImportRuleState(result)
                 loadNoteDraftsFromRaffle(result)
                 applyAdminStatus(result["raffle_status"])
 
@@ -3049,9 +5973,12 @@ $("#raffle_status").val(normalizeRaffleStatus(result["raffle_status"]))
                 CURRENT_RAFFLE_INFO.raffle_time = normalizeFieldValue(result["raffle_time"])
                 CURRENT_RAFFLE_INFO.raffle_cost = normalizeFieldValue(result["raffle_ticket_cost"])
                 CURRENT_RAFFLE_INFO.raffle_status = normalizeRaffleStatus(result["raffle_status"])
+                pruneImportHistoryToCurrentRaffle()
 
-                $("#display_raffle_subheader").text("#" + result["raffle_guild_num"] + " Raffle")
-                $("#display_raffle_time").text("Drawing: " + result["raffle_time"])
+                var raffleHeader = buildRaffleHeaderParts(result["raffle_guild_num"], result["raffle_title"], result["raffle_time"])
+                $("#display_raffle_subheader").text(raffleHeader.heading)
+                $("#display_raffle_meta_sep").text(raffleHeader.separator)
+                $("#display_raffle_time").text(raffleHeader.trailing)
             })
 }
 var get_prize_info = function (options) {
@@ -3349,7 +6276,7 @@ var get_ticket_table = function () {
         }
 
         function after_cell_change (change, source) {
-            if (source == "ignore") { return }
+            if (source == "ignore" || source == "loadData") { return }
 
 % if request.extended_tickets:
             if (change) {
@@ -3361,15 +6288,13 @@ var get_ticket_table = function () {
                 var ti = $("#ticket_info")
 
                 var paid = ti.handsontable("getDataAtCell", row, 3)
-                var free = ti.handsontable("getDataAtCell", row, 4)
-                var bart = ti.handsontable("getDataAtCell", row, 5)
+                var bart = ti.handsontable("getDataAtCell", row, 4)
                 
                 // Ensure values are numbers
                 paid = isNaN(paid) ? 0 : Number(paid)
-                free = isNaN(free) ? 0 : Number(free)
                 bart = isNaN(bart) ? 0 : Number(bart)
 
-                var total = paid + free + bart
+                var total = paid + bart
 
                 ti.handsontable("setDataAtCell", row, 2, total, "ignore")
             }
@@ -3400,12 +6325,22 @@ var get_ticket_table = function () {
         }
 
         $.getJSON("json/get/timestamp", function (result) {
-                if (!result) { return; }
+                if (!result || !result.timestamp) {
+                        CURRENT_RAFFLE_INFO.raffle_updated = ""
+                        CURRENT_RAFFLE_INFO.raffle_updated_by = ""
+                        $("#raffle_updated").text("")
+                        $("#display_raffle_updated").text("")
+                        return
+                }
 
-                var updated = DateFormat.format.date(parseInt(result) * 1000, "M/d/yyyy h:mm:ss a") + " EDT"
+                CURRENT_RAFFLE_INFO.raffle_updated = result.timestamp
+                CURRENT_RAFFLE_INFO.raffle_updated_by = result.updated_by || ""
+                var updated = formatAdminTimestamp(result.timestamp)
+                var updatedBy = $.trim(String(result.updated_by || ""))
+                var rendered = updatedBy ? ("Last Updated " + updated.toString() + " by " + updatedBy) : ("Last Updated " + updated.toString())
 
-                $("#raffle_updated").text("Updated: " + updated.toString())
-                $("#display_raffle_updated").text("Last Updated " + updated.toString())
+                $("#raffle_updated").text(rendered)
+                $("#display_raffle_updated").text(rendered)
                 
                 })
 % if request.extended_tickets:
@@ -3417,7 +6352,7 @@ var get_ticket_table = function () {
                         height: "auto",
                         rowHeaders: false,
                         colHeaders: ["#", "Name", "Total", "Paid", "Bar", "Range"],
-                        colWidths: [28, 146, 50, 46, 38, 122],
+                        colWidths: [28, 132, 56, 52, 64, 136],
                         contextMenu: false,
                         enterMoves: {row: 0, col: 1},
                         columnSorting: true,
@@ -3631,17 +6566,30 @@ $(document).ready(function () {
                         if (trackedMap[fieldId]) {
                             CURRENT_RAFFLE_INFO[trackedMap[fieldId]] = normalizeFieldValue($field.val())
                         }
-                        if (fieldId === "raffle_status") {
-                            var savedStatus = normalizeRaffleStatus((result && result.raffle_status) || $field.val())
-                            $field.val(savedStatus)
-                            applyAdminStatus(savedStatus)
-                            CURRENT_RAFFLE_INFO.raffle_status = savedStatus
-                        }
-                    },
-                    xhrFields: {
-                        withCredentials: true
+                    if (fieldId === "raffle_status") {
+                        var savedStatus = normalizeRaffleStatus((result && result.raffle_status) || $field.val())
+                        $field.val(savedStatus)
+                        applyAdminStatus(savedStatus)
+                        CURRENT_RAFFLE_INFO.raffle_status = savedStatus
                     }
-                })
+                    if (result) {
+                        syncCurrentRaffleImportRuleState(result)
+                    }
+                },
+                xhrFields: {
+                    withCredentials: true
+                }
+            })
+        })
+            $(document).on("change", ".barter-toggle-input", function () {
+                updateBarterToggleVisual(this)
+            })
+            $(document).on("change", ".barter-toggle-input[data-mode='current']", function () {
+                var fieldName = $(this).attr("data-field")
+                if (!fieldName) {
+                    return
+                }
+                saveCurrentRaffleImportRule(fieldName, $(this).is(":checked"))
             })
             $("#add_prize_button").click(function (event) {
                 event.preventDefault()
@@ -3683,27 +6631,68 @@ $(document).ready(function () {
                 }
                 
                 showLegacyModal("#import_template", "import")
+                var importRows = $.isArray(response) ? response : (response.rows || [])
+                var importWarnings = $.isArray(response.warnings) ? response.warnings : []
+                var importContext = response && response.import_context ? $.extend({}, response.import_context) : null
+                if (importContext) {
+                    importContext.import_rows = importRows
+                }
+                updateImportGuardrailSummary(importWarnings)
+                updateImportFileSummary(importContext)
+                var mismatchPrompts = collectImportMismatchPrompts(importWarnings)
+                if (mismatchPrompts.length) {
+                    var proceed = window.confirm(mismatchPrompts.join("\n\n"))
+                    if (!proceed) {
+                        hideLegacyModal("#import_template")
+                        return
+                    }
+                }
                 // get the first header
                 var headline = $("#import_data_here tr").first().clone() 
                 $("#import_data_here").empty().append(headline)
                 var table = $("#import_data_here")
-                $.each(response, function (key, item) {
+                if (!importRows.length) {
+                    var emptyTr = $("<tr></tr>")
+                    $("<td colspan='5' class='import-empty-state'></td>")
+                        .text("No new eligible ticket rows were found in this file.")
+                        .appendTo(emptyTr)
+                    table.append(emptyTr)
+                    $("#check_all").prop("checked", false)
+                    return
+                }
+                $.each(importRows, function (key, item) {
+                    var itemName = (item && typeof item === "object" && !Array.isArray(item)) ? (item.name || "") : item[0]
+                    var itemUid = (item && typeof item === "object" && !Array.isArray(item)) ? (item.uid || "") : item[4]
+                    var itemTotal = (item && typeof item === "object" && !Array.isArray(item)) ? (item.total_tickets || 0) : item[1]
+                    var itemPaid = (item && typeof item === "object" && !Array.isArray(item)) ? (item.paid_tickets || 0) : item[1]
+                    var itemBarter = (item && typeof item === "object" && !Array.isArray(item)) ? (item.barter_tickets || 0) : 0
+                    var itemSubject = (item && typeof item === "object" && !Array.isArray(item)) ? (item.subject || "") : item[2]
+                    var itemBarterItems = (item && typeof item === "object" && !Array.isArray(item) && $.isArray(item.barter_items)) ? item.barter_items : []
+                    var itemBarterJson = JSON.stringify(itemBarterItems)
+                    var itemBarterSummary = buildBarterItemSummary(itemBarterItems)
                     var tr = $("<tr></tr>")
                     var td = $("<td></td>")
                     var name_td = td.clone()
-                    var name = $("<input type='text' name='row"+key+"_name' />").val(item[0]).appendTo(name_td)
+                    var name = $("<input type='text' name='row"+key+"_name' />").val(itemName).appendTo(name_td)
                     name_td.appendTo(tr)
-                    var uid = $("<input type='hidden' name='row"+key+"_uid' />").val(item[4]).appendTo(name_td)
-                    var amount = $("<input type='text' name='row"+key+"_amount' />").val(item[1]).appendTo(td.clone().appendTo(tr))
-                    var sub
-                    if (item[2] == "GUILD BANK DEPOSIT") { sub = "[Guild Bank]" } else { sub = item[2] }
-                    var subject = td.clone().text(sub).appendTo(tr)
-                    var time
-                    if (item[3] == "MAILED IN") { time = "[Mail]" } else { time = item[3] }
-                    var time_ = td.clone().text(time).appendTo(tr)
-                    var check = $("<input type='checkbox' name='row"+key+"_confirmed' />").appendTo(td.clone().appendTo(tr))
-                    table.append(tr)
-                })
+                    var uid = $("<input type='hidden' name='row"+key+"_uid' />").val(itemUid).appendTo(name_td)
+                    $("<input type='hidden' name='row"+key+"_paid_tickets' />").val(itemPaid).appendTo(name_td)
+                    $("<input type='hidden' name='row"+key+"_barter_tickets' />").val(itemBarter).appendTo(name_td)
+                    $("<input type='hidden' name='row"+key+"_barter_items_json' />").val(itemBarterJson).appendTo(name_td)
+                     var amount = $("<input type='text' name='row"+key+"_amount' />").val(itemTotal).appendTo(td.clone().appendTo(tr))
+                     var sub
+                     if (itemBarterSummary) {
+                         sub = itemBarterSummary
+                     } else if (itemSubject == "GUILD BANK DEPOSIT") {
+                         sub = "[Guild Bank]"
+                     } else {
+                         sub = itemSubject
+                     }
+                     var subject = td.clone().text(sub).appendTo(tr)
+                     var time_ = td.clone().text(buildImportTimeLabel(item)).appendTo(tr)
+                     var check = $("<input type='checkbox' name='row"+key+"_confirmed' />").appendTo(td.clone().appendTo(tr))
+                     table.append(tr)
+                 })
                 $("#check_all").prop("checked", false)
             });
             
@@ -3727,8 +6716,44 @@ $(document).ready(function () {
                 }
             })
 
-            $("#import_close_button").click(function () { hideLegacyModal("#import_template") })
+            $("#import_close_button").click(function () {
+                updateImportGuardrailSummary([])
+                updateImportFileSummary(null)
+                hideLegacyModal("#import_template")
+            })
+            $("#import_debug_copy").click(function () {
+                var payload = String(window.LAST_IMPORT_DEBUG_REPORT || "")
+                if (!payload) {
+                    alert("No import debug report is available yet.")
+                    return
+                }
+                navigator.clipboard.writeText(payload).then(function () {
+                    alert("Import debug report copied.")
+                }).catch(function () {
+                    alert("Couldn't copy automatically. Here's the report:\n\n" + payload)
+                })
+            })
             $("#confirm_close_button").click(function () { hideLegacyModal("#confirm_template") })
+            $("#change_password_close_button").click(function () {
+                if ($("#change_password_template").data("force-change") === "1") {
+                    return
+                }
+                hideLegacyModal("#change_password_template")
+            })
+            $("#account_settings_close_button").click(function () { hideLegacyModal("#account_settings_template") })
+            $("#manage_access_close_button").click(function () { hideLegacyModal("#manage_access_template") })
+            $("#guild_settings_close_button").click(function () { hideLegacyModal("#guild_settings_template") })
+            $("#bounty_list_close_button").click(function () { hideLegacyModal("#bounty_list_template") })
+            $("#barter_summary_close_button").click(function () { hideLegacyModal("#barter_summary_template") })
+            $("#guildSettingsLogoUrl").on("input", function () { updateGuildLogoPreview($(this).val()) })
+            $("#guildSettingsFaviconUrl").on("input", function () { updateGuildFaviconPreview($(this).val()) })
+            $(document).on("input change", "#guild_settings_template .guild-settings-input, #guild_settings_template .guild-settings-select, #guild_settings_template .guild-color-input, #guild_settings_template .guild-mail-account-input, #guild_settings_template .guild-blacklist-input, #guild_settings_template .guild-sister-checkbox", function () {
+                markGuildSettingsDirty()
+            })
+            $(document).on("input change", "#bounty_list_template .guild-settings-input", function () {
+                markBountyListDirty()
+            })
+            $("#recent_imports_close_button").click(function () { hideLegacyModal("#recent_imports_template") })
             $("#barter_close_button").click(function () { hideLegacyModal("#barter_template") })
             $("#paid_close_button").click(function () { hideLegacyModal("#paid_template") })
             $("#import_selected").click(function () {
@@ -3745,8 +6770,8 @@ $(document).ready(function () {
                                     refresher()
                                     hideLegacyModal("#import_template")
                                     showLegacyModal("#confirm_template", "confirm")
-                                    $("#confirm_string").val(result[0])
-                                    $("#confirm_names").val(result[1])
+                                    storeImportBatch("lua", result)
+                                    populateConfirmModal(result)
                                 },
                                 error: function (xhr, status, error) {
                                     alert("Import failed: " + error + "\nStatus: " + status + "\nResponse: " + xhr.responseText);
@@ -3761,6 +6786,9 @@ $(document).ready(function () {
           $("#reshow_import").click(function () { hideLegacyModal("#confirm_template")
                                                   showLegacyModal("#import_template", "import") })
           $("#reshow_confirm").click(function () { showLegacyModal("#confirm_template", "confirm")
+                                                  hideLegacyModal("#import_template") })
+          $("#reshow_recent_imports").click(function () { showRecentImportsModal()
+                                                  hideLegacyModal("#confirm_template")
                                                   hideLegacyModal("#import_template") })
           $("#import_barter").click(function () { hideLegacyModal("#confirm_template")
                                                   showLegacyModal("#barter_template", "barter") })
@@ -3777,8 +6805,8 @@ $(document).ready(function () {
                                     refresher()
                                     hideLegacyModal("#barter_template")
                                     showLegacyModal("#confirm_template", "confirm")
-                                    $("#confirm_string").val(result[0])
-                                    $("#confirm_names").val(result[1])
+                                    storeImportBatch("barter", result)
+                                    populateConfirmModal(result)
                                 },
                                 xhrFields: {
                                     withCredentials: true
@@ -3798,8 +6826,8 @@ $(document).ready(function () {
                                     refresher()
                                     hideLegacyModal("#paid_template")
                                     showLegacyModal("#confirm_template", "confirm")
-                                    $("#confirm_string").val(result[0])
-                                    $("#confirm_names").val(result[1])
+                                    storeImportBatch("paid", result)
+                                    populateConfirmModal(result)
                                 },
                                 xhrFields: {
                                     withCredentials: true
@@ -3817,50 +6845,67 @@ $(window).resize(function () {
 document.addEventListener('DOMContentLoaded', function () {
         var menu = document.getElementById('adminProfileMenu')
         var trigger = document.getElementById('adminProfileMenuTrigger')
-        var submenu = document.getElementById('adminTemplateSubmenu')
-        var submenuTrigger = document.getElementById('adminTemplateSubmenuTrigger')
-
-        if (!menu || !trigger || !submenu || !submenuTrigger) {
+        if (!menu || !trigger) {
                 return
         }
+
+        var submenuPairs = [
+                {
+                        shell: document.getElementById('adminToolsSubmenu'),
+                        trigger: document.getElementById('adminToolsSubmenuTrigger')
+                },
+                {
+                        shell: document.getElementById('accountSubmenu'),
+                        trigger: document.getElementById('accountSubmenuTrigger')
+                }
+        ].filter(function (pair) {
+                return pair.shell && pair.trigger
+        })
 
         function setMenuOpen(open) {
                 menu.classList.toggle('open', open)
                 trigger.setAttribute('aria-expanded', open ? 'true' : 'false')
                 if (!open) {
-                        submenu.classList.remove('open')
-                        submenuTrigger.setAttribute('aria-expanded', 'false')
+                        submenuPairs.forEach(function (pair) {
+                                pair.shell.classList.remove('open')
+                                pair.trigger.setAttribute('aria-expanded', 'false')
+                        })
                 }
         }
 
-        function setSubmenuOpen(open) {
-                submenu.classList.toggle('open', open)
-                submenuTrigger.setAttribute('aria-expanded', open ? 'true' : 'false')
+        function setSubmenuOpen(targetPair, open) {
+                submenuPairs.forEach(function (pair) {
+                        var isTarget = pair === targetPair
+                        pair.shell.classList.toggle('open', isTarget && open)
+                        pair.trigger.setAttribute('aria-expanded', (isTarget && open) ? 'true' : 'false')
+                })
         }
 
-        submenu.addEventListener('mouseenter', function () {
-                if (menu.classList.contains('open')) {
-                        setSubmenuOpen(true)
-                }
-        })
+        submenuPairs.forEach(function (pair) {
+                pair.shell.addEventListener('mouseenter', function () {
+                        if (menu.classList.contains('open')) {
+                                setSubmenuOpen(pair, true)
+                        }
+                })
 
-        submenu.addEventListener('mouseleave', function () {
-                setSubmenuOpen(false)
+                pair.shell.addEventListener('mouseleave', function () {
+                        setSubmenuOpen(pair, false)
+                })
+
+                pair.trigger.addEventListener('click', function (event) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                        if (!menu.classList.contains('open')) {
+                                setMenuOpen(true)
+                        }
+                        setSubmenuOpen(pair, !pair.shell.classList.contains('open'))
+                })
         })
 
         trigger.addEventListener('click', function (event) {
                 event.preventDefault()
                 event.stopPropagation()
                 setMenuOpen(!menu.classList.contains('open'))
-        })
-
-        submenuTrigger.addEventListener('click', function (event) {
-                event.preventDefault()
-                event.stopPropagation()
-                if (!menu.classList.contains('open')) {
-                        setMenuOpen(true)
-                }
-                setSubmenuOpen(!submenu.classList.contains('open'))
         })
 
         document.addEventListener('click', function (event) {
@@ -3871,6 +6916,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
         document.addEventListener('keydown', function (event) {
                 if (event.key === 'Escape') {
+                        if ($("#change_password_template").data("force-change") === "1") {
+                                return
+                        }
+                        hideLegacyModal("#import_template")
+                        hideLegacyModal("#confirm_template")
+                        hideLegacyModal("#change_password_template")
+                        hideLegacyModal("#account_settings_template")
+                        hideLegacyModal("#manage_access_template")
+                        hideLegacyModal("#guild_settings_template")
+                        hideLegacyModal("#recent_imports_template")
+                        hideLegacyModal("#barter_template")
+                        hideLegacyModal("#paid_template")
                         hideNewRaffleModal()
                         setMenuOpen(false)
                         closeToolMenus()
@@ -3884,19 +6941,26 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                 })
         })
+
+% if request.user is not None and getattr(request.user, "must_change_password", False):
+        showChangePasswordModal(true)
+% endif
 })
 </script>
 </head>
-<body>
+<body class="${'is-staging' if is_staging else ''}">
 <div class="page-shell">
+% if is_staging:
+<div class="stage-banner">${stage_label} ENVIRONMENT</div>
+% endif
 
 <div class="admin-topbar">
-  <div class="admin-topbar-updated" id="display_raffle_updated">Last Updated</div>
+  <div class="admin-topbar-updated" id="display_raffle_updated"></div>
   <div class="admin-topbar-controls">
     <div class="profile-menu" id="adminProfileMenu">
       <button type="button" class="profile-menu-trigger" id="adminProfileMenuTrigger" aria-expanded="false" aria-haspopup="true">
         <span class="profile-trigger-logo-shell">
-          <img class="profile-menu-logo" src="https://www.bbcguild.com/wp-content/uploads/2020/04/cropped-cropped-BBC-LOGO-V2-2.gif" alt="Guild logo">
+          <img class="profile-menu-logo" id="adminProfileLogo" src="https://www.bbcguild.com/wp-content/uploads/2020/04/cropped-cropped-BBC-LOGO-V2-2.gif" alt="Guild logo">
         </span>
         <span class="profile-menu-caret">v</span>
       </button>
@@ -3914,66 +6978,88 @@ document.addEventListener('DOMContentLoaded', function () {
           </div>
         </div>
         <div class="profile-menu-list">
-          <div class="profile-submenu" id="adminTemplateSubmenu">
-            <button type="button" class="profile-submenu-trigger" id="adminTemplateSubmenuTrigger" aria-expanded="false">
+          <div class="profile-menu-section" id="profileGuildLinksSection" style="display:none;">
+            <div id="profileGuildLinks"></div>
+          </div>
+
+          <div class="profile-menu-section">
+            <button type="button" class="profile-menu-item" onclick="document.getElementById('adminProfileMenu').classList.remove('open'); document.getElementById('adminProfileMenuTrigger').setAttribute('aria-expanded', 'false'); copyPrizeCardsToSheets(); return false;">
               <span class="profile-menu-icon">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M12 3v18"></path>
-                  <path d="M3 12h18"></path>
-                  <path d="M5.5 5.5l13 13"></path>
-                  <path d="M18.5 5.5l-13 13"></path>
+                  <path d="M8 7h8"></path>
+                  <path d="M8 12h8"></path>
+                  <path d="M8 17h8"></path>
+                  <rect x="5" y="4" width="14" height="16" rx="2"></rect>
                 </svg>
               </span>
-              <span class="profile-menu-text">Templates</span>
+              <span class="profile-menu-text">Copy Cards to Sheets</span>
+            </button>
+          </div>
+
+          <div class="profile-menu-section">
+            <button type="button" class="profile-menu-item" onclick="document.getElementById('adminProfileMenu').classList.remove('open'); document.getElementById('adminProfileMenuTrigger').setAttribute('aria-expanded', 'false'); showRecentImportsModal(); return false;">
+              <span class="profile-menu-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 6v6l4 2"></path>
+                  <circle cx="12" cy="12" r="9"></circle>
+                </svg>
+              </span>
+              <span class="profile-menu-text">Recent Imports</span>
+            </button>
+          </div>
+
+          <div class="profile-submenu" id="adminToolsSubmenu">
+            <button type="button" class="profile-submenu-trigger" id="adminToolsSubmenuTrigger" aria-expanded="false">
+              <span class="profile-menu-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 3l2.2 2.1 3-.3.8 2.9 2.6 1.6-1.3 2.7 1.3 2.7-2.6 1.6-.8 2.9-3-.3L12 21l-2.2-2.1-3 .3-.8-2.9-2.6-1.6 1.3-2.7-1.3-2.7 2.6-1.6.8-2.9 3 .3z"></path>
+                  <circle cx="12" cy="12" r="3.2"></circle>
+                </svg>
+              </span>
+              <span class="profile-menu-text">Admin</span>
               <span class="profile-submenu-arrow">&lt;</span>
             </button>
 
-            <div class="profile-submenu-panel" id="adminTemplateSubmenuPanel">
+            <div class="profile-submenu-panel" id="adminToolsSubmenuPanel">
               <div class="profile-submenu-list">
-                <button type="button" class="profile-submenu-item">Christmas</button>
-                <button type="button" class="profile-submenu-item">Halloween</button>
-                <button type="button" class="profile-submenu-item">Birthday</button>
-                <button type="button" class="profile-submenu-item">Default</button>
-                <a class="profile-menu-item is-placeholder" href="#" onclick="return false;">
-                  <span class="profile-menu-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M4 12h16"></path>
-                      <path d="M12 4l8 8-8 8"></path>
-                    </svg>
-                  </span>
-                  <span class="profile-menu-text">Manage Templates</span>
-                </a>
+                <button type="button" class="profile-submenu-item" onclick="document.getElementById('adminProfileMenu').classList.remove('open'); document.getElementById('adminProfileMenuTrigger').setAttribute('aria-expanded', 'false'); showGuildSettingsModal(); return false;">Guild Settings</button>
+% if request.user is not None and request.user.has_global_role("superadmin"):
+                <button type="button" class="profile-submenu-item" onclick="document.getElementById('adminProfileMenu').classList.remove('open'); document.getElementById('adminProfileMenuTrigger').setAttribute('aria-expanded', 'false'); showManageAccessModal(); return false;">User Access</button>
+% endif
+                <button type="button" class="profile-submenu-item" onclick="document.getElementById('adminProfileMenu').classList.remove('open'); document.getElementById('adminProfileMenuTrigger').setAttribute('aria-expanded', 'false'); showBountyListModal(); return false;">Barter Bounty List</button>
+                <button type="button" class="profile-submenu-item" onclick="document.getElementById('adminProfileMenu').classList.remove('open'); document.getElementById('adminProfileMenuTrigger').setAttribute('aria-expanded', 'false'); showBarterSummaryModal(); return false;">Barter Summary</button>
+                <a class="profile-submenu-item is-placeholder" href="#" onclick="return false;">Templates</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="profile-menu-divider"></div>
+          <div class="profile-submenu" id="accountSubmenu">
+            <button type="button" class="profile-submenu-trigger" id="accountSubmenuTrigger" aria-expanded="false">
+              <span class="profile-menu-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="8" r="3"></circle>
+                  <path d="M5 20c0-3.2 3-5.5 7-5.5s7 2.3 7 5.5"></path>
+                </svg>
+              </span>
+              <span class="profile-menu-text">${request.user.name if request.user is not None else 'Account'}</span>
+              <span class="profile-submenu-arrow">&lt;</span>
+            </button>
+
+            <div class="profile-submenu-panel" id="accountSubmenuPanel">
+              <div class="profile-submenu-list">
+                <button type="button" class="profile-submenu-item" onclick="document.getElementById('adminProfileMenu').classList.remove('open'); document.getElementById('adminProfileMenuTrigger').setAttribute('aria-expanded', 'false'); showAccountSettingsModal(); return false;">Account Settings</button>
+                <button type="button" class="profile-submenu-item" onclick="document.getElementById('adminProfileMenu').classList.remove('open'); document.getElementById('adminProfileMenuTrigger').setAttribute('aria-expanded', 'false'); showChangePasswordModal(false); return false;">Change Password</button>
               </div>
             </div>
           </div>
 
           <div class="profile-menu-section">
-            <a class="profile-menu-item" href="/bbc1/">
-              <span class="profile-menu-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M3 12h18"></path>
-                  <path d="M15 5l6 7-6 7"></path>
-                </svg>
-              </span>
-              <span class="profile-menu-text">BBC1</span>
-            </a>
-            <a class="profile-menu-item" href="/bbc2/">
-              <span class="profile-menu-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M3 12h18"></path>
-                  <path d="M15 5l6 7-6 7"></path>
-                </svg>
-              </span>
-              <span class="profile-menu-text">BBC2</span>
-            </a>
-          </div>
-
-          <div class="profile-menu-section">
             <a class="profile-menu-item is-placeholder" href="#" onclick="return false;">
               <span class="profile-menu-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <circle cx="12" cy="12" r="9"></circle>
-                  <path d="M12 8v5"></path>
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9"></circle>
+                    <path d="M12 8v5"></path>
                   <path d="M12 16h.01"></path>
                 </svg>
               </span>
@@ -4001,11 +7087,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <section class="card admin-header">
   <div class="header-left">
-    <img id="mainLogo" src="https://www.bbcguild.com/wp-content/uploads/2020/04/cropped-cropped-BBC-LOGO-V2-2.gif" alt="BBC logo">
+    <img id="mainLogo" src="https://www.bbcguild.com/wp-content/uploads/2020/04/cropped-cropped-BBC-LOGO-V2-2.gif" alt="Guild logo">
 
     <div class="title-block">
-      <h1 id="display_guild_header">Guild</h1>
-      <div class="sub"><strong id="display_raffle_subheader">Raffle</strong> • <span id="display_raffle_time">Drawing</span></div>
+      <h1 id="display_guild_header"></h1>
+% if is_staging:
+      <div class="stage-pill">${stage_label}</div>
+% endif
+      <div class="sub"><strong id="display_raffle_subheader"></strong><span id="display_raffle_meta_sep"></span><span id="display_raffle_time"></span></div>
     </div>
   </div>
 
@@ -4027,11 +7116,11 @@ document.addEventListener('DOMContentLoaded', function () {
         <summary class="action-btn tool-menu-trigger">Edit Raffle <span class="tool-menu-caret">v</span></summary>
         <div class="tool-menu-panel">
           <div class="tool-panel-title">Raffle Setup</div>
-          <div class="tool-form-grid">
-            <div class="tool-field">
-              <label for="raffle_title">Raffle Name</label>
-              <input type="text" id="raffle_title" class="ginfo_change_save tool-input" name="raffle_title"/>
-            </div>
+            <div class="tool-form-grid">
+              <div class="tool-field">
+                <label for="raffle_title">Raffle Name</label>
+                <input type="text" id="raffle_title" class="ginfo_change_save tool-input" name="raffle_title"/>
+              </div>
             <div class="tool-field">
               <label for="raffle_subheader">Raffle Number</label>
               <input type="text" id="raffle_subheader" class="ginfo_change_save tool-input" name="raffle_guild_num"/>
@@ -4040,14 +7129,59 @@ document.addEventListener('DOMContentLoaded', function () {
               <label for="raffle_time">Drawing Time</label>
               <input type="text" id="raffle_time" class="ginfo_change_save tool-input" name="raffle_time"/>
             </div>
-            <div class="tool-field">
-              <label for="raffle_cost">Ticket Cost</label>
-              <input type="text" id="raffle_cost" class="ginfo_change_save tool-input" name="raffle_ticket_cost"/>
+              <div class="tool-field">
+                <label for="raffle_cost">Ticket Cost</label>
+                <input type="text" id="raffle_cost" class="ginfo_change_save tool-input" name="raffle_ticket_cost"/>
+              </div>
+              <div class="tool-field is-wide barter-toggle-field">
+                <label>Import Rules</label>
+                <div class="tool-form-grid">
+                  <div class="barter-toggle-shell">
+                    <label class="barter-toggle-switch" for="raffleGoldMailEnabledToggle">
+                      <input type="checkbox" id="raffleGoldMailEnabledToggle" class="barter-toggle-input" data-mode="current" data-field="raffle_gold_mail_enabled" />
+                      <span class="barter-toggle-slider"></span>
+                    </label>
+                    <div class="barter-toggle-copy">
+                      <span class="barter-toggle-label">Gold-Mail</span>
+                      <span class="barter-toggle-value">OFF</span>
+                    </div>
+                  </div>
+                  <div class="barter-toggle-shell">
+                    <label class="barter-toggle-switch" for="raffleGoldBankEnabledToggle">
+                      <input type="checkbox" id="raffleGoldBankEnabledToggle" class="barter-toggle-input" data-mode="current" data-field="raffle_gold_bank_enabled" />
+                      <span class="barter-toggle-slider"></span>
+                    </label>
+                    <div class="barter-toggle-copy">
+                      <span class="barter-toggle-label">Gold-Bank</span>
+                      <span class="barter-toggle-value">OFF</span>
+                    </div>
+                  </div>
+                  <div class="barter-toggle-shell">
+                    <label class="barter-toggle-switch" for="raffleBarterMailEnabledToggle">
+                      <input type="checkbox" id="raffleBarterMailEnabledToggle" class="barter-toggle-input" data-mode="current" data-field="raffle_barter_mail_enabled" />
+                      <span class="barter-toggle-slider"></span>
+                    </label>
+                    <div class="barter-toggle-copy">
+                      <span class="barter-toggle-label">Barter-Mail</span>
+                      <span class="barter-toggle-value">OFF</span>
+                    </div>
+                  </div>
+                  <div class="barter-toggle-shell">
+                    <label class="barter-toggle-switch" for="raffleBarterBankEnabledToggle">
+                      <input type="checkbox" id="raffleBarterBankEnabledToggle" class="barter-toggle-input" data-mode="current" data-field="raffle_barter_bank_enabled" />
+                      <span class="barter-toggle-slider"></span>
+                    </label>
+                    <div class="barter-toggle-copy">
+                      <span class="barter-toggle-label">Barter-Bank</span>
+                      <span class="barter-toggle-value">OFF</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </details>
-    </div>
+        </details>
+      </div>
 
     <div class="tool-cluster">
 % if request.extended_tickets:
@@ -4068,6 +7202,7 @@ document.addEventListener('DOMContentLoaded', function () {
           <div class="tool-menu-actions">
             <button type="button" class="tool-menu-action" onclick="$('#reshow_import').click(); closeToolMenus();">Imports</button>
             <button type="button" class="tool-menu-action" onclick="$('#reshow_confirm').click(); closeToolMenus();">Confirms</button>
+            <button type="button" class="tool-menu-action" onclick="showRecentImportsModal(); closeToolMenus();">Recent Imports</button>
           </div>
         </div>
       </details>
@@ -4103,6 +7238,7 @@ document.addEventListener('DOMContentLoaded', function () {
   <input type="submit" value="Manually refresh" id="manual_refresh" class="hidden-original-action" />
   <input type="submit" value="Re-Show Import Pane" id="reshow_import" class="hidden-original-action" />
   <input type="submit" value="Re-Show Confirmations Pane" id="reshow_confirm" class="hidden-original-action" />
+  <input type="button" value="Re-Show Recent Imports" id="reshow_recent_imports" class="hidden-original-action" />
 % if request.extended_tickets:
   <input type="submit" value="Import barter tickets" id="import_barter" class="hidden-original-action" />
   <input type="submit" value="Import paid tickets" id="import_paid" class="hidden-original-action" />
@@ -4217,6 +7353,51 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="new-raffle-field">
           <label>Status</label>
           <div class="new-raffle-status-chip">LIVE</div>
+        </div>
+        <div class="new-raffle-field barter-toggle-field is-wide">
+          <label>Import Rules</label>
+          <div class="tool-form-grid">
+            <div class="barter-toggle-shell">
+              <label class="barter-toggle-switch" for="newRaffleGoldMailEnabled">
+                <input type="checkbox" id="newRaffleGoldMailEnabled" class="barter-toggle-input" data-mode="new" data-field="raffle_gold_mail_enabled" />
+                <span class="barter-toggle-slider"></span>
+              </label>
+              <div class="barter-toggle-copy">
+                <span class="barter-toggle-label">Gold-Mail</span>
+                <span class="barter-toggle-value">OFF</span>
+              </div>
+            </div>
+            <div class="barter-toggle-shell">
+              <label class="barter-toggle-switch" for="newRaffleGoldBankEnabled">
+                <input type="checkbox" id="newRaffleGoldBankEnabled" class="barter-toggle-input" data-mode="new" data-field="raffle_gold_bank_enabled" />
+                <span class="barter-toggle-slider"></span>
+              </label>
+              <div class="barter-toggle-copy">
+                <span class="barter-toggle-label">Gold-Bank</span>
+                <span class="barter-toggle-value">OFF</span>
+              </div>
+            </div>
+            <div class="barter-toggle-shell">
+              <label class="barter-toggle-switch" for="newRaffleBarterMailEnabled">
+                <input type="checkbox" id="newRaffleBarterMailEnabled" class="barter-toggle-input" data-mode="new" data-field="raffle_barter_mail_enabled" />
+                <span class="barter-toggle-slider"></span>
+              </label>
+              <div class="barter-toggle-copy">
+                <span class="barter-toggle-label">Barter-Mail</span>
+                <span class="barter-toggle-value">OFF</span>
+              </div>
+            </div>
+            <div class="barter-toggle-shell">
+              <label class="barter-toggle-switch" for="newRaffleBarterBankEnabled">
+                <input type="checkbox" id="newRaffleBarterBankEnabled" class="barter-toggle-input" data-mode="new" data-field="raffle_barter_bank_enabled" />
+                <span class="barter-toggle-slider"></span>
+              </label>
+              <div class="barter-toggle-copy">
+                <span class="barter-toggle-label">Barter-Bank</span>
+                <span class="barter-toggle-value">OFF</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -4345,8 +7526,16 @@ document.addEventListener('DOMContentLoaded', function () {
 </form>
 </div>
 <div id="import_template">
-<div id="import_buttons"><input type="button" value="Close" id="import_close_button" /> <input type="submit" value="Import Selected" id="import_selected" /></div>
+<div id="import_buttons"><button type="button" id="import_debug_copy" class="import-debug-copy">COPY DEBUG</button> <input type="button" value="Close" id="import_close_button" /> <input type="submit" value="Import Selected" id="import_selected" /></div>
 <div id="import_data">
+    <div id="import_file_summary" class="import-file-summary" style="display:none;">
+        <div class="import-file-summary-row">
+            <div id="import_file_summary_text" class="import-file-summary-text"></div>
+        </div>
+    </div>
+    <div id="import_guardrail_summary" class="import-summary-warning" style="display:none;">
+        <p id="import_guardrail_summary_text" class="confirm-import-summary-text"></p>
+    </div>
     <form id="import_this">
         <table id="import_data_here">
             <tr>
@@ -4364,13 +7553,303 @@ document.addEventListener('DOMContentLoaded', function () {
 <div id="confirm_template" class="confirm">
 <div id="confirm_buttons"><input type="button" value="Close" id="confirm_close_button" /></div>
 <div id="confirm_data">
-    <br />
-    <p>Confirmation string (copy &amp; paste into addon)</p>
-    <textarea id="confirm_string"></textarea>
-    <br />
-    <p>Confirmation names</p>
-    <br />
-    <textarea id="confirm_names"></textarea>
+    <div id="confirm_import_summary">
+        <p class="confirm-import-summary-title">Latest Import Summary</p>
+        <p id="confirm_import_summary_text" class="confirm-import-summary-text"></p>
+    </div>
+    <div class="confirm-copy-block">
+        <div class="confirm-copy-header">
+            <p class="confirm-copy-label">Confirmation string</p>
+            <button type="button" class="confirm-copy-btn" onclick="copyTextAreaValue('confirm_string', this)">Copy</button>
+        </div>
+        <textarea id="confirm_string"></textarea>
+    </div>
+    <div class="confirm-copy-block">
+        <div class="confirm-copy-header">
+            <p class="confirm-copy-label">Confirmation names</p>
+            <button type="button" class="confirm-copy-btn" onclick="copyTextAreaValue('confirm_names', this)">Copy</button>
+        </div>
+        <textarea id="confirm_names"></textarea>
+    </div>
+</div>
+</div>
+
+<div id="change_password_template" class="confirm">
+<div id="change_password_buttons"><input type="button" value="Close" id="change_password_close_button" /></div>
+<div id="change_password_data">
+    <div class="manage-access-section">
+        <div class="manage-access-card">
+            <p class="manage-access-title">Change Password</p>
+            <div class="manage-access-password-row is-separated">
+                <input type="password" id="changePasswordCurrent" placeholder="Current password" autocomplete="current-password" class="manage-access-full" />
+            </div>
+            <div class="manage-access-password-row is-pair">
+                <input type="password" id="changePasswordNew" placeholder="New password" autocomplete="new-password" />
+                <input type="password" id="changePasswordConfirm" placeholder="Confirm new password" autocomplete="new-password" />
+            </div>
+            <div class="manage-access-password-tools">
+                <label class="manage-access-checkbox"><input type="checkbox" id="changePasswordShow" onchange="setPasswordFieldsVisible(['changePasswordCurrent','changePasswordNew','changePasswordConfirm'], this.checked)" /> <span>Show passwords</span></label>
+            </div>
+            <div class="manage-access-actions">
+                <button type="button" class="manage-access-btn" onclick="submitOwnPasswordChange()">Save Password</button>
+            </div>
+            <p class="manage-access-status" id="changePasswordStatus"></p>
+        </div>
+    </div>
+</div>
+</div>
+
+<div id="account_settings_template" class="confirm">
+<div id="change_password_buttons"><input type="button" value="Close" id="account_settings_close_button" /></div>
+<div id="change_password_data">
+    <div class="manage-access-section">
+        <div class="manage-access-card">
+            <p class="manage-access-title">Account Settings</p>
+            <div class="guild-settings-fields">
+                <label class="guild-settings-field">
+                    <span class="guild-settings-label">Time Zone</span>
+                    <select id="accountSettingsTimeZone" class="guild-settings-select"></select>
+                    <span class="guild-settings-help is-inline">Admin-only timestamps can follow your own preferred zone without affecting public viewers.</span>
+                </label>
+                <label class="guild-settings-field">
+                    <span class="guild-settings-label">Date / Time Format</span>
+                    <select id="accountSettingsDateTimeFormat" class="guild-settings-select"></select>
+                    <span class="guild-settings-help is-inline">This changes how times are displayed for you in admin areas like Last Updated and import review.</span>
+                </label>
+            </div>
+            <div class="manage-access-actions account-settings-actions">
+                <button type="button" class="manage-access-btn subtle" onclick="hideLegacyModal('#account_settings_template'); showChangePasswordModal(false)">Change Password</button>
+                <button type="button" class="manage-access-btn" onclick="saveAccountSettings()">Save Preferences</button>
+            </div>
+            <p class="manage-access-status" id="accountSettingsStatus"></p>
+        </div>
+    </div>
+</div>
+</div>
+
+<div id="manage_access_template" class="confirm">
+<div id="manage_access_buttons"><input type="button" value="Close" id="manage_access_close_button" /></div>
+<div id="manage_access_data">
+    <div class="manage-access-section">
+        <div class="manage-access-card">
+            <p class="manage-access-title">Create User</p>
+            <div class="manage-access-create">
+                <input type="text" id="manageAccessUsername" placeholder="Username" autocomplete="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" />
+                <input type="password" id="manageAccessPassword" placeholder="Temporary password" autocomplete="new-password" data-lpignore="true" data-1p-ignore="true" />
+                <input type="password" id="manageAccessPasswordConfirm" placeholder="Confirm temporary password" autocomplete="new-password" class="manage-access-full" data-lpignore="true" data-1p-ignore="true" />
+                <div class="manage-access-password-tools manage-access-full">
+                    <label class="manage-access-checkbox"><input type="checkbox" id="manageAccessShowPassword" onchange="setPasswordFieldsVisible(['manageAccessPassword','manageAccessPasswordConfirm'], this.checked)" /> <span>Show password</span></label>
+                </div>
+                <label class="manage-access-checkbox manage-access-full"><input type="checkbox" id="manageAccessCreateSuperadmin" /> <span>Superadmin</span></label>
+                <div class="manage-access-guilds manage-access-full" id="manageAccessCreateGuilds"></div>
+                <div class="manage-access-actions manage-access-full">
+                    <button type="button" class="manage-access-btn" onclick="createAccessUser()">Create User</button>
+                </div>
+            </div>
+        </div>
+        <div class="manage-access-card">
+            <p class="manage-access-title">User Access</p>
+            <p class="manage-access-status" id="manageAccessStatus"></p>
+            <div class="manage-access-grid" id="manage_access_users"></div>
+        </div>
+    </div>
+</div>
+</div>
+
+<div id="guild_settings_template" class="confirm">
+  <div id="manage_access_buttons">
+      <div class="guild-settings-toolbar">
+          <button type="button" class="manage-access-btn" onclick="saveGuildSettings()">Save Settings</button>
+          <p class="manage-access-status guild-settings-toolbar-status" id="guildSettingsStatus"></p>
+      </div>
+      <input type="button" value="Close" id="guild_settings_close_button" />
+  </div>
+  <div id="manage_access_data">
+      <div class="manage-access-section">
+          <div class="manage-access-card">
+              <p class="manage-access-title">Guild Settings</p>
+              <div class="guild-settings-grid">
+                  <div class="guild-settings-section">
+                      <p class="guild-settings-section-title">Identity</p>
+                      <div class="guild-settings-fields">
+                          <div class="guild-settings-row">
+                              <label class="guild-settings-field">
+                                  <span class="guild-settings-label">Guild Name</span>
+                                  <input type="text" id="guildSettingsName" class="guild-settings-input" placeholder="Guild display name" />
+                              </label>
+                              <label class="guild-settings-field">
+                                  <span class="guild-settings-label">Guild Shortname / Slug</span>
+                                  <input type="text" id="guildSettingsShortname" class="guild-settings-input" placeholder="Guild shortname / slug" />
+                                  <span class="guild-settings-help is-inline">Changing this changes the guild URL path. Use lowercase letters, numbers, dashes, or underscores.</span>
+                              </label>
+                          </div>
+                          <div class="guild-settings-row">
+                              <label class="guild-settings-field">
+                                  <span class="guild-settings-label">ESO Guild ID</span>
+                                  <input type="text" id="guildSettingsEsoId" class="guild-settings-input" placeholder="ESO Guild ID" />
+                                  <span class="guild-settings-help is-inline">If you do not know this yet, we can learn it from a known-good bank export later.</span>
+                              </label>
+                              <label class="guild-settings-field">
+                                  <span class="guild-settings-label">Guild Logo URL</span>
+                                  <input type="text" id="guildSettingsLogoUrl" class="guild-settings-input" placeholder="https://example.com/logo.png" />
+                                  <img id="guildSettingsLogoPreview" class="guild-logo-preview" src="https://www.bbcguild.com/wp-content/uploads/2020/04/cropped-cropped-BBC-LOGO-V2-2.gif" alt="Guild logo preview" />
+                              </label>
+                          </div>
+                          <div class="guild-settings-row">
+                              <label class="guild-settings-field">
+                                  <span class="guild-settings-label">Game Server</span>
+                                  <select id="guildSettingsGameServer" class="guild-settings-select">
+                                    <option value="PC-NA">PC-NA</option>
+                                  </select>
+                              </label>
+                              <label class="guild-settings-field">
+                                  <span class="guild-settings-label">Guild Favicon URL</span>
+                                  <input type="text" id="guildSettingsFaviconUrl" class="guild-settings-input" placeholder="https://example.com/favicon.png" />
+                                  <img id="guildSettingsFaviconPreview" class="guild-logo-preview" src="/static/favicon-256.png" alt="Guild favicon preview" />
+                              </label>
+                          </div>
+                          <div class="guild-settings-row is-single">
+                              <label class="guild-settings-field">
+                                  <span class="guild-settings-label">Guild Time Zone</span>
+                                  <select id="guildSettingsTimeZone" class="guild-settings-select"></select>
+                              </label>
+                          </div>
+                          <div class="guild-settings-row is-full">
+                              <div class="guild-settings-field is-full">
+                                  <span class="guild-settings-label">Sitewide Primary Colors</span>
+                                  <div class="guild-branding-row">
+                                      <label class="guild-color-field">
+                                          <input type="color" id="guildSettingsPrimaryColor" class="guild-color-input" value="#284CA6" />
+                                          <span class="guild-color-swatch-label">Primary Color</span>
+                                      </label>
+                                      <label class="guild-color-field">
+                                          <input type="color" id="guildSettingsAccentColor" class="guild-color-input" value="#5078D2" />
+                                          <span class="guild-color-swatch-label">Accent Color</span>
+                                      </label>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="guild-settings-section">
+                      <p class="guild-settings-section-title">Import Rules</p>
+                      <div class="guild-settings-rule-block">
+                          <p class="guild-settings-rule-title">Whitelist</p>
+                          <p class="guild-settings-help">Designate which ESO user inbox(es) tickets-by-mail are expected from. The system will warn against imports from inboxes not listed here.</p>
+                          <div class="guild-mail-account-list manage-access-full" id="guildSettingsMailAccountsList"></div>
+                          <div class="manage-access-actions manage-access-full">
+                              <button type="button" class="manage-access-btn subtle" onclick="$('#guildSettingsMailAccountsList').append(buildGuildMailAccountRow('')); markGuildSettingsDirty();">Add Another Mail Account</button>
+                          </div>
+                      </div>
+                      <div class="guild-settings-rule-block">
+                          <p class="guild-settings-rule-title">Blacklist</p>
+                          <p class="guild-settings-help">Designate which ESO usernames to ignore deposits or mailed gold from.</p>
+                          <div class="guild-mail-account-list manage-access-full" id="guildSettingsImportBlacklistList"></div>
+                          <div class="manage-access-actions manage-access-full">
+                              <button type="button" class="manage-access-btn subtle" onclick="$('#guildSettingsImportBlacklistList').append(buildGuildBlacklistRow('')); markGuildSettingsDirty();">Add Another Ignored Name</button>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="guild-settings-section">
+                      <p class="guild-settings-section-title">Relationships</p>
+                      <div class="guild-sister-list" id="guildSettingsSisterGuilds"></div>
+                      <p class="guild-settings-help">Linked sister guilds will appear as quick-switch options in the admin profile menu.</p>
+                  </div>
+              </div>
+          </div>
+      </div>
+</div>
+</div>
+
+<div id="bounty_list_template" class="confirm">
+  <div id="manage_access_buttons">
+      <div class="guild-settings-toolbar">
+          <button type="button" class="manage-access-btn" onclick="saveBountyList()">Save Changes</button>
+          <p class="manage-access-status guild-settings-toolbar-status" id="bountyListStatus"></p>
+      </div>
+      <div class="guild-settings-barter-strip">
+          <div class="barter-toggle-shell">
+            <label class="barter-toggle-switch" for="bountyListBarterMailEnabledToggle">
+              <input type="checkbox" id="bountyListBarterMailEnabledToggle" class="barter-toggle-input" data-mode="current" data-field="raffle_barter_mail_enabled" />
+              <span class="barter-toggle-slider"></span>
+            </label>
+            <div class="barter-toggle-copy">
+              <span class="barter-toggle-label">Barter-Mail</span>
+              <span class="barter-toggle-value">OFF</span>
+            </div>
+          </div>
+          <div class="barter-toggle-shell">
+            <label class="barter-toggle-switch" for="bountyListBarterBankEnabledToggle">
+              <input type="checkbox" id="bountyListBarterBankEnabledToggle" class="barter-toggle-input" data-mode="current" data-field="raffle_barter_bank_enabled" />
+              <span class="barter-toggle-slider"></span>
+            </label>
+            <div class="barter-toggle-copy">
+              <span class="barter-toggle-label">Barter-Bank</span>
+              <span class="barter-toggle-value">OFF</span>
+            </div>
+          </div>
+      </div>
+      <input type="button" value="Close" id="bounty_list_close_button" />
+  </div>
+  <div id="manage_access_data">
+      <div class="manage-access-section">
+          <div class="manage-access-card">
+              <p class="manage-access-title">Barter Bounty List</p>
+              <div class="bounty-list-shell">
+                  <div class="bounty-list-toolbar">
+                      <button type="button" class="manage-access-btn subtle" id="copyBountyListButton" onclick="copyBountyListToSpreadsheet()">Copy to Spreadsheet</button>
+                  </div>
+                  <p class="guild-settings-help">Barter rate is especially useful for low-value items. Example: if 3 Platinum Dust should equal 1 ticket, set quantity to 3 and barter rate to 1.</p>
+                  <div class="bounty-list-grid">
+                      <table class="bounty-list-table">
+                          <colgroup>
+                              <col class="col-name" />
+                              <col class="col-code" />
+                              <col class="col-qty" />
+                              <col class="col-value" />
+                              <col class="col-rate" />
+                              <col class="col-actions" />
+                          </colgroup>
+                          <thead>
+                              <tr>
+                                  <th>Item Name</th>
+                                  <th>Item Code</th>
+                                  <th>Quantity</th>
+                                  <th>Item Value</th>
+                                  <th>Barter Rate</th>
+                                  <th></th>
+                              </tr>
+                          </thead>
+                          <tbody id="bountyListRows"></tbody>
+                      </table>
+                      <div class="manage-access-actions">
+                          <button type="button" class="manage-access-btn subtle" onclick="$('#bountyListRows').append(buildBountyListRow({})); markBountyListDirty();">Add Item</button>
+                      </div>
+                  </div>
+                  <div class="bounty-list-paste">
+                      <p class="guild-settings-help">Paste rows from a spreadsheet in this order: Item Name, Item Code, Quantity, Item Value, Barter Rate.</p>
+                      <textarea id="bountyListPasteInput" placeholder="Dreugh Wax&#9;ITEMCODE123&#9;1&#9;15000&#9;15"></textarea>
+                      <div class="manage-access-actions">
+                          <button type="button" class="manage-access-btn subtle" onclick="applyBountyImportText()">Load Pasted Rows</button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+<div id="recent_imports_template" class="confirm">
+<div id="confirm_buttons"><input type="button" value="Close" id="recent_imports_close_button" onclick="hideLegacyModal('#recent_imports_template')" /></div>
+<div id="confirm_data">
+    <div id="recent_imports_data"></div>
+</div>
+</div>
+
+<div id="barter_summary_template" class="confirm">
+<div id="confirm_buttons"><input type="button" value="Close" id="barter_summary_close_button" onclick="hideLegacyModal('#barter_summary_template')" /></div>
+<div id="confirm_data">
+    <div id="barter_summary_data"></div>
 </div>
 </div>
 

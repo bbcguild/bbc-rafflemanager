@@ -1,10 +1,5 @@
-# fly.toml app configuration file generated for bbcguild-raffle on 2025-07-19T13:59:36-04:00
-#
-# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
-#
-
-app = 'bbcguilds'
-primary_region = 'iad'
+app = 'bbcguilds-staging'
+primary_region = 'ewr'
 
 [build]
   dockerfile = 'Dockerfile.production'
@@ -13,7 +8,8 @@ primary_region = 'iad'
   strategy = 'immediate'
 
 [env]
-  APP_ENV = 'production'
+  APP_ENV = 'staging'
+  APP_STAGE_LABEL = 'STAGING'
   DATABASE_PATH = '/data/raffle.db'
   GA4_MEASUREMENT_ID = 'G-8C00Y7WF9G'
   IMPORT_PATH = '/data/import'
@@ -25,7 +21,7 @@ primary_region = 'iad'
   app = '/app/startup.sh'
 
 [[mounts]]
-  source = 'raffle_data'
+  source = 'raffle_data_staging_ewr'
   destination = '/data'
   initial_size = '2gb'
 
@@ -34,7 +30,7 @@ primary_region = 'iad'
   force_https = true
   auto_stop_machines = 'stop'
   auto_start_machines = true
-  min_machines_running = 1
+  min_machines_running = 0
   processes = ['app']
 
   [[http_service.checks]]
@@ -48,5 +44,6 @@ primary_region = 'iad'
   policy = 'on-failure'
 
 [[vm]]
-  memory = '1gb'
+  memory = '512mb'
   cpus = 1
+  cpu_kind = 'shared'

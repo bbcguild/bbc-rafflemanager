@@ -5,16 +5,18 @@ ga4_site_area = 'public'
 ga4_raffle_view = 'archive' if initial_lookup_raffle else 'current'
 ga4_raffle_number = initial_lookup_raffle
 ga4_guild_slug = request.matchdict.get('guild', '')
+is_staging = (request.registry.settings.get("app_env") == "staging")
+stage_label = (request.registry.settings.get("app_stage_label") or "STAGING").strip()
 %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="icon" type="image/x-icon" href="/static/favicon.ico">
-<link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-256.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-256.png">
+<link rel="icon" id="appFaviconIco" type="image/x-icon" href="/static/favicon.ico">
+<link rel="icon" id="appFavicon32" type="image/png" sizes="32x32" href="/static/favicon-256.png">
+<link rel="icon" id="appFavicon16" type="image/png" sizes="16x16" href="/static/favicon-256.png">
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>BBC Raffle</title>
+<title>${('[%s] ' % stage_label) if is_staging else ''}BBC Raffle</title>
 <%include file="analytics_snippet.mako"/>
 
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.js"></script>
@@ -36,14 +38,18 @@ ga4_guild_slug = request.matchdict.get('guild', '')
 
 <style>
 :root{
+  --brand-primary:#284CA6;
+  --brand-accent:#5078D2;
+  --brand-primary-rgb:40,76,166;
+  --brand-accent-rgb:80,120,210;
   --panel:#091224;
   --panel2:#07101f;
-  --line:rgba(80,120,210,.18);
-  --line2:rgba(80,120,210,.34);
+  --line:rgba(var(--brand-accent-rgb),.18);
+  --line2:rgba(var(--brand-accent-rgb),.34);
   --text:#f4f7ff;
   --muted:#9fb0cf;
   --shadow:0 18px 48px rgba(0,0,0,.38);
-  --hover:rgba(80,120,210,.08);
+  --hover:rgba(var(--brand-accent-rgb),.08);
   --danger:#ff6b6b;
 }
 
@@ -52,8 +58,27 @@ html,body{margin:0;padding:0;max-width:100%;overflow-x:hidden}
 body{
   font-family:Inter,system-ui,Arial,sans-serif;
   color:var(--text);
-  background:radial-gradient(circle at top left, rgba(40,76,166,.18), transparent 24%),linear-gradient(180deg,#05070d 0%,#060a12 100%);
+  background:radial-gradient(circle at top left, rgba(var(--brand-primary-rgb),.18), transparent 24%),linear-gradient(180deg,#05070d 0%,#060a12 100%);
   overflow-x:hidden;
+}
+
+body.is-staging{
+  box-shadow:inset 0 6px 0 #d94a4a;
+}
+
+.stage-banner{
+  width:min(100%, 1180px);
+  margin:14px auto 0;
+  padding:10px 14px;
+  border:1px solid rgba(217,74,74,.55);
+  background:linear-gradient(180deg, rgba(123,21,21,.96), rgba(95,16,16,.96));
+  color:#fff3f3;
+  text-align:center;
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  box-shadow:0 12px 28px rgba(0,0,0,.28);
 }
 
 .page{
@@ -73,11 +98,21 @@ body{
 
 /* Header */
 .header{
+  position:relative;
   display:flex;
   align-items:center;
   gap:14px;
   padding:14px 20px;
   min-width:0;
+  overflow:hidden;
+  background:
+    linear-gradient(90deg, rgba(8,12,20,.84) 0%, rgba(8,12,20,.72) 24%, rgba(8,12,20,.34) 58%, rgba(8,12,20,.12) 100%),
+    linear-gradient(180deg, rgba(18,27,44,.38), rgba(10,18,32,.48)),
+    url("/static/cakes2026.png") center 48% / 95% auto no-repeat;
+}
+.header > *{
+  position:relative;
+  z-index:1;
 }
 .header-left{
   display:flex;
@@ -284,6 +319,111 @@ body{
   min-width:0;
 }
 
+.barter-list-button{
+  display:none;
+  align-items:center;
+  justify-content:center;
+  min-height:24px;
+  padding:0 10px;
+  border:1px solid rgba(255,255,255,.18);
+  background:rgba(255,255,255,.08);
+  color:var(--text);
+  font-size:.72rem;
+  font-weight:800;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  white-space:nowrap;
+  cursor:pointer;
+}
+
+.barter-list-button.is-visible{
+  display:inline-flex;
+}
+
+.barter-list-button:hover{
+  background:rgba(255,255,255,.14);
+}
+
+.barter-list-modal{
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:rgba(4,8,15,.72);
+  z-index:1200;
+}
+
+.barter-list-modal.is-open{
+  display:flex;
+}
+
+.barter-list-dialog{
+  width:min(920px, 100%);
+  max-height:min(80vh, 820px);
+  overflow:auto;
+  background:linear-gradient(180deg,var(--panel),var(--panel2));
+  border:1px solid var(--line2);
+  box-shadow:var(--shadow);
+  padding:18px 18px 20px;
+}
+
+.barter-list-dialog-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:14px;
+}
+
+.barter-list-dialog-title{
+  margin:0;
+  font-size:1.1rem;
+  font-weight:900;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+
+.barter-list-dialog-subtitle{
+  margin:6px 0 0;
+  color:var(--muted);
+  font-size:.9rem;
+}
+
+.barter-list-close{
+  border:1px solid rgba(255,255,255,.18);
+  background:rgba(255,255,255,.08);
+  color:var(--text);
+  font-weight:800;
+  padding:8px 12px;
+  cursor:pointer;
+}
+
+.barter-list-table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+.barter-list-table th,
+.barter-list-table td{
+  padding:10px 12px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  text-align:left;
+}
+
+.barter-list-table th{
+  color:var(--muted);
+  font-size:.78rem;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+
+.barter-list-empty{
+  padding:20px 12px;
+  color:var(--muted);
+}
+
 /* Mid row */
 .mid-row{
   display:grid;
@@ -311,7 +451,11 @@ body{
   border-bottom:1px solid rgba(255,255,255,.06);
 }
 .raffle-live-header{
+  justify-content:space-between;
   gap:10px;
+}
+.raffle-live-header .barter-list-button{
+  margin-left:auto;
 }
 .raffle-live-header.status-live .live-dot{
   background:#36ff8e;
@@ -761,57 +905,57 @@ body{
   .page{
     padding:12px;
     gap:12px;
-  #raffle_subheader{
-  display:block;
-  line-height:1.2;
-}
   }
 
   .header{
     position:relative;
-    display:grid;
-    grid-template-columns:56px minmax(0,1fr);
-    grid-template-areas:
-      'logo title'
-      'search search';
-    align-items:start;
-    gap:12px;
     padding:14px;
   }
 
+  .header-left{
+    display:grid;
+    grid-template-columns:56px minmax(0,1fr);
+    align-items:start;
+    gap:12px;
+    width:100%;
+  }
+
   .header img#mainLogo{
-    grid-area:logo;
     width:56px;
     height:56px;
   }
 
   .title-block{
-    grid-area:title;
     min-width:0;
-    padding-right:44px;
+    padding-right:0;
   }
 
   .title-block h1{
     font-size:1.5rem;
     line-height:1.06;
     margin:0;
+    white-space:normal;
+    overflow:visible;
+    text-overflow:unset;
   }
 
   .title-block .sub{
     font-size:.92rem;
   }
 
-.title-block .sub{
-  font-size:.92rem;
-}
-
-#raffle_subheader{
-  display:block;
-  line-height:1.2;
-}
+  #raffle_subheader{
+    display:block;
+    line-height:1.2;
+    white-space:normal;
+    overflow:visible;
+    text-overflow:unset;
+  }
 
   .title-block .updated{
     font-size:.82rem;
+    white-space:normal;
+    overflow:visible;
+    text-overflow:unset;
   }
 
   .mobile-subline{
@@ -882,15 +1026,7 @@ body{
 const guildSlug = "${request.matchdict['guild']}";
 const initialRequestedRaffleNum = "${initial_lookup_raffle}";
 const liveRaffleEndpoint = "/" + guildSlug + "/json/get/raffle";
-const MAX_HISTORY_DEPTH = 5;
 const publicExtendedTicketsEnabled = true;
-const urlParams = new URLSearchParams(window.location.search);
-const requestedDepthRaw = urlParams.get('depth');
-let currentDepth = requestedDepthRaw === null ? null : parseInt(requestedDepthRaw, 10);
-
-if (!Number.isFinite(currentDepth) || currentDepth < 0) {
-  currentDepth = null;
-}
 
 let allEntrantsData = [];
 let currentDisplayedRaffleNum = initialRequestedRaffleNum || null;
@@ -1061,26 +1197,8 @@ function getNextRaffleNum(raffleNum) {
   return formatRaffleNum(year, week);
 }
 
-function raffleLookupHref(raffleNum, depth) {
-  var href = "/" + guildSlug + "/lookup?raffle_lookup=" + encodeURIComponent(raffleNum);
-  if (Number.isFinite(depth) && depth >= 0) {
-    href += "&depth=" + depth;
-  }
-  return href;
-}
-
-function inferDepthFromLive(liveNum, currentNum) {
-  if (!liveNum || !currentNum) return null;
-  if (liveNum === currentNum) return 0;
-
-  var probe = liveNum;
-  for (var i = 1; i <= MAX_HISTORY_DEPTH; i++) {
-    probe = getPrevRaffleNum(probe);
-    if (!probe) return null;
-    if (probe === currentNum) return i;
-  }
-
-  return null;
+function raffleLookupHref(raffleNum) {
+  return "/" + guildSlug + "/lookup?raffle_lookup=" + encodeURIComponent(raffleNum);
 }
 
 function isArchiveDisplay() {
@@ -1126,18 +1244,13 @@ function updateRaffleNav() {
     return;
   }
 
-  var effectiveDepth = currentDepth;
-  if (effectiveDepth === null) {
-    effectiveDepth = inferDepthFromLive(liveCurrentRaffleNum, currentDisplayedRaffleNum);
-  }
-
   var prevNum = getPrevRaffleNum(currentDisplayedRaffleNum);
   var nextNum = getNextRaffleNum(currentDisplayedRaffleNum);
 
-  if (prevNum && effectiveDepth !== null && effectiveDepth < MAX_HISTORY_DEPTH) {
+  if (prevNum) {
     $nav.append(
       '<a class="archive-nav-link" href="' +
-      raffleLookupHref(prevNum, effectiveDepth + 1) +
+      raffleLookupHref(prevNum) +
       '" aria-label="Previous archive">⏪</a>'
     );
   } else {
@@ -1146,10 +1259,10 @@ function updateRaffleNav() {
 
   $nav.append('<span class="archive-nav-label">Archives</span>');
 
-  if (nextNum && effectiveDepth !== null && effectiveDepth > 0) {
+  if (nextNum && isArchiveDisplay()) {
     $nav.append(
       '<a class="archive-nav-link" href="' +
-      raffleLookupHref(nextNum, effectiveDepth - 1) +
+      raffleLookupHref(nextNum) +
       '" aria-label="Next archive">⏩</a>'
     );
   } else {
@@ -1157,7 +1270,89 @@ function updateRaffleNav() {
   }
 }
 
-function updateRaffleStatusLine(timestampValue) {
+function normalizeEasternTimeLabel(value) {
+  var text = (value || "").toString().trim();
+  if (!text) return "";
+
+  var easternShort = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York",
+    timeZoneName: "short"
+  }).formatToParts(new Date()).find(function(part) {
+    return part.type === "timeZoneName";
+  });
+
+  var currentEastern = easternShort ? easternShort.value : "ET";
+  return text.replace(/\bEDT\b|\bEST\b/g, currentEastern);
+}
+
+function buildRaffleHeaderParts(raffleNumber, raffleTitle, raffleTime) {
+  var numberText = String(raffleNumber || "").trim();
+  var titleText = String(raffleTitle || "").trim();
+  var timeText = normalizeEasternTimeLabel(raffleTime);
+  var headingText = "";
+  var trailingText = "";
+
+  if (titleText) {
+    headingText = "#" + numberText;
+    trailingText = titleText + (timeText ? " • " + timeText : "");
+  } else {
+    headingText = "#" + numberText + " Raffle";
+    trailingText = timeText ? "Drawing: " + timeText : "";
+  }
+
+  return {
+    heading: headingText,
+    trailing: trailingText,
+    separator: (headingText && trailingText) ? " • " : ""
+  };
+}
+
+function applyGuildBranding(result) {
+  var logoUrl = (result && result["guild_logo_url"]) ? String(result["guild_logo_url"]).trim() : "";
+  var faviconUrl = (result && result["guild_favicon_url"]) ? String(result["guild_favicon_url"]).trim() : "/static/favicon-256.png";
+  var primaryColor = normalizeBrandColor(result && result["guild_primary_color"], "#284CA6");
+  var accentColor = normalizeBrandColor(result && result["guild_accent_color"], "#5078D2");
+  if (logoUrl) {
+    $("#mainLogo").attr("src", logoUrl);
+  }
+  updateAppFavicons(faviconUrl);
+  applyBrandColors(primaryColor, accentColor);
+}
+
+function normalizeBrandColor(value, fallback) {
+  var raw = (value || "").toString().trim();
+  if (!raw) return fallback;
+  if (raw.charAt(0) !== "#") raw = "#" + raw;
+  if (!/^#[0-9a-fA-F]{6}$/.test(raw)) return fallback;
+  return raw.toUpperCase();
+}
+
+function hexToRgbList(hexValue) {
+  var hex = normalizeBrandColor(hexValue, "#000000").slice(1);
+  return [
+    parseInt(hex.slice(0, 2), 16),
+    parseInt(hex.slice(2, 4), 16),
+    parseInt(hex.slice(4, 6), 16)
+  ].join(",");
+}
+
+function applyBrandColors(primaryColor, accentColor) {
+  var root = document.documentElement;
+  var normalizedPrimary = normalizeBrandColor(primaryColor, "#284CA6");
+  var normalizedAccent = normalizeBrandColor(accentColor, "#5078D2");
+  root.style.setProperty("--brand-primary", normalizedPrimary);
+  root.style.setProperty("--brand-accent", normalizedAccent);
+  root.style.setProperty("--brand-primary-rgb", hexToRgbList(normalizedPrimary));
+  root.style.setProperty("--brand-accent-rgb", hexToRgbList(normalizedAccent));
+}
+
+function updateAppFavicons(faviconUrl) {
+  $("#appFaviconIco").attr("href", faviconUrl);
+  $("#appFavicon32").attr("href", faviconUrl);
+  $("#appFavicon16").attr("href", faviconUrl);
+}
+
+function updateRaffleStatusLine(updateInfo) {
   var $updated = $("#raffle_updated");
 
   if (isArchiveDisplay()) {
@@ -1167,14 +1362,14 @@ function updateRaffleStatusLine(timestampValue) {
 
   $updated.removeClass("closed");
 
-  if (!timestampValue) {
-    $updated.text("Last Updated");
+  if (!updateInfo || !updateInfo.timestamp) {
+    $updated.text("");
     return;
   }
 
-  var timestamp = parseInt(timestampValue, 10);
+  var timestamp = parseInt(updateInfo.timestamp, 10);
   if (isNaN(timestamp)) {
-    $updated.text("Last Updated");
+    $updated.text("");
     return;
   }
 
@@ -1212,7 +1407,8 @@ function updateRaffleStatusLine(timestampValue) {
     + " " + formatted.hour + ":" + formatted.minute + ":" + formatted.second
     + " " + formatted.dayPeriod + " " + formatted.timeZoneName;
 
-  $updated.text("Last Updated " + rendered);
+  var updatedBy = $.trim(String(updateInfo.updated_by || ""));
+  $updated.text(updatedBy ? ("Last Updated " + rendered + " by " + updatedBy) : ("Last Updated " + rendered));
 }
 
 function updateRaffleNav() {
@@ -1225,19 +1421,14 @@ function updateRaffleNav() {
     return;
   }
 
-  var effectiveDepth = currentDepth;
-  if (effectiveDepth === null) {
-    effectiveDepth = inferDepthFromLive(liveCurrentRaffleNum, currentDisplayedRaffleNum);
-  }
-
   var prevNum = getPrevRaffleNum(currentDisplayedRaffleNum);
   var nextNum = getNextRaffleNum(currentDisplayedRaffleNum);
   var showHome = !!(liveCurrentRaffleNum && currentDisplayedRaffleNum && liveCurrentRaffleNum !== currentDisplayedRaffleNum);
 
-  if (prevNum && effectiveDepth !== null && effectiveDepth < MAX_HISTORY_DEPTH) {
+  if (prevNum) {
     $nav.append(
       '<a class="archive-nav-link" href="' +
-      raffleLookupHref(prevNum, effectiveDepth + 1) +
+      raffleLookupHref(prevNum) +
       '" aria-label="Previous archive">&#9194;</a>'
     );
   } else {
@@ -1247,7 +1438,7 @@ function updateRaffleNav() {
   if (showHome) {
     $nav.append(
       '<a class="archive-nav-link archive-nav-home" href="' +
-      raffleLookupHref(liveCurrentRaffleNum, 0) +
+      raffleLookupHref(liveCurrentRaffleNum) +
       '" aria-label="Return to current raffle">' +
       '<svg class="archive-nav-home-icon" viewBox="0 0 24 24" aria-hidden="true">' +
       '<path d="M4.5 10.5 12 4l7.5 6.5"></path>' +
@@ -1260,10 +1451,10 @@ function updateRaffleNav() {
 
   $nav.append('<span class="archive-nav-label">Archives</span>');
 
-  if (nextNum && effectiveDepth !== null && effectiveDepth > 0) {
+  if (nextNum && showHome) {
     $nav.append(
       '<a class="archive-nav-link" href="' +
-      raffleLookupHref(nextNum, effectiveDepth - 1) +
+      raffleLookupHref(nextNum) +
       '" aria-label="Next archive">&#9193;</a>'
     );
   } else {
@@ -1407,6 +1598,74 @@ function buildEntrantsTable(result) {
   applyEntrantFilter();
 }
 
+function formatPublicBarterValue(value) {
+  var amount = parseInt(value, 10)
+  if (!isFinite(amount)) amount = 0
+  return amount.toLocaleString()
+}
+
+function updatePublicBarterButton(raffleResult) {
+  var enabled = !!(raffleResult && parseInt(raffleResult["raffle_barter_enabled"], 10))
+  $("#public_barter_list_button").toggleClass("is-visible", enabled)
+}
+
+function renderPublicBarterList(items, raffleResult) {
+  var $body = $("#public_barter_list_body")
+  var title = "Barter Bounty List"
+  var raffleNum = raffleResult && raffleResult["raffle_guild_num"] ? String(raffleResult["raffle_guild_num"]) : ""
+  var raffleTitle = raffleResult && raffleResult["raffle_title"] ? String(raffleResult["raffle_title"]).trim() : ""
+
+  if (raffleNum && raffleTitle) {
+    title = "#" + raffleNum + " • " + raffleTitle
+  } else if (raffleNum) {
+    title = "#" + raffleNum + " Raffle"
+  }
+
+  $("#public_barter_list_title").text(title)
+  $("#public_barter_list_subtitle").text("Eligible barter items for this raffle week")
+
+  if (!items || !items.length) {
+    $body.html('<div class="barter-list-empty">No barter bounty items are active for this raffle.</div>')
+    return
+  }
+
+  var rows = items.map(function (item) {
+    var ticketWord = parseInt(item.barter_rate, 10) === 1 ? "TICKET" : "TICKETS"
+    var rateText = formatPublicBarterValue(item.barter_rate) + " " + ticketWord
+    return "<tr>" +
+      "<td>" + formatPublicBarterValue(item.quantity) + "</td>" +
+      "<td>" + escapeHtml(item.item_name || "") + "</td>" +
+      "<td>=</td>" +
+      "<td>" + escapeHtml(rateText) + "</td>" +
+      "</tr>"
+  }).join("")
+
+  $body.html(
+    '<table class="barter-list-table">' +
+      '<thead><tr><th>Qty</th><th>Item Name</th><th>=</th><th>Barter Rate</th></tr></thead>' +
+      '<tbody>' + rows + '</tbody>' +
+    '</table>'
+  )
+}
+
+function openPublicBarterList() {
+  $.getJSON("json/get/raffle", function (raffleResult) {
+    if (!raffleResult || !parseInt(raffleResult["raffle_barter_enabled"], 10)) {
+      return
+    }
+    $.getJSON("json/get/raffle_bounty_list", function (result) {
+      renderPublicBarterList((result && result.items) || [], raffleResult || {})
+      $("#public_barter_list_modal").addClass("is-open")
+    }).fail(function () {
+      alert("Unable to load the barter list right now.")
+    })
+  })
+}
+
+function closePublicBarterList() {
+  $("#public_barter_list_modal").removeClass("is-open")
+}
+
 function refresher() {
   $.getJSON(liveRaffleEndpoint, function(result) {
     liveCurrentRaffleNum = String(result["raffle_guild_num"] || "");
@@ -1415,31 +1674,31 @@ function refresher() {
       currentDisplayedRaffleNum = liveCurrentRaffleNum;
     }
 
-    if (currentDepth === null) {
-      currentDepth = inferDepthFromLive(liveCurrentRaffleNum, currentDisplayedRaffleNum);
-    }
-
     updateRaffleNav();
   });
 
   $.getJSON("json/get/guild", function(result) {
     $("#guild_header").text(result["guild_name"]);
+    applyGuildBranding(result);
   });
 
   $.getJSON("json/get/raffle", function(result) {
     var raffleNum = String(result["raffle_guild_num"] || "");
     currentDisplayedRaffleNum = raffleNum;
-
-    if (currentDepth === null) {
-      currentDepth = inferDepthFromLive(liveCurrentRaffleNum, currentDisplayedRaffleNum);
-    }
+    var raffleHeader = buildRaffleHeaderParts(raffleNum, result["raffle_title"], result["raffle_time"]);
 
     if (window.innerWidth <= 700) {
-  $("#raffle_subheader").html("#" + raffleNum + " Raffle<br>Drawing: " + escapeHtml(result["raffle_time"]));
-} else {
-  $("#raffle_subheader").text("#" + raffleNum + " Raffle • Drawing: " + result["raffle_time"]);
-}
+  $("#raffle_subheader").html(escapeHtml(raffleHeader.heading) + "<br>" + escapeHtml(raffleHeader.trailing));
+  } else {
+  $("#raffle_subheader").text("#" + raffleNum + " Raffle • Drawing: " + normalizeEasternTimeLabel(result["raffle_time"]));
+  }
+    if (window.innerWidth <= 700) {
+  $("#raffle_subheader").html(escapeHtml(raffleHeader.heading) + "<br>" + escapeHtml(raffleHeader.trailing));
+  } else {
+  $("#raffle_subheader").text(raffleHeader.heading + raffleHeader.separator + raffleHeader.trailing);
+  }
     applyPublicStatus(result["raffle_status"], result["raffle_title"]);
+    updatePublicBarterButton(result);
     $("#raffle_notes_public_1").html(result["raffle_notes"] || "").removeClass("pending-note");
     $(".mid-row .info-panel:last .info-body").attr("id", "raffle_notes_public_2").addClass("rich-notes").html(result["raffle_notes_public_2"] || "").removeClass("pending-note");
     $("#entrants_headline").text("#" + raffleNum + " Raffle Entrants");
@@ -1474,10 +1733,20 @@ function refresher() {
 $(document).ready(refresher);
 $(document).ready(function () {
   window.setInterval(refresher, 30000);
+  $("#public_barter_list_button").on("click", openPublicBarterList);
+  $("#public_barter_list_close").on("click", closePublicBarterList);
+  $("#public_barter_list_modal").on("click", function (event) {
+    if (event.target === this) {
+      closePublicBarterList();
+    }
+  });
 });
 </script>
 </head>
-<body>
+<body class="${'is-staging' if is_staging else ''}">
+% if is_staging:
+<div class="stage-banner">${stage_label} ENVIRONMENT</div>
+% endif
 <div class="page">
 
   <section class="card header">
@@ -1497,7 +1766,7 @@ $(document).ready(function () {
           aria-label="Show raffle search"
         >🔍</button>
       </div>
-      <div class="updated${' closed' if initial_lookup_raffle else ''}" id="raffle_updated">${'Raffle Closed' if initial_lookup_raffle else 'Last Updated'}</div>
+      <div class="updated${' closed' if initial_lookup_raffle else ''}" id="raffle_updated">${'Raffle Closed' if initial_lookup_raffle else ''}</div>
     </div>
 
     <div class="stats-inline">
@@ -1526,6 +1795,7 @@ $(document).ready(function () {
   <span class="live-dot"></span>
   <span class="status-dice" aria-hidden="true">🎲</span>
   <strong id="raffle_titlebar"><span class="raffle-status-text">LIVE</span><span class="raffle-title-sep">-</span><span class="raffle-name-text">Raffle</span></strong>
+  <button type="button" class="barter-list-button" id="public_barter_list_button">View Barter List</button>
 </div>
       <div class="info-body rich-notes pending-note" id="raffle_notes_public_1"></div>
     </div>
@@ -1567,6 +1837,18 @@ $(document).ready(function () {
     </div>
   </section>
 
+</div>
+<div class="barter-list-modal" id="public_barter_list_modal">
+  <div class="barter-list-dialog">
+    <div class="barter-list-dialog-header">
+      <div>
+        <p class="barter-list-dialog-title" id="public_barter_list_title">Barter Bounty List</p>
+        <p class="barter-list-dialog-subtitle" id="public_barter_list_subtitle"></p>
+      </div>
+      <button type="button" class="barter-list-close" id="public_barter_list_close">Close</button>
+    </div>
+    <div id="public_barter_list_body"></div>
+  </div>
 </div>
 </body>
 </html>

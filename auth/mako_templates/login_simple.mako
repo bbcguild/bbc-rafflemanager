@@ -3,11 +3,13 @@ ga4_site_area = 'admin_auth'
 ga4_raffle_view = 'current'
 ga4_raffle_number = ''
 ga4_guild_slug = request.matchdict.get('guild', '')
+is_staging = (request.registry.settings.get("app_env") == "staging")
+stage_label = (request.registry.settings.get("app_stage_label") or "STAGING").strip()
 %>
 <!DOCTYPE html>
 <html>
 <head>
-    <title>${title}</title>
+    <title>${('[%s] ' % stage_label) if is_staging else ''}${title}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
         :root {
@@ -44,6 +46,27 @@ ga4_guild_slug = request.matchdict.get('guild', '')
             align-items: center;
             justify-content: center;
             padding: 24px;
+        }
+
+        body.is-staging {
+            box-shadow: inset 0 6px 0 #d94a4a;
+        }
+
+        .stage-banner {
+            position: fixed;
+            top: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            padding: 10px 16px;
+            border: 1px solid rgba(217, 74, 74, 0.55);
+            background: linear-gradient(180deg, rgba(123, 21, 21, 0.96), rgba(95, 16, 16, 0.96));
+            color: #fff3f3;
+            font-size: 13px;
+            font-weight: 900;
+            letter-spacing: .16em;
+            text-transform: uppercase;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
         }
 
         .login-wrap {
@@ -85,6 +108,35 @@ ga4_guild_slug = request.matchdict.get('guild', '')
 
         .login-form h2 {
             display: none;
+        }
+
+        .login-flash {
+            margin: 0 0 16px;
+        }
+
+        .login-flash .flash {
+            margin: 0 0 10px;
+        }
+
+        .login-flash .flash p {
+            margin: 0;
+            padding: 12px 14px;
+            border-radius: 12px;
+            font-weight: 700;
+        }
+
+        .login-flash .flash p.error {
+            background: rgba(132, 34, 34, 0.28);
+            border: 1px solid rgba(214, 96, 96, 0.32);
+            color: #ffd6d6;
+        }
+
+        .login-flash .flash p.notice,
+        .login-flash .flash p.success,
+        .login-flash .flash p.warning {
+            background: rgba(40, 76, 166, 0.18);
+            border: 1px solid rgba(95, 132, 212, 0.24);
+            color: var(--text);
         }
 
         .form-group {
@@ -164,7 +216,10 @@ ga4_guild_slug = request.matchdict.get('guild', '')
         }
     </style>
 </head>
-<body>
+<body class="${'is-staging' if is_staging else ''}">
+% if is_staging:
+    <div class="stage-banner">${stage_label} ENVIRONMENT</div>
+% endif
     <div class="login-wrap">
         <div class="brand">
             <img src="https://www.bbcguild.com/wp-content/uploads/2020/04/cropped-cropped-BBC-LOGO-V2-2.gif" alt="BBC logo">
@@ -175,6 +230,13 @@ ga4_guild_slug = request.matchdict.get('guild', '')
 
         <div class="login-form">
             <h2>${title}</h2>
+            <div class="login-flash">
+                % for flashmsg in flash.get_all():
+                    <div class="flash">
+                        <p class="${flashmsg['queue']}">${flashmsg['message']}</p>
+                    </div>
+                % endfor
+            </div>
             % if form:
                 <form method="POST" action="">
                     ${csrf_token_field | n}

@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
+<%
+is_staging = (request.registry.settings.get("app_env") == "staging")
+stage_label = (request.registry.settings.get("app_stage_label") or "STAGING").strip()
+%>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.js"></script>
-<title>Raffles!</title>
+<title>${('[%s] ' % stage_label) if is_staging else ''}Raffles!</title>
 <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-256.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-256.png">
@@ -33,6 +37,27 @@
             linear-gradient(180deg, #05070d 0%, #060a12 100%);
         color: var(--text);
         font-family: Inter, Arial, sans-serif;
+    }
+
+    body.is-staging {
+        box-shadow: inset 0 6px 0 #d94a4a;
+    }
+
+    .stage-banner {
+        position: fixed;
+        top: 16px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 20;
+        padding: 10px 16px;
+        border: 1px solid rgba(217, 74, 74, 0.55);
+        background: linear-gradient(180deg, rgba(123, 21, 21, 0.96), rgba(95, 16, 16, 0.96));
+        color: #fff3f3;
+        font-size: 13px;
+        font-weight: 900;
+        letter-spacing: .16em;
+        text-transform: uppercase;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
     }
 
     #main {
@@ -93,7 +118,10 @@
     }
 </style>
 </head>
-<body>
+<body class="${'is-staging' if is_staging else ''}">
+% if is_staging:
+<div class="stage-banner">${stage_label} ENVIRONMENT</div>
+% endif
 <div id="main">
     <div class="brand">
         <img src="https://www.bbcguild.com/wp-content/uploads/2020/04/cropped-cropped-BBC-LOGO-V2-2.gif" alt="BBC logo">
@@ -102,8 +130,9 @@
 
     <p class="intro">Select a guild:</p>
     <ul>
-        <li><a href="bbc1/">Bleakrock Barter Co</a></li>
-        <li><a href="bbc2/">Blackbriar Barter Co</a></li>
+        % for guild in guilds:
+        <li><a href="${guild['guild_shortname']}/">${guild['guild_name']}</a></li>
+        % endfor
     </ul>
 </div>
 </body>

@@ -29,7 +29,15 @@ def groupfinder(userid, request):
     """
     auth = AuthUser.find_by_id(userid)
     if auth:
-        return ['group:akaviri']
+        principals = []
+        if auth.has_global_role("owner"):
+            principals.extend(['group:admin_access', 'role:superadmin', 'role:owner'])
+        elif auth.has_global_role("superadmin"):
+            principals.extend(['group:admin_access', 'role:superadmin'])
+        for role in auth.roles or []:
+            if role["role"] == "guild_admin" and role["guild_shortname"]:
+                principals.append('guild:%s:admin_access' % role["guild_shortname"])
+        return principals
 
 class RootFactory(object):
     """ Defines the default ACLs, groups populated from SQLAlchemy.
@@ -42,7 +50,10 @@ class RootFactory(object):
     def __acl__(self):
         defaultlist = [ (Allow, Everyone, 'view'),
                 (Allow, Authenticated, 'authenticated'),]
-        defaultlist.append( (Allow, 'group:akaviri', 'akaviri') )
+        defaultlist.append( (Allow, 'role:owner', 'admin_access') )
+        defaultlist.append( (Allow, 'role:superadmin', 'admin_access') )
+        if getattr(self, "guild", None):
+            defaultlist.append((Allow, 'guild:%s:admin_access' % self.guild.lower(), 'admin_access'))
         return defaultlist
 
 def apex_email(request, recipients, subject, body, sender=None):
