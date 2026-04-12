@@ -451,11 +451,30 @@ body.is-staging{
   border-bottom:1px solid rgba(255,255,255,.06);
 }
 .raffle-live-header{
-  justify-content:space-between;
+  display:flex;
+  justify-content:flex-start;
   gap:10px;
+}
+.raffle-live-title{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:10px;
+  flex:1 1 auto;
+  margin-right:auto;
+}
+#raffle_titlebar{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  text-align:left;
+  flex:0 1 auto;
 }
 .raffle-live-header .barter-list-button{
   margin-left:auto;
+  flex:0 0 auto;
 }
 .raffle-live-header.status-live .live-dot{
   background:#36ff8e;
@@ -1792,9 +1811,11 @@ $(document).ready(function () {
   <section class="mid-row">
     <div class="card info-panel">
       <div class="info-bar raffle-live-header">
-  <span class="live-dot"></span>
-  <span class="status-dice" aria-hidden="true">🎲</span>
-  <strong id="raffle_titlebar"><span class="raffle-status-text">LIVE</span><span class="raffle-title-sep">-</span><span class="raffle-name-text">Raffle</span></strong>
+  <div class="raffle-live-title">
+    <span class="live-dot"></span>
+    <span class="status-dice" aria-hidden="true">🎲</span>
+    <strong id="raffle_titlebar"><span class="raffle-status-text">LIVE</span><span class="raffle-title-sep">-</span><span class="raffle-name-text">Raffle</span></strong>
+  </div>
   <button type="button" class="barter-list-button" id="public_barter_list_button">View Barter List</button>
 </div>
       <div class="info-body rich-notes pending-note" id="raffle_notes_public_1"></div>
