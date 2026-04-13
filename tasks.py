@@ -1270,6 +1270,21 @@ def make_ticket_list (request):
 
     data = [dict(x) for x in ticks]
 
+    build = []
+    for row in data:
+        count = safe_ticket_int(row.get("ticket_count"))
+        barter = safe_ticket_int(row.get("ticket_barter"))
+        total = count + barter
+        if total == 0:
+            continue
+        row["ticket_count"] = count
+        row["ticket_barter"] = barter
+        build.append(row)
+
+    # Keep literal ticket numbers consistent with the entrant ranges shown in
+    # admin/public ticket tables, which are alphabetically ordered.
+    data = sorted(build, key=lambda x: x["ticket_user_name"].lower())
+
     tno = 1 # starting ticket number
 
     res = []
