@@ -1084,6 +1084,43 @@ def get_all_tickets (request):
 def get_extended_tickets (request):
     return make_all_tickets(request, True)
 
+def build_ticket_ranges_by_user(request, ticket_rows):
+    if not ticket_rows:
+        return {}
+
+    tno = 1
+    ranges_by_user = {}
+
+    for ticket_row in [dict(x) for x in ticket_rows]:
+        user_name = ticket_row.get("ticket_user_name")
+        if not user_name:
+            continue
+
+        ticket_count = safe_ticket_int(ticket_row.get("ticket_count"))
+        ticket_barter = safe_ticket_int(ticket_row.get("ticket_barter"))
+        total = ticket_count + ticket_barter
+
+        if guild_bonus_five(request):
+            if total % 5 == 0:
+                total = total + int(total / 5)
+        elif guild_bonus_two(request):
+            if total % 2 == 0:
+                total = total + int(total / 2)
+
+        if total <= 0:
+            continue
+
+        start = tno
+        end = tno + total - 1
+        range_text = str(start) if start == end else f"{start}-{end}"
+        ranges_by_user.setdefault(user_name, []).append(range_text)
+        tno = end + 1
+
+    return {
+        user_name: ", ".join(user_ranges)
+        for user_name, user_ranges in ranges_by_user.items()
+    }
+
 def make_all_tickets (request, extended=False):
     tickets = db.get_tickets()
 
@@ -1091,6 +1128,7 @@ def make_all_tickets (request, extended=False):
         return []
 
     data = [dict(x) for x in tickets]
+    ticket_ranges_by_user = build_ticket_ranges_by_user(request, tickets)
 
     res = []
 
@@ -1116,7 +1154,7 @@ def make_all_tickets (request, extended=False):
             continue
 
         if extended:
-            new = [i+1, d["ticket_user_name"], total, ticket_count, barter_val]
+            new = [i+1, d["ticket_user_name"], total, ticket_count, barter_val, ticket_ranges_by_user.get(d["ticket_user_name"], "")]
         else:
             new = [i+1, d["ticket_user_name"], total]
 

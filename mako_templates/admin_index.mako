@@ -6159,13 +6159,15 @@ function addTicketRanges(rows, extended) {
             continue
         }
 
-        var total = Number(row[2]) || 0
-        var rangeText = ""
+        var rangeText = row.length > 5 ? (row[5] || "") : ""
 
-        if (total > 0) {
-            var runningEnd = runningStart + total - 1
-            rangeText = runningStart + "-" + runningEnd
-            runningStart = runningEnd + 1
+        if (!rangeText) {
+            var total = Number(row[2]) || 0
+            if (total > 0) {
+                var runningEnd = runningStart + total - 1
+                rangeText = runningStart + "-" + runningEnd
+                runningStart = runningEnd + 1
+            }
         }
 
         var newRow = row.slice()
