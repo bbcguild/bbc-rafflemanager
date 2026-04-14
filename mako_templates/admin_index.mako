@@ -1330,6 +1330,31 @@ body.legacy-modal-open{
   background:inherit !important;
 }
 
+#ticket_info .handsontable td.currentCol,
+#ticket_info .handsontable td.currentRow,
+#ticket_info .handsontable td.area,
+#ticket_info .handsontable td.ht__highlight,
+#ticket_info .handsontable td.ht__active_highlight{
+  background:#0d1524 !important;
+  color:#edf3ff !important;
+}
+
+#ticket_info .handsontable td.currentCol.totals-column,
+#ticket_info .handsontable td.currentRow.totals-column,
+#ticket_info .handsontable td.area.totals-column,
+#ticket_info .handsontable td.ht__highlight.totals-column,
+#ticket_info .handsontable td.ht__active_highlight.totals-column{
+  color:#e6d77a !important;
+}
+
+#ticket_info .handsontable td.currentCol.ticket-neutral-column,
+#ticket_info .handsontable td.currentRow.ticket-neutral-column,
+#ticket_info .handsontable td.area.ticket-neutral-column,
+#ticket_info .handsontable td.ht__highlight.ticket-neutral-column,
+#ticket_info .handsontable td.ht__active_highlight.ticket-neutral-column{
+  color:#edf3ff !important;
+}
+
 #ticket_info .wtHolder,
 #ticket_info .wtHider,
 #ticket_info .wtSpreader{
