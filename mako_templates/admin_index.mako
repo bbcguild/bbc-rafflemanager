@@ -1184,7 +1184,7 @@ body.legacy-modal-open{
   width:max-content;
   min-width:100%;
   display:grid;
-  grid-template-columns:minmax(760px, 1fr) minmax(720px, 760px);
+  grid-template-columns:minmax(560px, 1fr) minmax(640px, 700px);
   gap:12px;
   align-items:start;
   border-collapse:separate;
@@ -1207,7 +1207,7 @@ body.legacy-modal-open{
 #column_prizeinfo{
   display:block;
   vertical-align:top;
-  min-width:760px;
+  min-width:560px;
   width:auto !important;
   overflow:hidden;
   height:auto !important;
@@ -1216,7 +1216,7 @@ body.legacy-modal-open{
 #column_ticketinfo{
   display:block;
   vertical-align:top;
-  min-width:720px;
+  min-width:640px;
   width:100% !important;
   max-width:none !important;
   height:auto !important;
@@ -6494,7 +6494,7 @@ var get_ticket_table = function () {
                         height: "auto",
                         rowHeaders: false,
                         colHeaders: ["#", "Name", "Total", "Paid", "Bar", "Range"],
-                        colWidths: [44, 228, 84, 84, 84, 156],
+                        colWidths: [36, 196, 72, 72, 72, 132],
                         contextMenu: false,
                         enterMoves: {row: 0, col: 1},
                         columnSorting: true,
@@ -6576,7 +6576,7 @@ var get_ticket_table = function () {
                         height: "auto",
                         rowHeaders: false,
                         colHeaders: ["#", "Name", "Total", "Range"],
-                        colWidths: [44, 260, 92, 176],
+                        colWidths: [36, 228, 76, 140],
                         contextMenu: false,
                         enterMoves: {row: 0, col: 1},
                         columnSorting: true,
