@@ -1297,6 +1297,21 @@ body.legacy-modal-open{
   color:#aebfe0 !important;
 }
 
+#ticket_info .handsontable th.ht__highlight,
+#ticket_info .handsontable .ht_clone_top th.ht__highlight,
+#ticket_info .handsontable .ht_clone_left th.ht__highlight,
+#ticket_info .handsontable .ht_clone_top_left_corner th.ht__highlight,
+#ticket_info .handsontable th[aria-sort]{
+  background:#22314b !important;
+  color:#edf3ff !important;
+}
+
+#ticket_info .handsontable th.ht__active_highlight,
+#ticket_info .handsontable .ht_clone_top th.ht__active_highlight{
+  background:#2a3c5d !important;
+  color:#ffffff !important;
+}
+
 #ticket_info .handsontable td:first-of-type{
   font-weight:700;
 }

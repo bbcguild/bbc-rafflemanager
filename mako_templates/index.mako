@@ -1171,6 +1171,33 @@ function normalizeEntrantSearch(value) {
     .replace(/^@+/, "");
 }
 
+function entrantRowContainsTicketNumber(row, ticketNumber) {
+  if (!Array.isArray(row) || row.length < 6) {
+    return false;
+  }
+
+  var rangeText = String(row[5] || "").trim();
+  if (!rangeText) {
+    return false;
+  }
+
+  return rangeText.split(",").some(function(part) {
+    var piece = String(part || "").trim();
+    if (!piece) {
+      return false;
+    }
+
+    var match = piece.match(/^(\d+)(?:-(\d+))?$/);
+    if (!match) {
+      return false;
+    }
+
+    var start = parseInt(match[1], 10);
+    var end = match[2] ? parseInt(match[2], 10) : start;
+    return start <= ticketNumber && ticketNumber <= end;
+  });
+}
+
 function parseRaffleNum(raffleNum) {
   var cleaned = String(raffleNum == null ? "" : raffleNum).replace(/\D/g, "");
   if (!/^\d{4}$/.test(cleaned)) return null;
@@ -1593,7 +1620,12 @@ function applyEntrantFilter() {
     return;
   }
 
+  var numericTicket = /^\d+$/.test(query) ? parseInt(query, 10) : null;
+
   var filtered = allEntrantsData.filter(function(row) {
+    if (numericTicket !== null && entrantRowContainsTicketNumber(row, numericTicket)) {
+      return true;
+    }
     var name = normalizeEntrantSearch(row[1]);
     return name.indexOf(query) !== -1;
   });
