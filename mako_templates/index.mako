@@ -847,6 +847,7 @@ body.is-staging{
   gap:6px;
   cursor:pointer;
   user-select:none;
+  transition:color .16s ease, opacity .16s ease;
 }
 .sort-header .sort-label{
   min-width:0;
@@ -854,10 +855,21 @@ body.is-staging{
 .sort-header .sort-indicator{
   font-size:.8em;
   line-height:1;
-  opacity:.92;
+  opacity:.38;
 }
 .sort-header.is-active{
   color:#f6fbff;
+}
+.sort-header.is-active .sort-indicator{
+  opacity:.92;
+}
+.sort-header:hover,
+.sort-header:focus-visible{
+  color:#f6fbff;
+}
+.sort-header:hover .sort-indicator,
+.sort-header:focus-visible .sort-indicator{
+  opacity:.62;
 }
 .row.mode-barter,
 .row.mode-barter-range{
@@ -1183,7 +1195,7 @@ function renderEntrantsHeader() {
 
   var html = '';
   columns.forEach(function(column) {
-    var indicator = '';
+    var indicator = '<span class="sort-indicator" aria-hidden="true">↕</span>';
     var activeClass = '';
     if (currentEntrantsSort && currentEntrantsSort.key === column.key) {
       activeClass = ' is-active';
