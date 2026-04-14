@@ -1301,13 +1301,21 @@ body.legacy-modal-open{
 #ticket_info .handsontable .ht_clone_top th.ht__highlight,
 #ticket_info .handsontable .ht_clone_left th.ht__highlight,
 #ticket_info .handsontable .ht_clone_top_left_corner th.ht__highlight,
+#ticket_info .handsontable th.columnSorting,
+#ticket_info .handsontable .ht_clone_top th.columnSorting,
+#ticket_info .handsontable .ht_clone_left th.columnSorting,
+#ticket_info .handsontable .ht_clone_top_left_corner th.columnSorting,
 #ticket_info .handsontable th[aria-sort]{
   background:#22314b !important;
   color:#edf3ff !important;
 }
 
 #ticket_info .handsontable th.ht__active_highlight,
-#ticket_info .handsontable .ht_clone_top th.ht__active_highlight{
+#ticket_info .handsontable .ht_clone_top th.ht__active_highlight,
+#ticket_info .handsontable th.afterSelection,
+#ticket_info .handsontable .ht_clone_top th.afterSelection,
+#ticket_info .handsontable th.beforeSelection,
+#ticket_info .handsontable .ht_clone_top th.beforeSelection{
   background:#2a3c5d !important;
   color:#ffffff !important;
 }
@@ -6369,7 +6377,7 @@ var get_ticket_table = function () {
                         height: "auto",
                         rowHeaders: false,
                         colHeaders: ["#", "Name", "Total", "Paid", "Bar", "Range"],
-                        colWidths: [28, 132, 56, 52, 64, 136],
+                        colWidths: [28, 132, 56, 52, 64, 184],
                         contextMenu: false,
                         enterMoves: {row: 0, col: 1},
                         columnSorting: true,
@@ -6441,7 +6449,7 @@ var get_ticket_table = function () {
                         height: "auto",
                         rowHeaders: false,
                         colHeaders: ["#", "Name", "Total", "Range"],
-                        colWidths: [34, 164, 50, 122],
+                        colWidths: [34, 164, 50, 184],
                         contextMenu: false,
                         enterMoves: {row: 0, col: 1},
                         columnSorting: true,
