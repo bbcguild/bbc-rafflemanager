@@ -1181,9 +1181,10 @@ body.legacy-modal-open{
 }
 
 #main_table{
-  width:100%;
+  width:max-content;
+  min-width:100%;
   display:grid;
-  grid-template-columns:minmax(0,1fr) minmax(940px, 1040px);
+  grid-template-columns:minmax(760px, 1fr) minmax(720px, 760px);
   gap:12px;
   align-items:start;
   border-collapse:separate;
@@ -1206,7 +1207,7 @@ body.legacy-modal-open{
 #column_prizeinfo{
   display:block;
   vertical-align:top;
-  min-width:0;
+  min-width:760px;
   width:auto !important;
   overflow:hidden;
   height:auto !important;
@@ -1215,7 +1216,7 @@ body.legacy-modal-open{
 #column_ticketinfo{
   display:block;
   vertical-align:top;
-  min-width:0;
+  min-width:720px;
   width:100% !important;
   max-width:none !important;
   height:auto !important;
