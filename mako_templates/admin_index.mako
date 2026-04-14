@@ -1177,6 +1177,7 @@ body.legacy-modal-open{
   padding:0;
   height:auto !important;
   min-height:0 !important;
+  overflow-x:auto;
 }
 
 #main_table{
@@ -3278,12 +3279,6 @@ div#paid_template{
     width:100%;
     margin-left:0;
     justify-content:flex-start;
-  }
-}
-
-@media (max-width:1450px){
-  #main_table{
-    grid-template-columns:minmax(0,1fr) minmax(408px, 448px);
   }
 }
 
