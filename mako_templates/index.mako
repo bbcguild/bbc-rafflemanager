@@ -841,6 +841,24 @@ body.is-staging{
 .thead.mode-barter-range{
   font-size:.84rem;
 }
+.sort-header{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  cursor:pointer;
+  user-select:none;
+}
+.sort-header .sort-label{
+  min-width:0;
+}
+.sort-header .sort-indicator{
+  font-size:.8em;
+  line-height:1;
+  opacity:.92;
+}
+.sort-header.is-active{
+  color:#f6fbff;
+}
 .row.mode-barter,
 .row.mode-barter-range{
   font-size:.88rem;
@@ -1052,12 +1070,18 @@ let currentDisplayedRaffleNum = initialRequestedRaffleNum || null;
 let liveCurrentRaffleNum = null;
 let currentRaffleStatus = "LIVE";
 let currentEntrantsMode = "standard";
+let currentEntrantsSort = null;
 
 $(document).ready(function() {
   $.ajaxSetup({cache:false});
 
   $(document).on('input', '.lookup-input', function() {
     applyEntrantFilter();
+  });
+
+  $(document).on('click', '#entrantsHead .sort-header', function() {
+    var key = $(this).data('key');
+    toggleEntrantsSort(key);
   });
 
 });
@@ -1157,10 +1181,92 @@ function renderEntrantsHeader() {
 
   var html = '';
   columns.forEach(function(column) {
-    html += '<div class="' + column.className + '">' + escapeHtml(column.label) + '</div>';
+    var indicator = '';
+    var activeClass = '';
+    if (currentEntrantsSort && currentEntrantsSort.key === column.key) {
+      activeClass = ' is-active';
+      indicator = currentEntrantsSort.direction === 'asc'
+        ? '<span class="sort-indicator" aria-hidden="true">↑</span>'
+        : '<span class="sort-indicator" aria-hidden="true">↓</span>';
+    }
+
+    html += '<div class="' + column.className + ' sort-header' + activeClass + '" data-key="' + escapeHtml(column.key) + '" role="button" tabindex="0">'
+      + '<span class="sort-label">' + escapeHtml(column.label) + '</span>'
+      + indicator
+      + '</div>';
   });
 
   $head.attr("class", headClass).html(html);
+}
+
+function getRangeSortValue(row) {
+  if (!Array.isArray(row) || row.length < 6) {
+    return Number.MAX_SAFE_INTEGER;
+  }
+
+  var rangeText = String(row[5] || "").trim();
+  var firstPart = rangeText.split(",")[0].trim();
+  var match = firstPart.match(/^(\d+)/);
+  return match ? parseInt(match[1], 10) : Number.MAX_SAFE_INTEGER;
+}
+
+function getEntrantSortValue(row, key) {
+  if (!Array.isArray(row)) {
+    return null;
+  }
+
+  if (key === "idx") return Number(row[0]) || 0;
+  if (key === "name") return String(row[1] || "").toLowerCase();
+  if (key === "total") return Number(row[2]) || 0;
+  if (key === "paid") return Number(row[3]) || 0;
+  if (key === "bar") return Number(row[4]) || 0;
+  if (key === "range") return getRangeSortValue(row);
+  return null;
+}
+
+function sortEntrantRows(rows) {
+  var list = Array.isArray(rows) ? rows.slice() : [];
+  if (!currentEntrantsSort || !currentEntrantsSort.key || !currentEntrantsSort.direction) {
+    return list;
+  }
+
+  var direction = currentEntrantsSort.direction === "desc" ? -1 : 1;
+  var sortKey = currentEntrantsSort.key;
+
+  return list.sort(function(a, b) {
+    var aValue = getEntrantSortValue(a, sortKey);
+    var bValue = getEntrantSortValue(b, sortKey);
+    var primary = 0;
+
+    if (typeof aValue === "string" || typeof bValue === "string") {
+      primary = String(aValue || "").localeCompare(String(bValue || ""), undefined, { sensitivity: "base" });
+    } else {
+      primary = (Number(aValue) || 0) - (Number(bValue) || 0);
+    }
+
+    if (primary !== 0) {
+      return primary * direction;
+    }
+
+    return (Number(a[0]) || 0) - (Number(b[0]) || 0);
+  });
+}
+
+function toggleEntrantsSort(key) {
+  if (!key) {
+    return;
+  }
+
+  if (!currentEntrantsSort || currentEntrantsSort.key !== key) {
+    currentEntrantsSort = { key: key, direction: "asc" };
+  } else if (currentEntrantsSort.direction === "asc") {
+    currentEntrantsSort = { key: key, direction: "desc" };
+  } else {
+    currentEntrantsSort = { key: "idx", direction: "desc" };
+  }
+
+  renderEntrantsHeader();
+  applyEntrantFilter();
 }
 
 function normalizeEntrantSearch(value) {
@@ -1589,11 +1695,12 @@ function renderEntrantsRows(rows) {
   }
 
   var columns = getEntrantsColumns();
+  var sortedRows = sortEntrantRows(rows);
   var rowClass = "row hoverable mode-" + currentEntrantsMode;
 
   var htmlRows = [];
-  for (var i = 0; i < rows.length; i++) {
-    var r = rows[i];
+  for (var i = 0; i < sortedRows.length; i++) {
+    var r = sortedRows[i];
     var rowHtml = '<div class="' + rowClass + '">';
     columns.forEach(function(column) {
       rowHtml += '<div class="' + column.className + '">' + escapeHtml(column.value(r)) + '</div>';
