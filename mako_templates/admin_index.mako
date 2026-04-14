@@ -1182,7 +1182,7 @@ body.legacy-modal-open{
 #main_table{
   width:100%;
   display:grid;
-  grid-template-columns:minmax(0,1fr) minmax(688px, 760px);
+  grid-template-columns:minmax(0,1fr) minmax(940px, 1040px);
   gap:12px;
   align-items:start;
   border-collapse:separate;
@@ -1246,7 +1246,8 @@ body.legacy-modal-open{
 #right{
   width:100%;
   min-width:0;
-  overflow:visible;
+  overflow-x:auto;
+  overflow-y:visible;
   height:auto !important;
 }
 
