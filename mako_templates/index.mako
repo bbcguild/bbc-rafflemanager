@@ -606,6 +606,9 @@ body.is-staging{
 .entrants-panel{
   overflow:hidden;
 }
+.entrants-panel.is-capped{
+  height:auto;
+}
 .entrants-body{
   display:flex;
   flex-direction:column;
@@ -1647,6 +1650,7 @@ function buildPrizeCards(result) {
 
   if (!result || !result.length) {
     $("#prize_info").append('<div class="empty-state">No prize cards yet.</div>');
+    scheduleBottomRowLayoutSync();
     return;
   }
 
@@ -1710,6 +1714,8 @@ function buildPrizeCards(result) {
 
     $("#prize_info").append(card);
   });
+
+  scheduleBottomRowLayoutSync();
 }
 
 function renderEntrantsRows(rows) {
@@ -1718,6 +1724,7 @@ function renderEntrantsRows(rows) {
 
   if (!rows || !rows.length) {
     $all.append('<div class="empty-state">No matching entrants found.</div>');
+    scheduleBottomRowLayoutSync();
     return;
   }
 
@@ -1739,6 +1746,7 @@ function renderEntrantsRows(rows) {
   }
 
   $all.append(htmlRows.join(''));
+  scheduleBottomRowLayoutSync();
 }
 
 function applyEntrantFilter() {
@@ -1768,6 +1776,49 @@ function applyEntrantFilter() {
   renderEntrantsRows(filtered);
 }
 
+var bottomRowLayoutTimer = null;
+
+function syncBottomRowLayout() {
+  var $prizesPanel = $(".prizes-panel");
+  var $entrantsPanel = $(".entrants-panel");
+  var $entrantsScroll = $(".entrants-scroll");
+
+  if (!$prizesPanel.length || !$entrantsPanel.length || !$entrantsScroll.length) {
+    return;
+  }
+
+  $entrantsPanel.removeClass("is-capped").css("height", "");
+  $entrantsScroll.css("max-height", "");
+
+  if (window.innerWidth <= 1100) {
+    return;
+  }
+
+  var prizeHeight = $prizesPanel.outerHeight();
+  var entrantsNaturalHeight = $entrantsPanel.outerHeight();
+
+  if (!prizeHeight || !entrantsNaturalHeight || entrantsNaturalHeight <= prizeHeight) {
+    return;
+  }
+
+  var chromeHeight = entrantsNaturalHeight - $entrantsScroll.outerHeight();
+  var availableScrollHeight = Math.max(160, Math.floor(prizeHeight - chromeHeight - 2));
+
+  $entrantsPanel.addClass("is-capped").css("height", prizeHeight + "px");
+  $entrantsScroll.css("max-height", availableScrollHeight + "px");
+}
+
+function scheduleBottomRowLayoutSync() {
+  if (bottomRowLayoutTimer) {
+    window.cancelAnimationFrame(bottomRowLayoutTimer);
+  }
+
+  bottomRowLayoutTimer = window.requestAnimationFrame(function() {
+    bottomRowLayoutTimer = null;
+    syncBottomRowLayout();
+  });
+}
+
 function buildEntrantsTable(result) {
   var rows = Array.isArray(result) ? result.slice() : [];
   currentEntrantsMode = determineEntrantsMode(rows);
@@ -1780,6 +1831,7 @@ function buildEntrantsTable(result) {
 
   if (!allEntrantsData.length) {
     $("#allEntrants").html('<div class="empty-state">No entrants yet.</div>');
+    scheduleBottomRowLayoutSync();
     return;
   }
 
@@ -1919,6 +1971,7 @@ function refresher() {
 }
 
 $(document).ready(refresher);
+$(window).on("resize", scheduleBottomRowLayoutSync);
 $(document).ready(function () {
   window.setInterval(refresher, 30000);
   $("#public_barter_list_button").on("click", openPublicBarterList);
