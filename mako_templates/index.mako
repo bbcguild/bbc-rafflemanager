@@ -1155,13 +1155,12 @@ function renderEntrantsHeader() {
   var columns = getEntrantsColumns();
   var headClass = "thead mode-" + currentEntrantsMode;
 
-  var html = '<div class="' + headClass + '">';
+  var html = '';
   columns.forEach(function(column) {
     html += '<div class="' + column.className + '">' + escapeHtml(column.label) + '</div>';
   });
-  html += '</div>';
 
-  $head.replaceWith(html);
+  $head.attr("class", headClass).html(html);
 }
 
 function normalizeEntrantSearch(value) {
@@ -1877,9 +1876,9 @@ $(document).ready(function () {
       </div>
 
       <div class="entrants-body">
-      <div class="thead" id="entrantsHead">
+      <div class="thead mode-standard" id="entrantsHead">
         <div class="idx">#</div>
-        <div>Name</div>
+        <div class="name">Name</div>
         <div class="total">Total</div>
         </div>
 
