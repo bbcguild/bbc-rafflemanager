@@ -1182,7 +1182,7 @@ body.legacy-modal-open{
 #main_table{
   width:100%;
   display:grid;
-  grid-template-columns:minmax(0,1fr) minmax(420px, 464px);
+  grid-template-columns:minmax(0,1fr) minmax(688px, 760px);
   gap:12px;
   align-items:start;
   border-collapse:separate;
@@ -1216,7 +1216,7 @@ body.legacy-modal-open{
   vertical-align:top;
   min-width:0;
   width:100% !important;
-  max-width:520px !important;
+  max-width:none !important;
   height:auto !important;
 }
 
@@ -1295,6 +1295,23 @@ body.legacy-modal-open{
 #ticket_info .handsontable .htDimmed,
 #ticket_info .handsontable .colHeader{
   color:#aebfe0 !important;
+}
+
+#ticket_info .handsontable th.ticket-header-index,
+#ticket_info .handsontable .ht_clone_top th.ticket-header-index{
+  text-align:center !important;
+}
+
+#ticket_info .handsontable th.ticket-header-name,
+#ticket_info .handsontable .ht_clone_top th.ticket-header-name{
+  text-align:left !important;
+}
+
+#ticket_info .handsontable th.ticket-header-number,
+#ticket_info .handsontable .ht_clone_top th.ticket-header-number,
+#ticket_info .handsontable th.ticket-header-range,
+#ticket_info .handsontable .ht_clone_top th.ticket-header-range{
+  text-align:right !important;
 }
 
 #ticket_info .handsontable th.ht__highlight,
@@ -6247,6 +6264,24 @@ function renderSortableRange(value) {
     return pipeIndex >= 0 ? text.slice(pipeIndex + 1) : text
 }
 
+function applyTicketHeaderClasses(col, TH, totalCols) {
+    if (!TH) {
+        return
+    }
+
+    TH.classList.remove("ticket-header-index", "ticket-header-name", "ticket-header-number", "ticket-header-range")
+
+    if (col === 0) {
+        TH.classList.add("ticket-header-index")
+    } else if (col === 1) {
+        TH.classList.add("ticket-header-name")
+    } else if (col === (totalCols - 1)) {
+        TH.classList.add("ticket-header-range")
+    } else {
+        TH.classList.add("ticket-header-number")
+    }
+}
+
 function getSortableRangeStart(value) {
     var text = renderSortableRange(value)
     var firstPart = String(text || "").split(",")[0].trim()
@@ -6462,11 +6497,14 @@ var get_ticket_table = function () {
                         height: "auto",
                         rowHeaders: false,
                         colHeaders: ["#", "Name", "Total", "Paid", "Bar", "Range"],
-                        colWidths: [28, 132, 56, 52, 64, 184],
+                        colWidths: [44, 228, 84, 84, 84, 156],
                         contextMenu: false,
                         enterMoves: {row: 0, col: 1},
                         columnSorting: true,
 			licenseKey: "non-commercial-and-evaluation",
+                        afterGetColHeader: function(col, TH) {
+                            applyTicketHeaderClasses(col, TH, this.countCols())
+                        },
                         columns: [
                             {
                                 readOnly: true,
@@ -6541,11 +6579,14 @@ var get_ticket_table = function () {
                         height: "auto",
                         rowHeaders: false,
                         colHeaders: ["#", "Name", "Total", "Range"],
-                        colWidths: [34, 164, 50, 184],
+                        colWidths: [44, 260, 92, 176],
                         contextMenu: false,
                         enterMoves: {row: 0, col: 1},
                         columnSorting: true,
 			licenseKey: "non-commercial-and-evaluation",
+                        afterGetColHeader: function(col, TH) {
+                            applyTicketHeaderClasses(col, TH, this.countCols())
+                        },
                         columns: [
                             {},
                             {
