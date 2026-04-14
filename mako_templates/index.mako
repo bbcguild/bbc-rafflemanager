@@ -1262,7 +1262,7 @@ function toggleEntrantsSort(key) {
   } else if (currentEntrantsSort.direction === "asc") {
     currentEntrantsSort = { key: key, direction: "desc" };
   } else {
-    currentEntrantsSort = { key: "idx", direction: "desc" };
+    currentEntrantsSort = { key: "idx", direction: "asc" };
   }
 
   renderEntrantsHeader();
