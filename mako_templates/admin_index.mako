@@ -6247,6 +6247,45 @@ function renderSortableRange(value) {
     return pipeIndex >= 0 ? text.slice(pipeIndex + 1) : text
 }
 
+function getSortableRangeStart(value) {
+    var text = renderSortableRange(value)
+    var firstPart = String(text || "").split(",")[0].trim()
+    var match = firstPart.match(/^(\d+)/)
+    return match ? Number(match[1]) : Number.MAX_SAFE_INTEGER
+}
+
+function applyRangeColumnSort(hot, destinationSortConfigs) {
+    if (!hot || hot.__sortingRangeColumn) {
+        return
+    }
+
+    if (!destinationSortConfigs || !destinationSortConfigs.length) {
+        return
+    }
+
+    var primarySort = destinationSortConfigs[0]
+    var rangeColumnIndex = hot.countCols() - 1
+    if (!primarySort || primarySort.column !== rangeColumnIndex || !primarySort.sortOrder) {
+        return
+    }
+
+    var sourceData = hot.getSourceDataArray()
+    if (!sourceData || !sourceData.length) {
+        return
+    }
+
+    var extended = hot.countCols() > 4
+    var realRows = getTicketDataRows(sourceData, extended)
+    var direction = primarySort.sortOrder === "desc" ? -1 : 1
+    var sortedData = realRows.slice().sort(function(aRow, bRow) {
+        return (getSortableRangeStart(aRow[rangeColumnIndex]) - getSortableRangeStart(bRow[rangeColumnIndex])) * direction
+    })
+
+    hot.__sortingRangeColumn = true
+    hot.loadData(sortedData)
+    hot.__sortingRangeColumn = false
+}
+
 function getTicketDataRows(data, extended) {
     var rows = []
 
@@ -6476,6 +6515,9 @@ var get_ticket_table = function () {
                         minSpareRows: 1,
                         afterCreateRow: after_row_create,
                         afterChange: after_cell_change,
+                        afterColumnSort: function(currentSortConfig, destinationSortConfigs) {
+                            applyRangeColumnSort(this, destinationSortConfigs)
+                        },
                         })
                     var data = $("#ticket_info").handsontable("getData")
                     var rows = getTicketDataRows(data, true)
@@ -6557,6 +6599,9 @@ var get_ticket_table = function () {
                         minSpareRows: 1,
                         afterCreateRow: after_row_create,
                         afterChange: after_cell_change,
+                        afterColumnSort: function(currentSortConfig, destinationSortConfigs) {
+                            applyRangeColumnSort(this, destinationSortConfigs)
+                        },
                         })
                     var data = $("#ticket_info").handsontable("getData")
                     var rows = getTicketDataRows(data, false)
