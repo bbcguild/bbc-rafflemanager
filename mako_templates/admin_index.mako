@@ -6290,8 +6290,14 @@ function applyTicketSortTieBreak(hot, destinationSortConfigs) {
         return
     }
 
+    var extended = hot.countCols() > 4
+    var realRows = getTicketDataRows(sourceData, extended)
+    if (!realRows.length) {
+        return
+    }
+
     var rangeColumnIndex = hot.countCols() - 1
-    var sortedData = sourceData.slice().sort(function(aRow, bRow) {
+    var sortedData = realRows.slice().sort(function(aRow, bRow) {
         return compareTicketRowsByColumn(aRow, bRow, primarySort.column, primarySort.sortOrder, rangeColumnIndex)
     })
 
