@@ -6219,11 +6219,32 @@ function addTicketRanges(rows, extended) {
         }
 
         var newRow = row.slice()
-        newRow.push(rangeText)
+        newRow.push(encodeSortableRange(rangeText))
         output.push(newRow)
     }
 
     return output
+}
+
+function encodeSortableRange(rangeText) {
+    var text = String(rangeText || "").trim()
+    if (!text) {
+        return ""
+    }
+
+    var firstPart = text.split(",")[0].trim()
+    var match = firstPart.match(/^(\d+)/)
+    if (!match) {
+        return text
+    }
+
+    return match[1].padStart(10, "0") + "|" + text
+}
+
+function renderSortableRange(value) {
+    var text = String(value || "")
+    var pipeIndex = text.indexOf("|")
+    return pipeIndex >= 0 ? text.slice(pipeIndex + 1) : text
 }
 
 function getTicketDataRows(data, extended) {
@@ -6435,6 +6456,10 @@ var get_ticket_table = function () {
                             {
                                 className: "ticket-range-cell",
                                 readOnly: true,
+                                renderer: function(instance, td, row, col, prop, value, cellProperties) {
+                                    Handsontable.renderers.TextRenderer.apply(this, arguments)
+                                    td.textContent = renderSortableRange(value)
+                                },
                             },
                         ],
                         isEmptyRow: function(row) {
@@ -6510,6 +6535,10 @@ var get_ticket_table = function () {
                                                     {
                                 className: "ticket-range-cell",
                                 readOnly: true,
+                                renderer: function(instance, td, row, col, prop, value, cellProperties) {
+                                    Handsontable.renderers.TextRenderer.apply(this, arguments)
+                                    td.textContent = renderSortableRange(value)
+                                },
                             },
 
                         ],
