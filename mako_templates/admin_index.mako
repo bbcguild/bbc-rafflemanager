@@ -6247,63 +6247,6 @@ function renderSortableRange(value) {
     return pipeIndex >= 0 ? text.slice(pipeIndex + 1) : text
 }
 
-function getSortableRangeStart(value) {
-    var text = renderSortableRange(value)
-    var firstPart = String(text || "").split(",")[0].trim()
-    var match = firstPart.match(/^(\d+)/)
-    return match ? Number(match[1]) : Number.MAX_SAFE_INTEGER
-}
-
-function compareTicketRowsByColumn(aRow, bRow, columnIndex, sortOrder, rangeColumnIndex) {
-    var direction = sortOrder === "desc" ? -1 : 1
-    var aValue = aRow[columnIndex]
-    var bValue = bRow[columnIndex]
-    var primary = 0
-
-    if (columnIndex === rangeColumnIndex) {
-        primary = getSortableRangeStart(aValue) - getSortableRangeStart(bValue)
-    } else if (columnIndex >= 2 && columnIndex < rangeColumnIndex) {
-        primary = (Number(aValue) || 0) - (Number(bValue) || 0)
-    } else {
-        primary = String(aValue || "").localeCompare(String(bValue || ""), undefined, { sensitivity: "base" })
-    }
-
-    if (primary !== 0) {
-        return primary * direction
-    }
-
-    return getSortableRangeStart(aRow[rangeColumnIndex]) - getSortableRangeStart(bRow[rangeColumnIndex])
-}
-
-function applyTicketSortTieBreak(hot, destinationSortConfigs) {
-    if (!hot || !destinationSortConfigs || !destinationSortConfigs.length) {
-        return
-    }
-
-    var primarySort = destinationSortConfigs[0]
-    if (!primarySort || primarySort.column == null || !primarySort.sortOrder) {
-        return
-    }
-
-    var sourceData = hot.getSourceDataArray()
-    if (!sourceData || !sourceData.length) {
-        return
-    }
-
-    var extended = hot.countCols() > 4
-    var realRows = getTicketDataRows(sourceData, extended)
-    if (!realRows.length) {
-        return
-    }
-
-    var rangeColumnIndex = hot.countCols() - 1
-    var sortedData = realRows.slice().sort(function(aRow, bRow) {
-        return compareTicketRowsByColumn(aRow, bRow, primarySort.column, primarySort.sortOrder, rangeColumnIndex)
-    })
-
-    hot.loadData(sortedData)
-}
-
 function getTicketDataRows(data, extended) {
     var rows = []
 
@@ -6533,9 +6476,6 @@ var get_ticket_table = function () {
                         minSpareRows: 1,
                         afterCreateRow: after_row_create,
                         afterChange: after_cell_change,
-                        afterColumnSort: function(currentSortConfig, destinationSortConfigs) {
-                            applyTicketSortTieBreak(this, destinationSortConfigs)
-                        },
                         })
                     var data = $("#ticket_info").handsontable("getData")
                     var rows = getTicketDataRows(data, true)
@@ -6617,9 +6557,6 @@ var get_ticket_table = function () {
                         minSpareRows: 1,
                         afterCreateRow: after_row_create,
                         afterChange: after_cell_change,
-                        afterColumnSort: function(currentSortConfig, destinationSortConfigs) {
-                            applyTicketSortTieBreak(this, destinationSortConfigs)
-                        },
                         })
                     var data = $("#ticket_info").handsontable("getData")
                     var rows = getTicketDataRows(data, false)
