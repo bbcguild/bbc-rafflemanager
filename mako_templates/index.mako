@@ -880,10 +880,12 @@ body.is-staging{
 .row .total{
   color:#e6d77a;
 }
+.row .emphasis-cell{
+  font-weight:750;
+}
 .range{
   white-space:nowrap;
 }
-.name{font-weight:750}
 .name{
   min-width:0;
   white-space:nowrap;
@@ -1270,6 +1272,16 @@ function toggleEntrantsSort(key) {
 
   renderEntrantsHeader();
   applyEntrantFilter();
+}
+
+function getEntrantsEmphasisKey() {
+  if (!currentEntrantsSort || !currentEntrantsSort.key) {
+    return "name";
+  }
+
+  return (currentEntrantsSort.key === "idx" || currentEntrantsSort.key === "name")
+    ? "name"
+    : currentEntrantsSort.key;
 }
 
 function normalizeEntrantSearch(value) {
@@ -1700,13 +1712,15 @@ function renderEntrantsRows(rows) {
   var columns = getEntrantsColumns();
   var sortedRows = sortEntrantRows(rows);
   var rowClass = "row hoverable mode-" + currentEntrantsMode;
+  var emphasisKey = getEntrantsEmphasisKey();
 
   var htmlRows = [];
   for (var i = 0; i < sortedRows.length; i++) {
     var r = sortedRows[i];
     var rowHtml = '<div class="' + rowClass + '">';
     columns.forEach(function(column) {
-      rowHtml += '<div class="' + column.className + '">' + escapeHtml(column.value(r)) + '</div>';
+      var cellClass = column.className + (column.key === emphasisKey ? ' emphasis-cell' : '');
+      rowHtml += '<div class="' + cellClass + '">' + escapeHtml(column.value(r)) + '</div>';
     });
     rowHtml += '</div>';
     htmlRows.push(rowHtml);
