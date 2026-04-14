@@ -1257,10 +1257,13 @@ function toggleEntrantsSort(key) {
     return;
   }
 
+  var firstDirection = (key === "total" || key === "paid" || key === "bar") ? "desc" : "asc";
+  var secondDirection = firstDirection === "desc" ? "asc" : "desc";
+
   if (!currentEntrantsSort || currentEntrantsSort.key !== key) {
-    currentEntrantsSort = { key: key, direction: "asc" };
-  } else if (currentEntrantsSort.direction === "asc") {
-    currentEntrantsSort = { key: key, direction: "desc" };
+    currentEntrantsSort = { key: key, direction: firstDirection };
+  } else if (currentEntrantsSort.direction === firstDirection) {
+    currentEntrantsSort = { key: key, direction: secondDirection };
   } else {
     currentEntrantsSort = { key: "idx", direction: "asc" };
   }
