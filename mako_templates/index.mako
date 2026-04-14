@@ -617,7 +617,7 @@ body.is-staging{
 .entrants-scroll{
   overflow:auto;
   padding:0 16px 16px 10px;
-  max-height:2200px;
+  max-height:none;
   margin-right:20px;
 }
 
