@@ -1873,7 +1873,7 @@ $(document).ready(function () {
       <div class="table-sub">Tickets Lookup</div>
 
       <div class="entrants-controls">
-        <input type="text" class="lookup-input" placeholder="Find: ex. '@name'">
+        <input type="text" class="lookup-input" placeholder="Enter @name or ticket number">
       </div>
 
       <div class="entrants-body">
